@@ -1,0 +1,31 @@
+# @autosort/core
+
+The AutoSort engine: split a Spotify playlist into rule-based smart playlists, sort by BPM, key and the Camelot wheel, and keep everything in sync. Plain TypeScript, no framework or database; you bring token storage and a cache.
+
+## Daily sync in one call
+
+```ts
+import { SpotifyClient, syncSmartPlaylists, RECIPES } from '@autosort/core';
+
+const client = new SpotifyClient({ getAccessToken: () => getTokenFromYourDb() });
+
+const result = await syncSmartPlaylists({
+  client,
+  sources: [{ type: 'playlist', id: FAVS_PLAYLIST_ID }],
+  targets: savedDefinitions, // { id, name, rule, order, playlistId?, state? }
+  enrich: { cache: yourCache, lastfm: null },
+});
+
+// Save each outcome's plan.nextState + playlistId, and previousUris as an undo point.
+```
+
+## Building blocks
+
+- **Spotify:** `buildAuthorizeUrl`, `createPkcePair`, `exchangeCode`, `refreshTokens` and `SpotifyClient` (playlists, items, Liked Songs, create/add/replace/remove, with retries and quota detection).
+- **Data:** `enrichTracks` gathers artist genres, ReccoBeats audio features, MusicBrainz original years and Last.fm tags. It is cached and runs within a budget, so a big library fills in over a few runs.
+- **Rules:** `matchesRule`, `parseRule` (zod), `ruleChips` ("Genre: Country", "Clean only").
+- **Suggestions:** `suggestPlaylists` proposes Country, 90s Country, Clean Rap, Worship, Love Songs, Workout…; `unmatchedTracks` lists songs no rule claims.
+- **Sorting:** `sortTracks` by any field, `harmonic` (Camelot + BPM), `energyArc`, seeded `shuffle`, with pinned positions.
+- **Camelot:** `toCamelot`, `transition`, `compatibleKeys`, `camelotTable`.
+- **Sync:** `planSmartPlaylist` (pure, idempotent) and `applyChange` / `restorePlaylist`.
+- **Recipes:** built-in rule sets in `RECIPES`.

@@ -1,0 +1,15 @@
+{
+  "name": "autosort-monorepo",
+  "private": true,
+  "description": "AutoSort: turn one big Spotify playlist into smart playlists that keep themselves up to date.",
+  "license": "MIT",
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck",
+    "smoke": "pnpm --filter @autosort/core build && node scripts/smoke.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
