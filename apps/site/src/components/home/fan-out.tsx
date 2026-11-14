@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import type { CSSProperties } from 'react';
 
 /**
@@ -10,13 +11,13 @@ import type { CSSProperties } from 'react';
  */
 
 const PLAYLISTS = [
-  { name: 'Country', count: 412, cover: 'linear-gradient(145deg,#F59E0B,#7C2D12)' },
-  { name: '90s Country', count: 96, cover: 'linear-gradient(145deg,#B45309,#451A03)' },
-  { name: 'Clean Rap', count: 141, cover: 'linear-gradient(145deg,#38BDF8,#1E3A8A)' },
-  { name: 'Worship', count: 88, cover: 'linear-gradient(145deg,#FDE68A,#B45309)' },
-  { name: 'Workout', count: 230, cover: 'linear-gradient(145deg,#F97316,#7F1D1D)' },
-  { name: 'Happy', count: 318, cover: 'linear-gradient(145deg,#FBBF24,#F472B6)' },
-  { name: 'Love Songs', count: 205, cover: 'linear-gradient(145deg,#F472B6,#831843)' },
+  { name: 'Country', count: 412, cover: 'linear-gradient(145deg,#F59E0B,#7C2D12)', image: '/images/recipes/country.jpg' },
+  { name: '90s Country', count: 96, cover: 'linear-gradient(145deg,#B45309,#451A03)', image: '/images/recipes/90s-country.jpg' },
+  { name: 'Clean Rap', count: 141, cover: 'linear-gradient(145deg,#38BDF8,#1E3A8A)', image: '/images/recipes/clean-rap.jpg' },
+  { name: 'Worship', count: 88, cover: 'linear-gradient(145deg,#FDE68A,#B45309)', image: '/images/recipes/worship.jpg' },
+  { name: 'Workout', count: 230, cover: 'linear-gradient(145deg,#F97316,#7F1D1D)', image: '/images/recipes/workout.jpg' },
+  { name: 'Happy', count: 318, cover: 'linear-gradient(145deg,#FBBF24,#F472B6)', image: '/images/recipes/happy.jpg' },
+  { name: 'Love Songs', count: 205, cover: 'linear-gradient(145deg,#F472B6,#831843)', image: '/images/recipes/love-songs.jpg' },
 ] as const;
 
 /** Row positions from the board (container is 600×540). */
@@ -72,10 +73,9 @@ export function FanOutDiagram() {
 
         <div className="absolute left-0 top-10 box-border flex h-[460px] w-[34%] flex-col gap-3 rounded-panel border border-line bg-surface-2 p-3.5 shadow-[0_24px_64px_rgba(0,0,0,0.6)]">
           <div className="grid aspect-square grid-cols-2 overflow-hidden rounded-art">
-            <span className="bg-[#4A3B2A]" />
-            <span className="bg-[#2F3B4A]" />
-            <span className="bg-[#3A2F4A]" />
-            <span className="bg-[#4A4530]" />
+            {['country', 'rap', 'love-songs', 'chill'].map((slug) => (
+              <Image key={slug} src={`/images/recipes/${slug}.jpg`} alt="" width={120} height={120} className="size-full object-cover" />
+            ))}
           </div>
           <div className="flex flex-col gap-0.5">
             <span className="text-[18px] font-extrabold tracking-[-0.02em] sm:text-[22px]">Everything</span>
@@ -101,7 +101,7 @@ export function FanOutDiagram() {
               } as CSSProperties
             }
           >
-            <span className="size-9 shrink-0 rounded-art sm:size-10" style={{ background: p.cover }} />
+            <Image src={p.image} alt="" width={40} height={40} className="size-9 shrink-0 rounded-art object-cover sm:size-10" style={{ background: p.cover }} />
             <span className="min-w-0 flex-1 truncate text-[14px] font-bold sm:text-[15px]">{p.name}</span>
             <span className="tnum text-[14px] font-semibold text-text-2">{p.count}</span>
           </div>
