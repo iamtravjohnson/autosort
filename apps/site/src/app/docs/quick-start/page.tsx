@@ -169,6 +169,12 @@ export default function QuickStartPage() {
           </OL>
           <P>The environment variables, for reference:</P>
           <EnvTable />
+          <DocsNote tone="info" label="Optional: photo covers">
+            AutoSort gives every new smart playlist its own cover (the playlist&apos;s color and name). For photo covers instead, get a key
+            at <a href="https://openrouter.ai/keys">openrouter.ai/keys</a> and add it as <code>OPENROUTER_API_KEY</code> in your Vercel project
+            under <strong>Settings → Environment Variables</strong>, then redeploy. Each photo costs about $0.13 with the default model.
+            AutoSort sends only the playlist&apos;s name and rule, never your songs or artists.
+          </DocsNote>
         </Step>
 
         <Step n={4} id="redirect" title="Add the Redirect URI to Spotify">
