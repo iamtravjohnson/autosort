@@ -12,7 +12,7 @@
     "db:migrate": "node scripts/migrate.mjs"
   },
   "dependencies": {
-    "@autosort/core": "^0.3.0",
+    "@autosort/core": "^0.3.1",
     "drizzle-orm": "^0.45.4",
     "next": "16.4.6",
     "postgres": "^4.1.1",
