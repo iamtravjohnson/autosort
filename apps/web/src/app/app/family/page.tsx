@@ -6,7 +6,7 @@ import { CopyRow } from '@/components/access/copy-button';
 import { Avatar, ConnectionPill, StatusPill } from '@/components/access/people';
 import { InfoIcon } from '@/components/icons';
 import { docsUrl, familyMembers, INVITE_DAYS, openInvites, userManagementUrl } from '@/lib/access';
-import { appOrigin, MAX_PEOPLE } from '@/lib/config';
+import { appUrl, MAX_PEOPLE } from '@/lib/config';
 import { count } from '@/lib/format';
 import { requireOwner } from '@/lib/session';
 import { createInvite, removeMember, revokeInvite } from './actions';
@@ -18,7 +18,7 @@ const rowAction = 'inline-flex h-9 items-center rounded-pill px-3.5 text-[13px] 
 /** Owner only: who's on this AutoSort, open invites, and adding someone new. */
 export default async function FamilyPage() {
   const me = await requireOwner();
-  const [members, invites, origin] = await Promise.all([familyMembers(), openInvites(), appOrigin()]);
+  const [members, invites, origin] = await Promise.all([familyMembers(), openInvites(), appUrl()]);
   const pending = invites.filter((i) => !i.expired);
   const used = Math.min(MAX_PEOPLE, members.length + pending.length);
   const full = members.length + pending.length >= MAX_PEOPLE;

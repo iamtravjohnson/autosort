@@ -4,6 +4,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { db, schema } from '@/db';
 import type { User } from '@/db/schema';
+import { BASE_PATH } from './base-path';
 import { sign } from './secrets';
 
 const COOKIE = 'autosort_session';
@@ -28,7 +29,7 @@ export async function startSession(userId: string) {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
-    path: '/',
+    path: BASE_PATH || '/',
     maxAge: MAX_AGE,
   });
 }

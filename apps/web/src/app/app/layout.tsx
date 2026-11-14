@@ -7,6 +7,7 @@ import { dailySchedule } from '@/lib/access';
 import { coverGradient, timeAgo } from '@/lib/format';
 import { lastRun, spotifyStatus, userSmartPlaylists, userSources } from '@/lib/queries';
 import { requireUser } from '@/lib/session';
+import { withBase } from '@/lib/base-path';
 
 // Syncs and analyses run inside server actions on these pages.
 export const maxDuration = 300;
@@ -26,7 +27,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       {needsReconnect ? (
         <div role="status" className="flex flex-wrap items-center justify-center gap-3 bg-accent-tint px-4 py-2.5 text-[14px] text-[#E9E3FF]">
           <span>{spotify?.status === 'reconnect' ? 'Spotify signed you out.' : 'AutoSort needs a few more Spotify permissions.'}</span>
-          <a href="/api/auth/login" className="font-bold text-accent-soft">
+          <a href={withBase('/api/auth/login')} className="font-bold text-accent-soft">
             Reconnect Spotify
           </a>
         </div>

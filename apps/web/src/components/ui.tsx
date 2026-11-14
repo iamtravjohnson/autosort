@@ -3,6 +3,7 @@ import Link from 'next/link';
 import type { ComponentProps, ReactNode } from 'react';
 import { toCamelot } from '@autosort/core';
 import { ArrowUpIcon, CheckIcon, XIcon } from './icons';
+import { withBase } from '@/lib/base-path';
 
 /* ---------- Layout ---------- */
 
@@ -195,7 +196,7 @@ const SPOTIFY_LOGO_RATIO = 225.25 / 823.46;
 export function SpotifyLogo({ tone = 'white', width = 84, className = '' }: { tone?: 'white' | 'black'; width?: number; className?: string }) {
   return (
     <Image
-      src={tone === 'white' ? '/brand/spotify/Full_Logo_White_RGB.svg' : '/brand/spotify/Full_Logo_Black_RGB.svg'}
+      src={withBase(tone === 'white' ? '/brand/spotify/Full_Logo_White_RGB.svg' : '/brand/spotify/Full_Logo_Black_RGB.svg')}
       alt="Spotify"
       width={Math.max(70, width)}
       height={Math.round(Math.max(70, width) * SPOTIFY_LOGO_RATIO)}

@@ -7,6 +7,7 @@ import { spotifyFor } from '@/lib/spotify';
 import { friendlyError } from '@/lib/stats';
 import { SPOTIFY_NAME_SUFFIX } from '@/lib/sync';
 import { InfoGlyph, LockGlyph } from './glyphs';
+import { withBase } from '@/lib/base-path';
 
 const ART = ['#2F4A40', '#4A4530', '#4A302F', '#3A2F4A', '#2F3B4A', '#4A3B2A', '#3E2F4A'];
 const LIMIT = 24;
@@ -38,7 +39,7 @@ export async function OtherPlaylists({ user, hideIds }: { user: User; hideIds: s
         <p role="status" className="m-0 rounded-card bg-surface-2 px-4 py-3.5 text-[14px] text-text-2">
           We couldn&apos;t load your playlists. {e.message}{' '}
           {e.reconnect ? (
-            <a href="/api/auth/login" className="font-bold">
+            <a href={withBase('/api/auth/login')} className="font-bold">
               Reconnect Spotify
             </a>
           ) : null}

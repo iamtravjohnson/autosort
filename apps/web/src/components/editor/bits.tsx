@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import type { ReactNode } from 'react';
 import type { ActionResult } from '@/lib/rules-ui';
+import { withBase } from '@/lib/base-path';
 
 /** Album art (decorative: the title sits next to it). Falls back to a flat tile. */
 export function Art({ url, size = 40, className = '' }: { url: string | null | undefined; size?: number; className?: string }) {
@@ -33,7 +34,7 @@ export function ActionNotice({ result, className = '' }: { result: ActionResult 
       {result.reconnect ? (
         <>
           {' '}
-          <a href="/api/auth/login" className="font-bold">
+          <a href={withBase('/api/auth/login')} className="font-bold">
             Reconnect Spotify
           </a>
         </>

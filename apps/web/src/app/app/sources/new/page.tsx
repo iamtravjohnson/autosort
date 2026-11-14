@@ -10,6 +10,7 @@ import { requireUser } from '@/lib/session';
 import { spotifyFor } from '@/lib/spotify';
 import { friendlyError } from '@/lib/stats';
 import { SPOTIFY_NAME_SUFFIX } from '@/lib/sync';
+import { withBase } from '@/lib/base-path';
 
 export const metadata: Metadata = { title: 'Add a source · AutoSort' };
 
@@ -25,7 +26,7 @@ async function PickerList({ user, sources }: { user: User; sources: Source[] }) 
       <p role="alert" className="m-0 rounded-card bg-error/[0.14] px-4 py-3.5 text-[14px] text-error-text">
         We couldn&apos;t load your playlists. {e.message}{' '}
         {e.reconnect ? (
-          <a href="/api/auth/login" className="font-bold text-current underline">
+          <a href={withBase('/api/auth/login')} className="font-bold text-current underline">
             Reconnect Spotify
           </a>
         ) : null}

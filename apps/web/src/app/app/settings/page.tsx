@@ -11,6 +11,7 @@ import { timeAgo } from '@/lib/format';
 import { spotifyStatus } from '@/lib/queries';
 import { requireUser } from '@/lib/session';
 import { deleteMyData } from './actions';
+import { withBase } from '@/lib/base-path';
 
 export const metadata: Metadata = { title: 'Settings' };
 
@@ -91,7 +92,7 @@ export default async function SettingsPage() {
             </span>
           </span>
           <div className="flex flex-wrap items-center gap-2">
-            <a href="/api/auth/login" className={buttonClass(connection === 'connected' ? 'secondary' : 'primary', 'sm')}>
+            <a href={withBase('/api/auth/login')} className={buttonClass(connection === 'connected' ? 'secondary' : 'primary', 'sm')}>
               Reconnect Spotify
             </a>
             <ConfirmDialog
@@ -127,7 +128,7 @@ export default async function SettingsPage() {
             </svg>
           </Link>
         ) : null}
-        <form action="/api/auth/logout" method="post" className="flex justify-end">
+        <form action={withBase('/api/auth/logout')} method="post" className="flex justify-end">
           <button type="submit" className="inline-flex h-10 items-center rounded-pill px-3 text-[14px] font-bold text-text-2 transition-colors duration-[120ms] hover:text-text-1">
             Sign out
           </button>
@@ -187,7 +188,7 @@ export default async function SettingsPage() {
             <span className="text-[14px] font-bold">Export</span>
             <span className="text-[13px] text-text-2">Your sources, smart playlist rules and activity as a JSON file.</span>
           </span>
-          <a href="/api/export" download className={buttonClass('secondary', 'sm')}>
+          <a href={withBase('/api/export')} download className={buttonClass('secondary', 'sm')}>
             Export my data
           </a>
         </div>

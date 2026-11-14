@@ -7,6 +7,7 @@ import { buttonClass } from '@/components/ui';
 import { docsUrl, ownerName, SPOTIFY_DASHBOARD_URL } from '@/lib/access';
 import { MAX_PEOPLE, redirectUri } from '@/lib/config';
 import { setupStatus, type CheckState } from '@/lib/setup';
+import { withBase } from '@/lib/base-path';
 
 export const metadata: Metadata = { title: 'Setup' };
 
@@ -158,7 +159,7 @@ export default async function SetupPage() {
               <p className="m-0 max-w-[460px] text-[14px] leading-[1.55] text-text-2">
                 The first person to connect becomes this AutoSort&apos;s owner and can invite up to {MAX_PEOPLE - 1} family members.
               </p>
-              <a href="/api/auth/login" className={buttonClass('primary', 'lg')}>
+              <a href={withBase('/api/auth/login')} className={buttonClass('primary', 'lg')}>
                 Connect your Spotify account
               </a>
               {cron && cron.state !== 'done' ? (

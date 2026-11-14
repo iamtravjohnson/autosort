@@ -1,5 +1,6 @@
 import 'server-only';
 import { headers } from 'next/headers';
+import { BASE_PATH } from './base-path';
 
 export const APP_VERSION = '0.1.0';
 export const MAX_PEOPLE = 5; // Spotify Development Mode: 5 users per developer app
@@ -13,16 +14,19 @@ export function spotifyCredentials(): { clientId: string; clientSecret: string }
   return clientId && clientSecret ? { clientId, clientSecret } : null;
 }
 
-/** This instance's public origin, e.g. https://dana-autosort.vercel.app (or http://127.0.0.1:3000 locally). */
-export async function appOrigin(): Promise<string> {
+/**
+ * This instance's public address, including any base path: e.g. https://dana-autosort.vercel.app,
+ * https://example.com/autosort, or http://127.0.0.1:3000 locally. APP_URL overrides it.
+ */
+export async function appUrl(): Promise<string> {
   if (process.env.APP_URL) return process.env.APP_URL.replace(/\/$/, '');
   const h = await headers();
   const host = h.get('x-forwarded-host') ?? h.get('host') ?? '127.0.0.1:3000';
   const proto = h.get('x-forwarded-proto') ?? (host.startsWith('127.0.0.1') || host.startsWith('localhost') ? 'http' : 'https');
-  return `${proto}://${host}`;
+  return `${proto}://${host}${BASE_PATH}`;
 }
 
 /** The exact Redirect URI to paste into the Spotify app. */
 export async function redirectUri(): Promise<string> {
-  return `${await appOrigin()}/api/auth/callback/spotify`;
+  return `${await appUrl()}/api/auth/callback/spotify`;
 }

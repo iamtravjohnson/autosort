@@ -4,6 +4,7 @@ import type { SmartPlaylist } from '@/db/schema';
 import { coverGradient, timeAgo } from '@/lib/format';
 import { isWithinDay } from '@/lib/stats';
 import { ExternalGlyph, MusicGlyph, PauseGlyph, WarningGlyph } from './glyphs';
+import { withBase } from '@/lib/base-path';
 
 /** A small rule chip: "Genre: Country" → muted "Genre:" + value. */
 function MiniChip({ text }: { text: string }) {
@@ -83,7 +84,7 @@ export function SmartPlaylistCard({ playlist: p, from, needsReconnect }: { playl
             <WarningGlyph size={12} />
             Sync failed ·{' '}
             {needsReconnect ? (
-              <a href="/api/auth/login" className="relative z-10 text-error-text underline">
+              <a href={withBase('/api/auth/login')} className="relative z-10 text-error-text underline">
                 Reconnect
               </a>
             ) : (

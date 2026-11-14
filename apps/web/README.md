@@ -7,7 +7,7 @@ Free and open source (MIT). Up to 5 people per copy (Spotify's limit for develop
 ## Deploy
 
 1. Create a Spotify developer app at [developer.spotify.com/dashboard](https://developer.spotify.com/dashboard) (Web API only). You need Spotify Premium.
-2. Click **Deploy to Vercel** on [autosort.app/start](https://autosort.app/start). Paste your Client ID and Client Secret. Vercel creates the database for you.
+2. Click **Deploy to Vercel** on [autosort.app/start](https://autosort.app/start). Paste your Client ID and Client Secret. Vercel creates the database for you: on the Neon screen, keep the Washington, D.C. region, turn **Auth** off, leave **Realtime** off, pick the **Free** plan, and leave any variable prefix blank.
 3. In your Spotify app, add the Redirect URI shown on your AutoSort's setup page: `https://<your-app>.vercel.app/api/auth/callback/spotify`.
 4. Open your AutoSort and connect Spotify. The first person to connect is the owner and can invite up to 4 more.
 
@@ -27,6 +27,12 @@ In your repository on GitHub: **Actions → Update AutoSort → Run workflow**. 
 | `LASTFM_API_KEY` | No | Better mood and theme playlists |
 | `OPENROUTER_API_KEY` | No | Photo covers for new smart playlists (only the playlist's name and rule are sent) |
 | `OPENROUTER_IMAGE_MODEL` | No | Image model, default `google/gemini-3-pro-image` |
+| `APP_URL` | No | Public address, including any `BASE_PATH`, if it can't be detected |
+| `BASE_PATH` | No | Serve AutoSort under a path on another site, e.g. `/autosort` (see below) |
+
+## Show it inside another site
+
+To show AutoSort at `https://example.com/autosort`, set `BASE_PATH=/autosort` and `APP_URL=https://example.com/autosort` on this deployment and redeploy. On the other site, rewrite `/autosort` and `/autosort/:path*` to `https://<this-deployment>/autosort` and `/autosort/:path*`. Add `https://example.com/autosort/api/auth/callback/spotify` as a Redirect URI in your Spotify app. Spotify's sign-in page can't load inside an iframe, so link to the path rather than embedding it.
 
 ## Run locally
 

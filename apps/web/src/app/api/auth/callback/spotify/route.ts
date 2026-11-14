@@ -3,13 +3,13 @@ import { and, eq, gt, isNull, sql } from 'drizzle-orm';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { db, schema } from '@/db';
-import { MAX_PEOPLE, redirectUri, spotifyCredentials } from '@/lib/config';
+import { appUrl, MAX_PEOPLE, redirectUri, spotifyCredentials } from '@/lib/config';
 import { startSession } from '@/lib/session';
 import { saveTokens } from '@/lib/spotify';
 
-function fail(request: Request, reason: string, invite?: string) {
+async function fail(reason: string, invite?: string) {
   const path = invite ? `/join/${encodeURIComponent(invite)}` : '/connect';
-  return NextResponse.redirect(new URL(`${path}?error=${encodeURIComponent(reason)}`, request.url));
+  return NextResponse.redirect(`${await appUrl()}${path}?error=${encodeURIComponent(reason)}`);
 }
 
 /**
@@ -24,17 +24,17 @@ export async function GET(request: Request) {
   jar.delete('autosort_oauth_state');
   jar.delete('autosort_invite');
 
-  if (url.searchParams.get('error')) return fail(request, 'denied', inviteToken);
+  if (url.searchParams.get('error')) return fail('denied', inviteToken);
   const code = url.searchParams.get('code');
-  if (!code || !expected || url.searchParams.get('state') !== expected) return fail(request, 'state', inviteToken);
+  if (!code || !expected || url.searchParams.get('state') !== expected) return fail('state', inviteToken);
   const creds = spotifyCredentials();
-  if (!creds) return NextResponse.redirect(new URL('/setup', request.url));
+  if (!creds) return NextResponse.redirect(`${await appUrl()}/setup`);
 
   let tokens;
   try {
     tokens = await exchangeCode({ ...creds, code, redirectUri: await redirectUri() });
   } catch {
-    return fail(request, 'exchange', inviteToken);
+    return fail('exchange', inviteToken);
   }
 
   const client = new SpotifyClient({ getAccessToken: () => tokens.accessToken });
@@ -43,7 +43,7 @@ export async function GET(request: Request) {
     me = await client.me();
   } catch (err) {
     // A 403 here means this Spotify account isn't on the developer app's user list yet.
-    return fail(request, err instanceof Error && /403/.test(err.message) ? 'not-allowlisted' : 'profile', inviteToken);
+    return fail(err instanceof Error && /403/.test(err.message) ? 'not-allowlisted' : 'profile', inviteToken);
   }
 
   const d = db();
@@ -56,13 +56,13 @@ export async function GET(request: Request) {
       const [owner] = await d.insert(schema.users).values({ spotifyId: me.id, displayName: me.displayName, role: 'owner' }).returning();
       userId = owner!.id;
     } else {
-      if (count >= MAX_PEOPLE) return fail(request, 'full', inviteToken);
-      if (!inviteToken) return fail(request, 'invite-required');
+      if (count >= MAX_PEOPLE) return fail('full', inviteToken);
+      if (!inviteToken) return fail('invite-required');
       const [invite] = await d
         .select()
         .from(schema.invites)
         .where(and(eq(schema.invites.token, inviteToken), isNull(schema.invites.usedBy), gt(schema.invites.expiresAt, new Date())));
-      if (!invite) return fail(request, 'invite-invalid', inviteToken);
+      if (!invite) return fail('invite-invalid', inviteToken);
       const [member] = await d.insert(schema.users).values({ spotifyId: me.id, displayName: me.displayName, role: 'member' }).returning();
       userId = member!.id;
       await d.update(schema.invites).set({ usedBy: userId }).where(eq(schema.invites.token, inviteToken));
@@ -73,5 +73,5 @@ export async function GET(request: Request) {
 
   await saveTokens(userId!, tokens);
   await startSession(userId!);
-  return NextResponse.redirect(new URL('/app', request.url));
+  return NextResponse.redirect(`${await appUrl()}/app`);
 }

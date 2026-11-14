@@ -7,7 +7,7 @@ import type { InviteState } from '@/components/access/add-member';
 import type { ConfirmState } from '@/components/access/confirm-dialog';
 import { db, schema } from '@/db';
 import { deleteUserEverywhere, INVITE_DAYS, spotsUsed } from '@/lib/access';
-import { appOrigin, MAX_PEOPLE } from '@/lib/config';
+import { appUrl, MAX_PEOPLE } from '@/lib/config';
 import { randomToken } from '@/lib/secrets';
 import { requireOwner } from '@/lib/session';
 
@@ -41,7 +41,7 @@ export async function createInvite(_prev: InviteState, formData: FormData): Prom
       expiresAt: new Date(Date.now() + INVITE_DAYS * 86_400_000),
     });
   revalidatePath('/app', 'layout');
-  return { ok: true, name: parsed.data.name, link: `${await appOrigin()}/join/${token}` };
+  return { ok: true, name: parsed.data.name, link: `${await appUrl()}/join/${token}` };
 }
 
 const TokenInput = z.object({ token: z.string().min(1).max(128) });

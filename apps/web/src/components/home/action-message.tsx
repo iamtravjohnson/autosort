@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { ActionState } from '@/lib/stats';
+import { withBase } from '@/lib/base-path';
 
 /** Result line under a form: success in teal, problems in red, with "Reconnect Spotify" when needed. */
 export function ActionMessage({ state, className = '' }: { state: ActionState | null | undefined; className?: string }) {
@@ -13,7 +14,7 @@ export function ActionMessage({ state, className = '' }: { state: ActionState | 
       {state.reconnect ? (
         <>
           {' '}
-          <a href="/api/auth/login" className="font-bold text-current underline">
+          <a href={withBase('/api/auth/login')} className="font-bold text-current underline">
             Reconnect Spotify
           </a>
         </>
