@@ -102,9 +102,12 @@ export default async function SourcePage({ params }: Props) {
           <Link href={`/app/sources/${source.id}/suggestions`} className={buttonClass('primary', 'md', 'flex-1 sm:flex-none')}>
             See Smart suggestions
           </Link>
-          <Link href={`/app/sources/${source.id}/unmatched`} className={buttonClass('secondary', 'md', 'tnum')}>
-            Unmatched songs · {unmatched.toLocaleString('en-US')}
-          </Link>
+          {/* "Unmatched" only means something once a smart playlist reads from this source. */}
+          {feeding.length > 0 ? (
+            <Link href={`/app/sources/${source.id}/unmatched`} className={buttonClass('secondary', 'md', 'tnum')}>
+              Unmatched songs · {unmatched.toLocaleString('en-US')}
+            </Link>
+          ) : null}
           <a
             href={spotifySourceUrl(source)}
             target="_blank"
@@ -133,10 +136,10 @@ export default async function SourcePage({ params }: Props) {
 
             <div className="tnum flex flex-col gap-3 rounded-card bg-surface-2 px-3.5 py-3 sm:px-4 sm:py-3.5">
               <Meter label="Tempo & key found" value={stats.withAudio} total={stats.songs} />
-              <Meter label="Release years found" value={stats.withYear} total={stats.songs} />
+              <Meter label="Original release year checked" value={Math.max(0, stats.songs - (source.pending?.years ?? 0))} total={stats.songs} />
               <div className="flex flex-wrap items-center justify-between gap-2 text-[12px] text-text-3 sm:text-[13px]">
-                <span>Data: ReccoBeats, MusicBrainz, Last.fm · genres from Spotify artists</span>
-                {unmatched ? (
+                <span>Data: ReccoBeats (tempo, key) · MusicBrainz (original years) · Last.fm (genres)</span>
+                {unmatched && feeding.length > 0 ? (
                   <Link href={`/app/sources/${source.id}/unmatched`} className="font-bold">
                     {unmatched.toLocaleString('en-US')} unmatched · review
                   </Link>

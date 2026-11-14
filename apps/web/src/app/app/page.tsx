@@ -33,7 +33,8 @@ export default async function HomePage() {
       songs: s.snapshot?.length ?? 0,
       feeds: feeding.length,
       analyzedAt: s.snapshotAt,
-      unmatched: s.snapshot ? unmatchedTracks(s, playlists).length : 0,
+      // "Unmatched" only means something once a smart playlist reads from the source.
+      unmatched: s.snapshot && playlistsFeeding(s.id, playlists).length > 0 ? unmatchedTracks(s, playlists).length : 0,
       filedToday: filedToday(feeding),
       addedThisWeek: addedThisWeek(s.snapshot),
     };

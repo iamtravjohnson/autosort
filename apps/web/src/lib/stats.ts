@@ -276,18 +276,18 @@ export function sourceStats(snapshot: readonly TrackSnapshot[]): SourceStats {
   };
 }
 
-/** "still looking up tempo and key for 1,200 songs and release years for 300" (or null). */
+/** "Still checking original release years for 121 songs…" (or null). */
 export function pendingText(pending: Record<string, number> | null | undefined): string | null {
   if (!pending) return null;
   const n = (k: string) => pending[k] ?? 0;
+  const genres = n('tags') + n('albumTags') + n('artistTags') + n('artists');
   const parts: string[] = [];
+  if (genres) parts.push(`${genres.toLocaleString('en-US')} genre lookups`);
   if (n('audio')) parts.push(`tempo and key for ${n('audio').toLocaleString('en-US')} songs`);
-  if (n('years')) parts.push(`release years for ${n('years').toLocaleString('en-US')} songs`);
-  if (n('artists')) parts.push(`genres for ${n('artists').toLocaleString('en-US')} artists`);
-  if (n('tags')) parts.push(`tags for ${n('tags').toLocaleString('en-US')} songs`);
+  if (n('years')) parts.push(`original release years for ${n('years').toLocaleString('en-US')} songs`);
   if (!parts.length) return null;
   const list = parts.length === 1 ? parts[0] : `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}`;
-  return `Still looking up ${list}. Refresh the analysis later to fill them in.`;
+  return `Still checking ${list}. They fill in with each nightly sync, or refresh the analysis now. Until then, album release years are used.`;
 }
 
 /** Up to 4 distinct album images from a snapshot, for a source mosaic. */
