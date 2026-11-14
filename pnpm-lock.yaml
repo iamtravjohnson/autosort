@@ -40,7 +40,7 @@ importers:
         version: 9.39.5(jiti@2.7.0)
       eslint-config-next:
         specifier: 16.4.6
-        version: 16.4.6(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3)
+        version: 16.4.6(@typescript-eslint/parser@8.72.2(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3)
       sharp:
         specifier: ^0.35.5
         version: 0.35.5(@types/node@20.19.43)
@@ -54,8 +54,8 @@ importers:
   apps/web:
     dependencies:
       '@autosort/core':
-        specifier: ^0.2.1
-        version: 0.2.1
+        specifier: ^0.3.0
+        version: 0.3.0
       drizzle-orm:
         specifier: ^0.45.4
         version: 0.45.4(postgres@4.1.1)
@@ -101,7 +101,7 @@ importers:
         version: 9.39.5(jiti@2.7.0)
       eslint-config-next:
         specifier: 16.4.6
-        version: 16.4.6(@typescript-eslint/parser@8.72.2(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3)
+        version: 16.4.6(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3)
       tailwindcss:
         specifier: 4.3.3
         version: 4.3.3
@@ -131,8 +131,8 @@ packages:
     resolution: {integrity: sha512-U4+70Pc5ZS9osnCBCE5Jha/ciHM+Yp+CNMNC/7HvYbNRk1Ldd+f7qO65W5qfhu/TCv+/ozljlXXe9Nj8419DMA==}
     engines: {node: '>=10'}
 
-  '@autosort/core@0.2.1':
-    resolution: {integrity: sha512-69dhAhtQT2mTe1JgkdtPHsk4fmPWRBsrWfxCl11B8ZBP6AJ0klB1ssNl80GRg472jRjpbBF0GdSf9eYiE1BU6Q==}
+  '@autosort/core@0.3.0':
+    resolution: {integrity: sha512-HgUziV2FHgxjp9bVLpxtisiwhB3MuuAafPUFUWeBparJH/qwuoE6Pn7nT9Ks40vSTMDRW8g5+llEeghfuou+5w==}
     engines: {node: '>=20'}
 
   '@babel/code-frame@7.29.7':
@@ -2975,7 +2975,7 @@ snapshots:
 
   '@alloc/quick-lru@5.3.0': {}
 
-  '@autosort/core@0.2.1':
+  '@autosort/core@0.3.0':
     dependencies:
       zod: 4.6.7
 

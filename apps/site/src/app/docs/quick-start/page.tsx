@@ -25,7 +25,7 @@ import { site } from '@/lib/site';
 const PATH = '/docs/quick-start';
 const TITLE = 'Quick start: run your own Spotify playlist organizer';
 const DESCRIPTION =
-  'Set up your own AutoSort in about 15 minutes: create a Spotify developer app, deploy to Vercel, add the Redirect URI, then connect Spotify and pick a playlist to organize.';
+  'Set up your own AutoSort in about 15 minutes: create a Spotify developer app, get a free Last.fm key, deploy to Vercel, add the Redirect URI, then connect Spotify and pick a playlist to organize.';
 
 export const metadata = pageMetadata({ title: TITLE, description: DESCRIPTION, path: PATH });
 
@@ -35,8 +35,12 @@ const STEPS = [
     text: 'In the Spotify Developer Dashboard, choose Create app, check only Web API, and copy the Client ID and Client Secret.',
   },
   {
+    name: 'Get a free Last.fm API key',
+    text: 'At last.fm/api/account/create, sign in, name the app AutoSort, submit, and copy the API key.',
+  },
+  {
     name: 'Deploy to Vercel',
-    text: 'Deploy AutoSort to Vercel, paste SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET, and let Vercel create the database.',
+    text: 'Deploy AutoSort to Vercel, paste SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET and LASTFM_API_KEY, and let Vercel create the database.',
   },
   {
     name: 'Add the Redirect URI to Spotify',
@@ -70,9 +74,10 @@ const FAQ: FaqItem[] = [
 const TOC = [
   { id: 'need', label: 'What you need' },
   { id: 'spotify-app', label: '1 · Spotify developer app' },
-  { id: 'deploy', label: '2 · Deploy to Vercel' },
-  { id: 'redirect', label: '3 · Redirect URI' },
-  { id: 'connect', label: '4 · Connect Spotify' },
+  { id: 'keys', label: '2 · Last.fm key' },
+  { id: 'deploy', label: '3 · Deploy to Vercel' },
+  { id: 'redirect', label: '4 · Redirect URI' },
+  { id: 'connect', label: '5 · Connect Spotify' },
   { id: 'next', label: 'What happens next' },
   { id: 'faq', label: 'FAQ' },
 ];
@@ -81,8 +86,8 @@ export default function QuickStartPage() {
   return (
     <DocsPage path={PATH} title={TITLE} meta="15 min" toc={TOC}>
       <QuickAnswer>
-        Create a free Spotify developer app and copy its Client ID and Client Secret. Deploy AutoSort to Vercel, paste both keys, and let
-        Vercel create the database. Add your Redirect URI to the Spotify app, then connect your Spotify account and pick the playlist to
+        Create a free Spotify developer app and copy its Client ID and Client Secret, then get a free Last.fm API key. Deploy AutoSort to
+        Vercel, paste all three, and let Vercel create the database. Add your Redirect URI to the Spotify app, then connect your Spotify account and pick the playlist to
         organize. Plan on about 15 minutes.
       </QuickAnswer>
       <DocsEarlyReleaseNote />
@@ -95,6 +100,7 @@ export default function QuickStartPage() {
           </li>
           <li>A free GitHub account</li>
           <li>A free Vercel account</li>
+          <li>A free Last.fm account, for the API key AutoSort uses to tell genres apart</li>
           <li>Nothing else: Vercel creates the small database AutoSort needs while it deploys</li>
         </UL>
       </DocsSection>
@@ -104,7 +110,7 @@ export default function QuickStartPage() {
           <P>
             Open the <a href="https://developer.spotify.com/dashboard">Spotify Developer Dashboard</a>, choose <strong>Create app</strong>, and
             name it something like “AutoSort (Family)”. When it asks which APIs you&apos;ll use, check only <strong>Web API</strong>. Copy the{' '}
-            <strong>Client ID</strong> and <strong>Client Secret</strong>. You&apos;ll paste them in step 2.
+            <strong>Client ID</strong> and <strong>Client Secret</strong>. You&apos;ll paste them in step 3.
           </P>
           <Screenshot
             url="developer.spotify.com/dashboard"
@@ -117,8 +123,29 @@ export default function QuickStartPage() {
           </DocsNote>
         </Step>
 
-        <Step n={2} id="deploy" title="Deploy to Vercel">
-          <P>The button copies AutoSort to your GitHub, creates its database and asks for your two Spotify keys.</P>
+        <Step n={2} id="keys" title="Get a free Last.fm API key">
+          <P>
+            Spotify no longer tells apps which genre an artist plays, so AutoSort reads Last.fm&apos;s tags for each song, album and artist
+            instead. That&apos;s how it keeps a rapper&apos;s country song out of your Rap playlist. The key is free and takes about two
+            minutes:
+          </P>
+          <OL>
+            <li>
+              Open <a href="https://www.last.fm/api/account/create">last.fm/api/account/create</a> and sign in (or create a free Last.fm
+              account).
+            </li>
+            <li>
+              Fill in your email, an application name like <strong>AutoSort</strong> and a short description like{' '}
+              <strong>Organizes my Spotify playlists</strong>. Leave the callback URL and homepage empty.
+            </li>
+            <li>
+              Click <strong>Submit</strong> and copy the <strong>API key</strong>. You don&apos;t need the shared secret.
+            </li>
+          </OL>
+        </Step>
+
+        <Step n={3} id="deploy" title="Deploy to Vercel">
+          <P>The button copies AutoSort to your GitHub, creates its database and asks for your three keys.</P>
           <DeployButton />
           <P>Vercel walks you through a few screens. Here&apos;s what to pick:</P>
           <OL>
@@ -136,15 +163,15 @@ export default function QuickStartPage() {
               leave it off. Plan: <strong>Free</strong>. If it asks for an environment variable prefix, leave it blank.
             </li>
             <li>
-              <strong>Paste your keys</strong> into <code>SPOTIFY_CLIENT_ID</code> and <code>SPOTIFY_CLIENT_SECRET</code>, then click{' '}
-              <strong>Deploy</strong>. It takes about two minutes.
+              <strong>Paste your keys</strong> into <code>SPOTIFY_CLIENT_ID</code>, <code>SPOTIFY_CLIENT_SECRET</code> and{' '}
+              <code>LASTFM_API_KEY</code>, then click <strong>Deploy</strong>. It takes about two minutes.
             </li>
           </OL>
           <P>The environment variables, for reference:</P>
           <EnvTable />
         </Step>
 
-        <Step n={3} id="redirect" title="Add the Redirect URI to Spotify">
+        <Step n={4} id="redirect" title="Add the Redirect URI to Spotify">
           <P>
             In your Spotify app&apos;s settings, paste this under <strong>Redirect URIs</strong> and save. Swap in your own Vercel address;
             your setup page shows the exact value.
@@ -157,7 +184,7 @@ export default function QuickStartPage() {
           </DocsNote>
         </Step>
 
-        <Step n={4} id="connect" title="Connect Spotify and pick a source">
+        <Step n={5} id="connect" title="Connect Spotify and pick a source">
           <P>
             Open your deployment. The setup checklist confirms everything is green. Click <strong>Connect your Spotify account</strong> (you
             become the owner), then choose the playlist you always add to, or Liked Songs, as the source.

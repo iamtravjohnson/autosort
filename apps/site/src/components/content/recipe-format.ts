@@ -172,7 +172,7 @@ export function conditionExplain(c: Condition): string {
       const parts: string[] = [];
       if (c.in?.length)
         parts.push(
-          `Matches when the artist's Spotify genres, or the song's strongest Last.fm tags, mention ${join(c.in.map((g) => GENRE_EXAMPLES[g] ?? `"${g}"`))}.`,
+          `Matches when the song's main genre is ${join(c.in.map((g) => GENRE_EXAMPLES[g] ?? `"${g}"`))}, judged from Last.fm tags for the song, its album and its artist, and how it sounds.`,
         );
       if (c.notIn?.length) parts.push(`Leaves out genres that mention ${join(c.notIn.map((g) => GENRE_EXAMPLES[g] ?? `"${g}"`))}.`);
       return parts.join(' ');

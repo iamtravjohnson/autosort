@@ -16,7 +16,7 @@ const TOC = [
 ];
 
 const RULE_FIELDS: Array<[string, string, string]> = [
-  ['Genre', 'is any of Country, Americana', 'Spotify artist genres, plus Last.fm tags if you add a key'],
+  ['Genre', 'is any of Country, Americana', 'Last.fm tags for the song, its album and its artist, checked against how the song sounds (needs a free Last.fm key)'],
   ['Release year / decade', 'between 1990 and 1999', 'Spotify album release date, corrected to the original year by MusicBrainz'],
   ['Clean only', 'on', 'Spotify explicit flag'],
   ['Mood', 'is Happy', 'ReccoBeats audio: energy and valence'],
@@ -95,7 +95,7 @@ export default function HowItWorksPage() {
       <DocsSection id="data" title="Where the data comes from" size="xl">
         <UL>
           <li>
-            <strong>Spotify Web API</strong>: your playlists, artist genres, the explicit flag and album release dates.
+            <strong>Spotify Web API</strong>: your playlists, the explicit flag and album release dates. (Spotify no longer shares artist genres with apps like AutoSort.)
           </li>
           <li>
             <strong>ReccoBeats</strong> (free, no key): BPM, key and mode, energy, valence, danceability and acousticness. Spotify closed its

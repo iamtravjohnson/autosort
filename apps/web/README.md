@@ -6,8 +6,8 @@ Free and open source (MIT). Up to 5 people per copy (Spotify's limit for develop
 
 ## Deploy
 
-1. Create a Spotify developer app at [developer.spotify.com/dashboard](https://developer.spotify.com/dashboard) (Web API only). You need Spotify Premium.
-2. Click **Deploy to Vercel** on [autosort.app/start](https://autosort.app/start). Paste your Client ID and Client Secret. Vercel creates the database for you: on the Neon screen, keep the Washington, D.C. region, turn **Auth** off, leave **Realtime** off, pick the **Free** plan, and leave any variable prefix blank.
+1. Create a Spotify developer app at [developer.spotify.com/dashboard](https://developer.spotify.com/dashboard) (Web API only). You need Spotify Premium. Also get a free Last.fm API key at [last.fm/api/account/create](https://www.last.fm/api/account/create): AutoSort uses Last.fm tags to tell genres apart, since Spotify no longer shares them.
+2. Click **Deploy to Vercel** on [autosort.app/start](https://autosort.app/start). Paste your Client ID, Client Secret and Last.fm key. Vercel creates the database for you: on the Neon screen, keep the Washington, D.C. region, turn **Auth** off, leave **Realtime** off, pick the **Free** plan, and leave any variable prefix blank.
 3. In your Spotify app, add the Redirect URI shown on your AutoSort's setup page: `https://<your-app>.vercel.app/api/auth/callback/spotify`.
 4. Open your AutoSort and connect Spotify. The first person to connect is the owner and can invite up to 4 more.
 
@@ -26,7 +26,7 @@ After that: **Settings → Update now**, or in your repository **Actions → Upd
 | `DATABASE_URL` | Auto | Set by Vercel's Neon integration |
 | `AUTH_SECRET` | No | Generated and stored in the database if unset |
 | `CRON_SECRET` | No | Protects the daily sync endpoint |
-| `LASTFM_API_KEY` | No | Better mood and theme playlists |
+| `LASTFM_API_KEY` | Yes | Free key from [last.fm/api](https://www.last.fm/api/account/create). Genre playlists (Country, Rap, Worship…) need it: Spotify no longer shares artist genres |
 | `OPENROUTER_API_KEY` | No | Photo covers for new smart playlists (only the playlist's name and rule are sent) |
 | `OPENROUTER_IMAGE_MODEL` | No | Image model, default `google/gemini-3-pro-image` |
 | `APP_URL` | No | Public address, including any `BASE_PATH`, if it can't be detected |

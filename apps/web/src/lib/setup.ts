@@ -76,9 +76,11 @@ export async function setupStatus(): Promise<SetupStatus> {
     },
     {
       key: 'lastfm',
-      label: 'Last.fm key (better moods and themes)',
-      state: process.env.LASTFM_API_KEY ? 'done' : 'optional',
-      detail: process.env.LASTFM_API_KEY ? 'Found LASTFM_API_KEY' : 'Optional: a free key from last.fm/api improves Love Songs, Worship and mood playlists',
+      label: 'Last.fm key (genres, moods and themes)',
+      state: process.env.LASTFM_API_KEY ? 'done' : 'missing',
+      detail: process.env.LASTFM_API_KEY
+        ? 'Found LASTFM_API_KEY'
+        : 'Add a free key from last.fm/api as LASTFM_API_KEY. Without it, genre playlists like Country, Rap and Worship stay empty: Spotify no longer shares artist genres',
     },
     {
       key: 'covers',

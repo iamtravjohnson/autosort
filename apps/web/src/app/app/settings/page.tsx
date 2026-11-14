@@ -189,8 +189,8 @@ export default async function SettingsPage() {
           <Row k="Daily sync" tone={info.lastCronAt ? 'text-success-text' : 'text-text-3'}>
             {info.lastCronAt ? `Last ran ${timeAgo(info.lastCronAt)}` : info.onVercel ? 'Scheduled · hasn’t run yet' : 'Runs on Vercel only'}
           </Row>
-          <Row k="Mood data (Last.fm)" tone={info.lastfm ? 'text-success-text' : 'text-text-3'}>
-            {info.lastfm ? 'On' : 'Off · optional'}
+          <Row k="Genres and moods (Last.fm)" tone={info.lastfm ? 'text-success-text' : 'text-warning-text'}>
+            {info.lastfm ? 'On' : 'Off · add LASTFM_API_KEY for genre playlists'}
           </Row>
         </dl>
       </section>

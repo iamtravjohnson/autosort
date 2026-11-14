@@ -4,7 +4,7 @@ import { db, schema } from '@/db';
 
 /**
  * AUTH_SECRET signs sessions and encrypts Spotify tokens. If the env var isn't set (the
- * Deploy button only asks for the two Spotify keys), one is generated once and kept in the
+ * Deploy button only asks for the Spotify and Last.fm keys), one is generated once and kept in the
  * database. Setting AUTH_SECRET later works too, but signs everyone out once.
  */
 let cached: string | null = null;

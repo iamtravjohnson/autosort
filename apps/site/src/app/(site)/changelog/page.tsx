@@ -35,9 +35,9 @@ export default function ChangelogPage() {
       </div>
 
       <QuickAnswer>
-        AutoSort&apos;s latest release is the self-hosted app v0.1.0, an early release with one-click Deploy to Vercel, published November 14,
-        2026. The engine&apos;s latest is v0.2.1 (@autosort/core on npm), published November 13, 2026. The autosort.app website launched
-        November 14, 2026.
+        AutoSort&apos;s latest releases are the self-hosted app v0.2.0 and engine v0.3.0 (@autosort/core on npm), published November 14,
+        2026, with a new genre analyzer that keeps songs out of the wrong playlists. The app first shipped as v0.1.0, an early release with
+        one-click Deploy to Vercel. The autosort.app website launched November 14, 2026.
       </QuickAnswer>
 
       <ol className="m-0 flex list-none flex-col p-0">

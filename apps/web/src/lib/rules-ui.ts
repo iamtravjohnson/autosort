@@ -37,6 +37,8 @@ export function compactTrack(s: TrackSnapshot): CompactTrack {
     decade: s.decade,
     genres: s.genres,
     genreBuckets: s.genreBuckets,
+    genreNear: s.genreNear,
+    genreReasons: s.genreReasons,
     tags: s.tags,
     moods: s.moods,
     themes: s.themes,
@@ -63,6 +65,10 @@ export function factsFromCompact(s: CompactTrack): TrackFacts {
     genres: s.genres,
     tags: s.tags,
     genreBuckets: s.genreBuckets as TrackFacts['genreBuckets'],
+    genreNear: (s.genreNear ?? []) as TrackFacts['genreNear'],
+    genreScores: {},
+    genreConfidence: s.genreConfidence ?? 'low',
+    genreReasons: s.genreReasons ?? [],
     year: s.year,
     yearSource: s.year ? 'album' : null,
     decade: s.decade,
@@ -314,4 +320,9 @@ export function shortDate(iso: string | null | undefined): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return '—';
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+}
+
+/** Does the rule (or any group inside it) filter by genre? */
+export function ruleUsesGenre(rule: Rule): boolean {
+  return rule.conditions.some((c) => ('match' in c ? ruleUsesGenre(c) : c.field === 'genre'));
 }

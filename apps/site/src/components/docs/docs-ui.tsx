@@ -417,7 +417,7 @@ export const ENV_VARS: Array<{ name: string; req: EnvRequirement; where: string 
   { name: 'SPOTIFY_CLIENT_SECRET', req: 'Required', where: 'Same page, under "View client secret"' },
   { name: 'DATABASE_URL', req: 'Auto', where: 'Filled in when Vercel creates the database' },
   { name: 'AUTH_SECRET', req: 'Auto', where: 'Generated during deploy' },
-  { name: 'LASTFM_API_KEY', req: 'Optional', where: 'Free key from last.fm/api · improves mood and theme tags' },
+  { name: 'LASTFM_API_KEY', req: 'Required', where: 'Free key from last.fm/api/account/create · tells genres apart (Country, Rap, Worship…)' },
   { name: 'OPENROUTER_API_KEY', req: 'Optional', where: 'Key from openrouter.ai/keys · photo covers for new smart playlists' },
 ];
 

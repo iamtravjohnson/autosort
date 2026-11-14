@@ -22,6 +22,37 @@ export interface Release {
 
 export const releases: Release[] = [
   {
+    id: 'app-v0-2-0',
+    product: 'App',
+    version: 'v0.2.0',
+    date: '2026-11-14',
+    title: 'Accurate genres, and removed songs stay removed',
+    items: [
+      { kind: 'Improved', text: 'Genre playlists use the new engine analyzer, so a rapper’s country song no longer lands in Rap.' },
+      { kind: 'New', text: 'Delete a song from a smart playlist in Spotify and AutoSort won’t add it back. Songs you add by hand stay.' },
+      { kind: 'New', text: 'The playlist editor shows why each song matched, plus an optional “Maybe these too?” list of songs AutoSort wasn’t sure about.' },
+      { kind: 'Improved', text: 'Deploy to Vercel now asks for a free Last.fm key, which genre playlists need.' },
+    ],
+    notesUrl: `${site.github}/tree/main/apps/web`,
+  },
+  {
+    id: 'engine-v0-3-0',
+    product: 'Engine',
+    version: 'v0.3.0',
+    date: '2026-11-14',
+    title: 'A new genre analyzer',
+    latest: true,
+    items: [
+      { kind: 'New', text: 'analyzeGenres scores each genre from the song’s own tags, then its album’s, then its main artist’s, and checks rap against how much rapping is in the audio.' },
+      { kind: 'Improved', text: 'Featured artists barely count, a second genre needs the song’s own tags to back it, and thin evidence leaves a song out instead of misfiling it.' },
+      { kind: 'New', text: 'Every track gets plain-English genreReasons and a genreNear list for optional review.' },
+      { kind: 'Fixed', text: 'Spotify no longer returns artist genres to most apps, so that lookup is now off by default; Last.fm lookups use cleaned titles (no “feat.” or “Remastered”).' },
+      { kind: 'New', text: 'planSmartPlaylist reports songs the user deleted (userRemovedTrackIds) so apps can keep them out.' },
+    ],
+    notesUrl: `${site.github}/commits/main/packages/core`,
+    npmUrl: `${site.npm}/v/0.3.0`,
+  },
+  {
     id: 'app-v0-1-0',
     product: 'App',
     version: 'v0.1.0',
@@ -52,7 +83,6 @@ export const releases: Release[] = [
     version: 'v0.2.1',
     date: '2026-11-13',
     title: 'Loads in more bundlers',
-    latest: true,
     items: [
       {
         kind: 'Improved',

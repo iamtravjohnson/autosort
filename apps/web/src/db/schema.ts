@@ -49,6 +49,11 @@ export interface TrackSnapshot {
   decade: number | null;
   genres: string[];
   genreBuckets: string[];
+  /** Likely genres that didn't make the cut (optional review). Missing in older snapshots. */
+  genreNear?: string[];
+  genreConfidence?: 'high' | 'medium' | 'low';
+  /** Why the song got its genre, e.g. "Album tagged country". */
+  genreReasons?: string[];
   tags: string[];
   moods: string[];
   themes: string[];
@@ -114,6 +119,8 @@ export interface RunPlaylistResult {
   name: string;
   added: number;
   removed: number;
+  /** Songs the user deleted in Spotify, now kept out. */
+  keptOut?: number;
   created?: boolean;
   error?: string;
 }

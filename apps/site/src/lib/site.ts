@@ -1,14 +1,14 @@
 /**
  * One-click "Deploy to Vercel": copies apps/web into the person's own GitHub, asks for the two
- * Spotify keys and creates a Neon Postgres database through Vercel's Marketplace.
+ * Spotify keys and a Last.fm key, and creates a Neon Postgres database through Vercel's Marketplace.
  */
 const deployUrl = `https://vercel.com/new/clone?${new URLSearchParams({
   'repository-url': 'https://github.com/iamtravjohnson/autosort/tree/main/apps/web',
   'project-name': 'autosort',
   'repository-name': 'autosort',
-  env: 'SPOTIFY_CLIENT_ID,SPOTIFY_CLIENT_SECRET',
-  envDescription: 'The Client ID and Client Secret from your Spotify developer app',
-  envLink: 'https://autosort.app/docs/spotify-app',
+  env: 'SPOTIFY_CLIENT_ID,SPOTIFY_CLIENT_SECRET,LASTFM_API_KEY',
+  envDescription: 'Your Spotify developer app’s Client ID and Client Secret, and a free Last.fm API key (AutoSort uses it to tell genres apart)',
+  envLink: 'https://autosort.app/docs/quick-start#keys',
   stores: JSON.stringify([{ type: 'integration', integrationSlug: 'neon', productSlug: 'neon', protocol: 'storage' }]),
 })}`;
 

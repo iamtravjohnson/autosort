@@ -64,8 +64,8 @@ const sections: LegalSection[] = [
     body: (
       <ul>
         <li>
-          <strong>What it reads:</strong> your playlists and their songs, plus details Spotify provides, such as artist genres, the
-          explicit flag and album release dates.
+          <strong>What it reads:</strong> your playlists and their songs, plus details Spotify provides, such as the explicit flag
+          and album release dates.
         </li>
         <li>
           <strong>Lookups:</strong> BPM, key and energy come from ReccoBeats, original release years from MusicBrainz and optional tags

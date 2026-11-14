@@ -96,7 +96,7 @@ export const recipes: SiteRecipe[] = [
     cover: ['#FDE68A', '#B45309'],
     description: 'Worship, gospel and Christian music.',
     quickAnswer:
-      "This recipe builds a Spotify playlist of the worship, gospel and Christian music in your source playlist. A song counts if its artist's Spotify genres or its Last.fm tags say worship, CCM, gospel or praise. Import it, pick your source, and new worship songs land here on each daily sync.",
+      "This recipe builds a Spotify playlist of the worship, gospel and Christian music in your source playlist. A song counts when Last.fm tags for the song, its album or its artist say worship, CCM, gospel or praise. Import it, pick your source, and new worship songs land here on each daily sync.",
     whoFor: [
       'Sunday mornings, from the drive to church to the kitchen after.',
       'Families who share one big playlist but want worship on its own.',
@@ -308,7 +308,7 @@ export const recipes: SiteRecipe[] = [
     cover: ['#F59E0B', '#7C2D12'],
     description: 'Every country song in your source, newest first.',
     quickAnswer:
-      "This recipe builds a Spotify playlist of every country song in your source playlist, newest added first. AutoSort checks each artist's Spotify genres, so americana, bluegrass and outlaw country count too. Import it, pick your source, and any country song you add later lands here on the next daily sync.",
+      "This recipe builds a Spotify playlist of every country song in your source playlist, newest added first. AutoSort checks Last.fm tags for each song, its album and its artist, so americana, bluegrass and outlaw country count too. Import it, pick your source, and any country song you add later lands here on the next daily sync.",
     whoFor: [
       'Anyone whose main playlist mixes country in with everything else.',
       'Truck rides and back-porch evenings when only country will do.',
@@ -328,7 +328,7 @@ export const recipes: SiteRecipe[] = [
     cover: ['#0EA5E9', '#1E1B4B'],
     description: 'Hip-hop and rap, newest first.',
     quickAnswer:
-      "This recipe builds a Spotify playlist of all the hip-hop and rap in your source playlist, newest added first. AutoSort reads each artist's Spotify genres, so trap, drill and boom bap are included. Import it, pick your source, and new rap songs land here on each daily sync.",
+      "This recipe builds a Spotify playlist of all the hip-hop and rap in your source playlist, newest added first. AutoSort checks Last.fm tags for each song, its album and its artist, so trap, drill and boom bap are included, and a rapper's country song stays out. Import it, pick your source, and new rap songs land here on each daily sync.",
     whoFor: [
       'Listeners who save rap next to everything else in one big playlist.',
       'Commutes and gym sessions where you want one genre start to finish.',

@@ -9,7 +9,7 @@ import { site } from '@/lib/site';
 
 const PATH = '/start';
 const QUICK_ANSWER =
-  'You need Spotify Premium for the app owner, plus free GitHub and Vercel accounts. Create a Spotify developer app, deploy AutoSort to Vercel, paste two keys and connect Spotify. It takes about 15 minutes, and AutoSort itself costs nothing. Your copy runs on your own accounts, so your data stays yours.';
+  'You need Spotify Premium for the app owner, plus free GitHub and Vercel accounts. Create a Spotify developer app, get a free Last.fm key, deploy AutoSort to Vercel, paste three keys and connect Spotify. It takes about 15 minutes, and AutoSort itself costs nothing. Your copy runs on your own accounts, so your data stays yours.';
 
 export const metadata: Metadata = pageMetadata({
   title: 'Deploy your own Spotify playlist organizer',
@@ -31,23 +31,24 @@ const NEEDS = [
   },
   { title: 'GitHub account', body: 'Holds your copy of the code.', ...FREE },
   { title: 'Vercel account', body: 'Runs the app and the daily sync.', ...FREE },
+  { title: 'Last.fm account', body: 'For the API key AutoSort uses to tell genres apart.', ...FREE },
   { title: 'Storage', body: 'Nothing to sign up for: Vercel creates it during deploy.', ...FREE },
 ];
 
 const STEPS = [
   {
-    title: 'Create your Spotify developer app',
-    body: 'Copy the Client ID and Client Secret.',
-    time: '~5 min',
-    href: '/docs/spotify-app',
-    howTo: 'In the Spotify Developer Dashboard, create an app and copy its Client ID and Client Secret. The app owner needs Spotify Premium.',
+    title: 'Get your keys',
+    body: 'A Spotify developer app (Client ID and Secret) and a free Last.fm API key.',
+    time: '~7 min',
+    href: '/docs/quick-start#spotify-app',
+    howTo: 'In the Spotify Developer Dashboard, create an app and copy its Client ID and Client Secret (the app owner needs Spotify Premium). Then get a free API key at last.fm/api/account/create.',
   },
   {
     title: 'Deploy AutoSort to Vercel',
-    body: 'Paste both keys. Vercel sets up the database and schedule.',
+    body: 'Paste all three keys. Vercel sets up the database and schedule.',
     time: '~5 min',
     href: '/docs/quick-start',
-    howTo: 'Deploy your own copy of AutoSort to Vercel and paste both keys. Vercel sets up the database and the daily sync schedule.',
+    howTo: 'Deploy your own copy of AutoSort to Vercel and paste the three keys. Vercel sets up the database and the daily sync schedule.',
   },
   {
     title: 'Connect Spotify and pick your playlist',
@@ -61,7 +62,7 @@ const STEPS = [
 const BEFORE: Array<{ q: string; a: ReactNode }> = [
   {
     q: 'Do I need to know how to code?',
-    a: "No. You'll copy and paste two values and click a few buttons. The docs walk through every screen.",
+    a: "No. You'll copy and paste three values and click a few buttons. The docs walk through every screen.",
   },
   {
     q: 'What does it cost to run?',

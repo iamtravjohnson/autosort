@@ -15,6 +15,7 @@ import {
   ORDER_DEFAULTS,
   orderChoice,
   orderLabel,
+  ruleUsesGenre,
   shortDate,
   spotifyPlaylistUrl,
   spotifyTrackUrl,
@@ -125,6 +126,16 @@ export function PlaylistEditor({
     () => previewOf(mergeTracks(dSources.map((id) => factsBySource.get(id) ?? [])), { rule: dRule, order: dOrder, include: dInclude, exclude: dExclude, pinned: dPinned }),
     [factsBySource, dSources, dRule, dOrder, dInclude, dExclude, dPinned],
   );
+  // Optional review: songs that would match if a close-second genre counted. Never added on their own.
+  const showWhy = ruleUsesGenre(draft.rule);
+  const maybe = useMemo(() => {
+    if (!ruleUsesGenre(dRule)) return [];
+    const inPreview = new Set(preview.map((t) => t.id));
+    const exc = new Set(dExclude);
+    return mergeTracks(dSources.map((id) => factsBySource.get(id) ?? []))
+      .filter((t) => t.genreNear.length > 0 && !inPreview.has(t.id) && !exc.has(t.id))
+      .filter((t) => matchesRule({ ...t, genreBuckets: [...t.genreBuckets, ...t.genreNear] }, dRule));
+  }, [preview, factsBySource, dSources, dRule, dExclude]);
   const baselineCount = useMemo(() => previewOf(mergeTracks(baseline.sourceIds.map((id) => factsBySource.get(id) ?? [])), baseline).length, [factsBySource, baseline]);
   const stale = deferred !== draft;
 
@@ -520,12 +531,44 @@ export function PlaylistEditor({
                   {draft.sourceIds.length === 0 ? 'Pick a source to see which songs match.' : 'No songs match these rules yet. Try loosening one.'}
                 </p>
               ) : (
-                <PreviewTable tracks={showAll ? preview : preview.slice(0, PREVIEW_PAGE)} pinned={draft.pinned} dim={stale} />
+                <PreviewTable tracks={showAll ? preview : preview.slice(0, PREVIEW_PAGE)} pinned={draft.pinned} dim={stale} showWhy={showWhy} />
               )}
               {preview.length > PREVIEW_PAGE ? (
                 <button type="button" onClick={() => setShowAll((v) => !v)} className="tnum self-start text-[13px] font-bold text-accent-hover hover:text-accent-soft">
                   {showAll ? `Show the first ${PREVIEW_PAGE}` : `Show all ${preview.length.toLocaleString('en-US')}`}
                 </button>
+              ) : null}
+              {maybe.length > 0 ? (
+                <details className="group rounded-card border border-line p-3.5">
+                  <summary className="tnum cursor-pointer text-[14px] font-bold text-text-1">
+                    Maybe these too? {maybe.length.toLocaleString('en-US')} <span className="font-normal text-text-3">(optional)</span>
+                  </summary>
+                  <p className="m-0 mt-2 text-[13px] leading-[1.55] text-text-2">
+                    AutoSort wasn&apos;t sure about these, so it left them out. Add any that belong; ignoring this list is fine.
+                  </p>
+                  <ul className="m-0 mt-2 flex list-none flex-col gap-1 p-0">
+                    {maybe.slice(0, 30).map((t) => (
+                      <li key={t.id} className="flex items-center gap-3 rounded-sm px-1 py-1.5">
+                        <Art url={t.album.imageUrl} size={36} />
+                        <span className="flex min-w-0 flex-1 flex-col">
+                          <span className="truncate text-[14px] font-semibold">{t.name}</span>
+                          <span className="truncate text-[12px] text-text-2">
+                            {t.artists.map((a) => a.name).join(', ')}
+                            {t.genreReasons.length ? ` · ${t.genreReasons.slice(0, 2).join(' · ')}` : ''}
+                          </span>
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setDraft((d) => ({ ...d, include: [...new Set([...d.include, t.id])], exclude: d.exclude.filter((x) => x !== t.id) }))}
+                          aria-label={`Add ${t.name}`}
+                          className="h-8 rounded-pill px-3 text-[13px] font-bold text-accent-hover hover:bg-white/5 hover:text-accent-soft"
+                        >
+                          Add
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </details>
               ) : null}
             </section>
           </div>
@@ -800,7 +843,8 @@ function SyncPanel({ sync, sourceName, onChange }: { sync: SyncSettings; sourceN
   );
 }
 
-function PreviewTable({ tracks, pinned, dim }: { tracks: TrackFacts[]; pinned: Record<string, number>; dim: boolean }) {
+function PreviewTable({ tracks, pinned, dim, showWhy }: { tracks: TrackFacts[]; pinned: Record<string, number>; dim: boolean; showWhy: boolean }) {
+  const why = (t: TrackFacts) => (showWhy && t.genreReasons.length ? t.genreReasons.slice(0, 2).join(' · ') : null);
   return (
     <div className={`transition-opacity duration-200 ${dim ? 'opacity-70' : ''}`}>
       {/* Phones: compact rows (BPM + key only). */}
@@ -814,6 +858,7 @@ function PreviewTable({ tracks, pinned, dim }: { tracks: TrackFacts[]; pinned: R
                 {t.artists.map((a) => a.name).join(', ')}
                 {pinned[t.id] !== undefined ? ' · pinned' : ''}
               </span>
+              {why(t) ? <span className="truncate text-[12px] text-text-3">{why(t)}</span> : null}
             </span>
             <span className="w-8 text-right text-[13px] font-semibold">{t.audio ? Math.round(t.audio.tempo) : '—'}</span>
             <span className="w-11 text-center">
@@ -867,6 +912,7 @@ function PreviewTable({ tracks, pinned, dim }: { tracks: TrackFacts[]; pinned: R
                           {t.artists.map((a) => a.name).join(', ')}
                           {isPinned ? <span className="text-warning-text"> · pinned</span> : null}
                         </span>
+                        {why(t) ? <span className="truncate text-[12px] text-text-3">{why(t)}</span> : null}
                       </span>
                     </span>
                   </td>

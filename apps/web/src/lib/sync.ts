@@ -23,8 +23,11 @@ import { spotifyFor } from './spotify';
 export const SPOTIFY_NAME_SUFFIX = ' (AutoSort)';
 const RUN_RETENTION_DAYS = 30;
 
-/** Per-run lookup budgets sized to finish inside a 300-second function. Big libraries fill in over a few runs. */
-const BUDGET = { artists: 300, audio: 4000, years: 60, tags: 150 };
+/**
+ * Per-run lookup budgets sized to finish inside a 300-second function. Big libraries fill in over a
+ * few runs. Spotify artist genres are off: Spotify no longer returns them to developer-mode apps.
+ */
+const BUDGET = { artists: 0, audio: 4000, years: 60, tags: 150, albumTags: 100, artistTags: 120 };
 
 /* ---------- Snapshots: compact facts kept from the last analysis ---------- */
 
@@ -43,6 +46,9 @@ export function toSnapshot(f: TrackFacts): TrackSnapshot {
     decade: f.decade,
     genres: f.genres,
     genreBuckets: f.genreBuckets,
+    genreNear: f.genreNear,
+    genreConfidence: f.genreConfidence,
+    genreReasons: f.genreReasons,
     tags: f.tags,
     moods: f.moods,
     themes: f.themes,
@@ -70,6 +76,10 @@ export function fromSnapshot(s: TrackSnapshot): TrackFacts {
     genres: s.genres,
     tags: s.tags,
     genreBuckets: s.genreBuckets as TrackFacts['genreBuckets'],
+    genreNear: (s.genreNear ?? []) as TrackFacts['genreNear'],
+    genreScores: {},
+    genreConfidence: s.genreConfidence ?? 'low',
+    genreReasons: s.genreReasons ?? [],
     year: s.year,
     yearSource: s.year ? 'album' : null,
     decade: s.decade,
@@ -205,11 +215,14 @@ export async function syncUser(userId: string, opts: SyncOptions): Promise<strin
           }
           result.added = plan.addedTrackIds.length;
           result.removed = plan.removedTrackIds.length;
+          if (plan.userRemovedTrackIds.length) result.keptOut = plan.userRemovedTrackIds.length;
           await d
             .update(schema.smartPlaylists)
             .set({
               spotifyPlaylistId: playlistId,
               managedTrackIds: plan.nextState.managedTrackIds,
+              // Songs the user deleted in Spotify stay out from now on.
+              ...(plan.userRemovedTrackIds.length ? { exclude: [...new Set([...p.exclude, ...plan.userRemovedTrackIds])] } : {}),
               trackCount: plan.desiredUris.length,
               lastSyncedAt: new Date(),
               lastAddedCount: plan.addedTrackIds.length,
