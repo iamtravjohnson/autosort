@@ -153,7 +153,7 @@ export default function OpenSourcePage() {
             Support the project
           </h2>
           <p className="m-0 text-[15px] leading-[1.55] text-text-2">
-            AutoSort will always be free. If it helps your family&apos;s Favs, a GitHub Sponsorship helps keep it maintained.
+            AutoSort will always be free. If it helps your family&apos;s music, a GitHub Sponsorship helps keep it maintained.
           </p>
           <p className="m-0 text-[13px] leading-[1.55] text-text-3">
             Sponsorship may not be set up yet. If the link doesn&apos;t work, a star on GitHub or a good bug report helps just as much.

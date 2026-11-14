@@ -119,7 +119,7 @@ export default function PrivacyPage() {
       sibling={{ label: 'Terms', href: '/terms' }}
       inShort={[
         'This website has no accounts, no ads and no cookies.',
-        'The AutoSort app runs on your own Vercel and database accounts. The AutoSort project never receives your Spotify data.',
+        'The AutoSort app runs on your own Vercel account, with the database Vercel creates for it. The AutoSort project never receives your Spotify data.',
         'Spotify tokens are stored encrypted, disconnecting deletes your data, and nothing is sent to AI models.',
       ]}
       sections={sections}

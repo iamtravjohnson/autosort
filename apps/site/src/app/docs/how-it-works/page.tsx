@@ -39,12 +39,12 @@ function FlowDiagram() {
   return (
     <figure
       role="img"
-      aria-label="Flow: songs added to Favs are checked against each playlist's rules every morning, then added to matching smart playlists or left in Unmatched"
+      aria-label="Flow: songs added to your source playlist are checked against each playlist's rules every morning, then added to matching smart playlists or left in Unmatched"
       className="m-0 flex flex-col gap-3 rounded-[10px] border border-[var(--d-border)] bg-[var(--d-panel)] p-5 sm:flex-row sm:flex-wrap sm:items-center"
     >
       <div className="flex flex-[1_1_140px] flex-col gap-1 rounded-card bg-[var(--d-surface-2)] p-3.5">
         <span className="text-[12px] font-bold uppercase tracking-[0.06em] text-[var(--d-text-3)]">Source</span>
-        <span className="text-[16px] font-extrabold">Favs</span>
+        <span className="text-[16px] font-extrabold">Everything</span>
         <span className="text-[13px] text-[var(--d-text-2)]">You add songs here</span>
       </div>
       <Arrow />
@@ -122,7 +122,7 @@ export default function HowItWorksPage() {
             <strong>Add new matches daily</strong>: on by default. New songs go in newest added first.
           </li>
           <li>
-            <strong>Remove songs that leave the source</strong>: delete a song from Favs and it leaves the smart playlist too.
+            <strong>Remove songs that leave the source</strong>: delete a song from the source and it leaves the smart playlist too.
           </li>
           <li>
             <strong>Keep songs I add manually</strong>: songs you add in Spotify stay, even if they don&apos;t match.

@@ -14,7 +14,7 @@ export function GET() {
     `> ${site.description}`,
     '',
     'AutoSort is free and open source (MIT). Each family runs its own copy with its own free Spotify developer app; Spotify allows up to 5 users per developer app in Development Mode, and the app owner needs Spotify Premium.',
-    'It reads one source playlist (for example "Favs") or Liked Songs, and keeps smart playlists such as Country, 90s Country, Clean Rap, Worship, Workout and Love Songs up to date every day. It also sorts playlists by BPM, key (Camelot wheel), energy, date added and release date.',
+    'It reads one source playlist (the one you keep adding to) or Liked Songs, and keeps smart playlists such as Country, 90s Country, Clean Rap, Worship, Workout and Love Songs up to date every day. It also sorts playlists by BPM, key (Camelot wheel), energy, date added and release date.',
     'Data sources: Spotify Web API (playlists, artist genres, explicit flag, release dates), ReccoBeats (tempo, key, energy, valence), MusicBrainz (original release years) and Last.fm (crowd tags). AutoSort does not send Spotify data to AI models; smart playlists are built from editable rules.',
     `Status: the engine, @autosort/core, is published on npm and runs the founder's family setup. The one-click self-hosted app is in development. Source: ${site.github}`,
     '',

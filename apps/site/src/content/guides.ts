@@ -86,7 +86,7 @@ export const guides: Guide[] = [
           },
           {
             type: 'p',
-            text: "Some people use a playlist called Favs; some use Liked Songs. Either works, as long as it's the one place you save to. If your saves are already spread across a few playlists, pick one as the main inbox and leave the others alone for now.",
+            text: "Some people keep one big playlist (call it Everything, Favorites or anything you like); some use Liked Songs. Either works, as long as it's the one place you save to. If your saves are already spread across a few playlists, pick one as the main inbox and leave the others alone for now.",
           },
           {
             type: 'p',
@@ -200,7 +200,7 @@ export const guides: Guide[] = [
     faq: [
       {
         q: 'How many songs is "huge"?',
-        a: "Anything past a few hundred, where you stop scrolling to the bottom. The founder's own Favs playlist has about 362 songs, and that was already enough to want it split.",
+        a: "Anything past a few hundred, where you stop scrolling to the bottom. The founder's own main playlist has about 362 songs, and that was already enough to want it split.",
       },
       {
         q: "Should I delete songs I've skipped?",

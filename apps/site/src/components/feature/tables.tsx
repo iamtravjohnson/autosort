@@ -22,7 +22,7 @@ export function WhereTable({ example }: { example: WhereExample }) {
         <thead>
           <tr className="bg-surface-2 text-left">
             <th scope="col" className="px-4 py-3 font-bold">
-              {example.songColumn ?? 'Song in Favs'}
+              {example.songColumn ?? 'Song'}
             </th>
             {example.columns.map((c) => (
               <th key={c} scope="col" className="px-4 py-3 font-bold">

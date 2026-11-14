@@ -54,7 +54,7 @@ const FAQ: FaqItem[] = [
   },
   {
     q: 'What does it cost to run AutoSort?',
-    a: "AutoSort is free and open source under the MIT license. It's built to run on free accounts: a Spotify developer app, GitHub, Vercel's free Hobby plan and a free hosted database. Spotify Premium for the app owner is the only paid requirement.",
+    a: "AutoSort is free and open source under the MIT license. It's built to run on free accounts: a Spotify developer app, GitHub, and Vercel's free Hobby plan, which also creates the small database AutoSort needs. Spotify Premium for the app owner is the only paid requirement.",
   },
   {
     q: 'Can I run AutoSort on my own computer?',
@@ -94,7 +94,7 @@ export default function QuickStartPage() {
           </li>
           <li>A free GitHub account</li>
           <li>A free Vercel account</li>
-          <li>A free hosted database (Vercel sets one up for you)</li>
+          <li>Nothing else: Vercel creates the small database AutoSort needs while it deploys</li>
         </UL>
       </DocsSection>
 
@@ -138,7 +138,7 @@ export default function QuickStartPage() {
         <Step n={4} id="connect" title="Connect Spotify and pick a source">
           <P>
             Open your deployment. The setup checklist confirms everything is green. Click <strong>Connect your Spotify account</strong> (you
-            become the owner), then choose Favs, another playlist, or Liked Songs as the source.
+            become the owner), then choose the playlist you always add to, or Liked Songs, as the source.
           </P>
           <CodeBlock
             title="Terminal · optional local run"

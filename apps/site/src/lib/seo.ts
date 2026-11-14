@@ -24,7 +24,7 @@ export function pageMetadata(opts: {
       type: opts.type ?? 'website',
       locale: 'en_US',
     },
-    twitter: { card: 'summary_large_image', title: opts.title, description: opts.description },
+    twitter: { card: 'summary_large_image', title: opts.title, description: opts.description, creator: site.founder.twitter, site: site.founder.twitter },
     ...(opts.noindex ? { robots: { index: false, follow: true } } : {}),
   };
 }
@@ -81,6 +81,14 @@ export function softwareJsonLd(opts: { name?: string; description?: string; path
   };
 }
 
+/** The founder as a schema.org Person, with profiles for entity linking. */
+export const founderPerson = {
+  '@type': 'Person',
+  name: site.founder.name,
+  url: site.founder.url,
+  sameAs: [site.founder.twitterUrl, site.founder.github, site.founder.url],
+};
+
 export function sourceCodeJsonLd(): Json {
   return {
     '@context': 'https://schema.org',
@@ -89,7 +97,7 @@ export function sourceCodeJsonLd(): Json {
     codeRepository: site.github,
     programmingLanguage: 'TypeScript',
     license: 'https://opensource.org/licenses/MIT',
-    author: { '@type': 'Person', name: site.founder.name, url: site.founder.url },
+    author: founderPerson,
   };
 }
 
@@ -102,7 +110,7 @@ export function articleJsonLd(opts: { headline: string; description: string; pat
     mainEntityOfPage: absoluteUrl(opts.path),
     datePublished: opts.datePublished ?? opts.dateModified,
     dateModified: opts.dateModified,
-    author: { '@type': 'Person', name: site.founder.name, url: site.founder.url },
+    author: founderPerson,
     publisher: { '@type': 'Organization', name: site.name, url: site.url },
   };
 }

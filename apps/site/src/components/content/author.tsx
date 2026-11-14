@@ -30,12 +30,17 @@ export function AuthorBox() {
         <span className="text-[12px] font-bold uppercase tracking-[0.06em] text-text-3">About the author</span>
         <span className="text-[17px] font-extrabold">{site.founder.name}</span>
         <p className="m-0 text-[14px] leading-[1.55] text-text-2">
-          {site.founder.name.split(' ')[0]} built AutoSort to keep his family&apos;s Favs playlists in order without changing how anyone
+          {site.founder.name.split(' ')[0]} built AutoSort to keep his family&apos;s playlists in order without changing how anyone
           saves songs. It&apos;s free and open source.
         </p>
-        <a href={site.founder.url} target="_blank" rel="noopener noreferrer author" className="text-[14px] font-bold">
-          {host} ↗
-        </a>
+        <span className="flex flex-wrap gap-x-4 gap-y-1">
+          <a href={site.founder.url} target="_blank" rel="noopener noreferrer author" className="text-[14px] font-bold">
+            {host} ↗
+          </a>
+          <a href={site.founder.twitterUrl} target="_blank" rel="noopener noreferrer me" className="text-[14px] font-bold">
+            {site.founder.twitter} ↗
+          </a>
+        </span>
       </div>
     </div>
   );

@@ -32,10 +32,10 @@ const STEPS = [
   },
   {
     title: 'Deploy AutoSort with one click',
-    body: 'The Vercel button copies the code to your GitHub, sets up a free database, and schedules the daily sync.',
+    body: 'The Vercel button copies the code to your GitHub, sets up the free storage it needs, and schedules the daily sync.',
   },
   {
-    title: 'Pick Favs and accept Smart suggestions',
+    title: 'Pick your playlist and accept Smart suggestions',
     body: 'AutoSort reads your playlist, proposes playlists like Country or Workout, and creates them in Spotify.',
   },
 ];
@@ -43,13 +43,13 @@ const STEPS = [
 const WHY = [
   {
     Icon: DatabaseIcon,
-    title: 'Your data stays in your own database',
+    title: 'Your data stays in your own account',
     body: "Nothing goes to a central AutoSort server. There isn't one.",
   },
   {
     Icon: NoSubscriptionIcon,
     title: 'No subscription',
-    body: 'Every feature is free. It runs on free tiers of Vercel and your database host.',
+    body: "Every feature is free. It runs on Vercel's free plan.",
   },
   {
     Icon: FamilyIcon,
@@ -80,14 +80,14 @@ const COMPARISONS = [
 const FAQ: FaqItem[] = [
   {
     q: 'Is AutoSort really free?',
-    a: "Yes. AutoSort is free and open source under the MIT license, with no subscription and no paid tier. It's built to run on the free tiers of Vercel and a hosted database. The one cost is Spotify's: whoever owns the Spotify developer app needs Spotify Premium.",
+    a: "Yes. AutoSort is free and open source under the MIT license, with no subscription and no paid tier. It runs on Vercel's free plan, and the deploy sets up the small database it needs for you, so there's nothing else to sign up for. The one cost is Spotify's: whoever owns the Spotify developer app needs Spotify Premium.",
   },
   {
     q: 'Do I need Spotify Premium?',
     a: 'The owner does. Spotify requires the owner of a developer app in Development Mode to have Premium, and each copy of AutoSort runs on its own developer app. Family members you add sign in with their own Spotify accounts.',
   },
   {
-    q: 'Does AutoSort change my Favs playlist?',
+    q: 'Does AutoSort change my main playlist?',
     a: 'No. AutoSort reads your source playlist and only writes to the smart playlists it creates, which appear in Spotify with names like "Country (AutoSort)". Every sync is logged, and you can undo it.',
   },
   {
@@ -220,7 +220,7 @@ export default function HomePage() {
         <div className="flex flex-[1_1_380px] flex-col gap-4">
           <H2 id="updated">It keeps itself updated</H2>
           <p className="m-0 text-[17px] leading-[1.6] text-text-2">
-            Keep adding songs to Favs exactly like you do now. Every morning AutoSort files the new ones into the right playlists. When a new
+            Keep adding songs to your main playlist exactly like you do now. Every morning AutoSort files the new ones into the right playlists. When a new
             group shows up, like enough Christmas songs for their own playlist, it suggests one.
           </p>
           <div>
@@ -300,7 +300,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <CtaBand title="Give Favs some order." body="About 15 minutes, from zero to sorted." />
+      <CtaBand title="Give your playlist some order." body="About 15 minutes, from zero to sorted." />
     </>
   );
 }

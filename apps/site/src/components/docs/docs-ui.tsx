@@ -62,7 +62,19 @@ export function DocsFooter() {
   return (
     <footer className="border-t border-[var(--d-border)]">
       <div className="mx-auto flex max-w-[1440px] flex-wrap justify-between gap-4 p-6 text-[13px] text-[var(--d-text-3)]">
-        <span>{site.disclaimer}</span>
+        <span className="flex flex-col gap-1.5">
+          <span>
+            Made by{' '}
+            <a href={site.founder.url} target="_blank" rel="noopener noreferrer">
+              {site.founder.name}
+            </a>{' '}
+            ·{' '}
+            <a href={site.founder.twitterUrl} target="_blank" rel="noopener noreferrer">
+              {site.founder.twitter}
+            </a>
+          </span>
+          <span>{site.disclaimer}</span>
+        </span>
         <WorksWithSpotify />
       </div>
     </footer>

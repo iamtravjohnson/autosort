@@ -77,7 +77,19 @@ export function SiteFooter() {
           ))}
         </div>
         <div className="flex flex-wrap justify-between gap-4 border-t border-line pt-6 text-[13px] text-text-3">
-          <span>{site.disclaimer}</span>
+          <span className="flex flex-col gap-1.5">
+            <span>
+              Made by{' '}
+              <a href={site.founder.url} target="_blank" rel="noopener noreferrer" className="text-text-2 hover:text-text-1">
+                {site.founder.name}
+              </a>{' '}
+              ·{' '}
+              <a href={site.founder.twitterUrl} target="_blank" rel="noopener noreferrer" className="text-text-2 hover:text-text-1">
+                {site.founder.twitter}
+              </a>
+            </span>
+            <span>{site.disclaimer}</span>
+          </span>
           <WorksWithSpotify />
         </div>
       </div>

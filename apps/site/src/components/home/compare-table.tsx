@@ -25,7 +25,7 @@ const ROWS: Row[] = [
     others: 'Varies. Sort Your Music is open source',
   },
   {
-    feature: 'Self-hosted · data in your own database',
+    feature: 'Self-hosted · your data stays in your account',
     smartReorder: 'No. Built into Spotify',
     others: 'No. Hosted web apps',
   },

@@ -8,7 +8,13 @@ export const site = {
   githubRepo: 'iamtravjohnson/autosort',
   npm: 'https://www.npmjs.com/package/@autosort/core',
   license: 'MIT',
-  founder: { name: 'Travis Johnson', url: 'https://travisjohnson.com' },
+  founder: {
+    name: 'Travis Johnson',
+    url: 'https://travisjohnson.com',
+    twitter: '@iamtravjohnson',
+    twitterUrl: 'https://x.com/iamtravjohnson',
+    github: 'https://github.com/iamtravjohnson',
+  },
   disclaimer: 'AutoSort is an independent open-source project, not affiliated with or endorsed by Spotify.',
   /** Where "Deploy your own" goes. */
   startPath: '/start',

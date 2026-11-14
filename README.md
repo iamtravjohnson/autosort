@@ -2,9 +2,9 @@
 
 **Turn one giant Spotify playlist into smart playlists that stay organized: by genre, decade, mood, BPM and Camelot key. Free, open source and self-hosted.**
 
-Keep adding songs to the one playlist you always use (say, "Favs"). AutoSort reads it and keeps playlists like *Country*, *90s Country*, *Clean Rap*, *Worship*, *Workout* and *Love Songs* up to date every day. It can also sort any playlist by BPM, energy, or harmonically around the Camelot wheel.
+Keep adding songs to the one playlist you always use (say, "Everything"). AutoSort reads it and keeps playlists like *Country*, *90s Country*, *Clean Rap*, *Worship*, *Workout* and *Love Songs* up to date every day. It can also sort any playlist by BPM, energy, or harmonically around the Camelot wheel.
 
-Website: [autosort.app](https://autosort.app)
+Website: [autosort.app](https://autosort.app) · Made by [Travis Johnson](https://travisjohnson.com) ([@iamtravjohnson](https://x.com/iamtravjohnson))
 
 > **Status:** early. The engine (`@autosort/core`) works and is tested. The self-hosted app and the website come next.
 

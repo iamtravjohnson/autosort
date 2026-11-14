@@ -9,7 +9,7 @@ import { site } from '@/lib/site';
 
 const PATH = '/start';
 const QUICK_ANSWER =
-  'You need Spotify Premium for the app owner, plus free GitHub, Vercel and database accounts. Create a Spotify developer app, deploy AutoSort to Vercel, paste two keys and connect Spotify. It takes about 15 minutes, and AutoSort itself costs nothing. Your copy runs on your own accounts, so your data stays yours.';
+  'You need Spotify Premium for the app owner, plus free GitHub and Vercel accounts. Create a Spotify developer app, deploy AutoSort to Vercel, paste two keys and connect Spotify. It takes about 15 minutes, and AutoSort itself costs nothing. Your copy runs on your own accounts, so your data stays yours.';
 
 export const metadata: Metadata = pageMetadata({
   title: 'Deploy your own Spotify playlist organizer',
@@ -31,7 +31,7 @@ const NEEDS = [
   },
   { title: 'GitHub account', body: 'Holds your copy of the code.', ...FREE },
   { title: 'Vercel account', body: 'Runs the app and the daily sync.', ...FREE },
-  { title: 'A database', body: 'Vercel creates one during deploy.', ...FREE },
+  { title: 'Storage', body: 'Nothing to sign up for: Vercel creates it during deploy.', ...FREE },
 ];
 
 const STEPS = [
@@ -50,7 +50,7 @@ const STEPS = [
     howTo: 'Deploy your own copy of AutoSort to Vercel and paste both keys. Vercel sets up the database and the daily sync schedule.',
   },
   {
-    title: 'Connect Spotify and pick Favs',
+    title: 'Connect Spotify and pick your playlist',
     body: 'Accept Smart suggestions and your playlists appear in Spotify.',
     time: '~5 min',
     href: '/docs/how-it-works',
@@ -67,8 +67,8 @@ const BEFORE: Array<{ q: string; a: ReactNode }> = [
     q: 'What does it cost to run?',
     a: (
       <>
-        AutoSort is free, with no subscription. A family-sized setup is built to fit the free tiers of Vercel and the database host, which
-        you sign up for yourself. The only paid requirement is Spotify&apos;s: the owner of the Spotify developer app needs Premium.
+        AutoSort is free, with no subscription. A family-sized setup is built to fit Vercel&apos;s free plan, including the small database it
+        creates for you. The only paid requirement is Spotify&apos;s: the owner of the Spotify developer app needs Premium.
       </>
     ),
   },

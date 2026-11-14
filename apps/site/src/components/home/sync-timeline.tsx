@@ -33,7 +33,7 @@ export function SyncTimeline() {
       <ol className="m-0 flex list-none flex-col p-0">
         <Event marker="violet">
           <Time>6:00 AM</Time>
-          <span className="text-[16px] font-bold">14 new songs in Favs</span>
+          <span className="text-[16px] font-bold">14 new songs in Everything</span>
         </Event>
         <Event marker="amber">
           <span className="sr-only">Filed into smart playlists:</span>

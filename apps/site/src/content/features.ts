@@ -84,7 +84,7 @@ export interface WhereExample {
   title: string;
   lead: string;
   caption: string;
-  /** First column heading. Default "Song in Favs". */
+  /** First column heading. Default "Song". */
   songColumn?: string;
   /** Middle columns, between the song and "Goes to". */
   columns: string[];
@@ -281,9 +281,9 @@ export const splitPages: FeaturePage[] = [
       'AutoSort reads every song in a Spotify playlist, looks up each artist’s genres, and creates one playlist per genre, such as Country, Rap or Worship. It’s free and open source. Songs you add later are filed into the right genre playlist by a daily sync, so the split stays current.',
     hero: {
       type: 'fanout',
-      ariaLabel: 'Example: a made-up 2,431-song playlist called Favs split into six genre playlists, with 257 songs left unmatched',
+      ariaLabel: 'Example: a made-up 2,431-song playlist called Everything split into six genre playlists, with 257 songs left unmatched',
       note: 'Example counts for a made-up 2,431-song playlist.',
-      source: { name: 'Favs', sub: '2,431 songs, every genre', cover: 'mosaic' },
+      source: { name: 'Everything', sub: '2,431 songs, every genre', cover: 'mosaic' },
       targets: [
         { name: 'Rap', count: 520, cover: COVER.rap },
         { name: 'Pop', count: 468, cover: COVER.love },
@@ -325,8 +325,8 @@ export const splitPages: FeaturePage[] = [
     example: {
       type: 'where',
       title: 'Example: where each song goes',
-      lead: 'Made-up songs and artists, shaped like a real Favs playlist. One song can land in more than one playlist.',
-      caption: 'Songs from Favs and the genre playlists they are filed into',
+      lead: 'Made-up songs and artists, shaped like a real catch-all playlist. One song can land in more than one playlist.',
+      caption: 'Songs from Everything and the genre playlists they are filed into',
       columns: ['Artist genres', 'Released'],
       rows: [
         { song: 'Tailgate Summer', artist: 'Kacey Lynn Dorsey', cells: ['country, country pop', '2023'], to: 'Country' },
@@ -371,7 +371,7 @@ export const splitPages: FeaturePage[] = [
         a: 'No. AutoSort is free and open source under the MIT license. You run your own copy with your own free Spotify developer app, and the app owner needs Spotify Premium.',
       },
     ],
-    cta: { title: 'Split Favs by genre for good', body: FREE_BODY },
+    cta: { title: 'Split your playlist by genre for good', body: FREE_BODY },
   },
   {
     kind: 'split',
@@ -385,9 +385,9 @@ export const splitPages: FeaturePage[] = [
       'AutoSort groups the songs in a Spotify playlist by the decade they first came out and creates one playlist per decade, like 90s or 2000s. It checks each song’s original release year on MusicBrainz, so a 1994 hit on a 2015 Greatest Hits album still lands in 90s. New songs are filed daily.',
     hero: {
       type: 'fanout',
-      ariaLabel: 'Example: a made-up 2,431-song playlist called Favs split into seven decade playlists, from the 60s to the 2020s',
+      ariaLabel: 'Example: a made-up 2,431-song playlist called Everything split into seven decade playlists, from the 60s to the 2020s',
       note: 'Example counts for a made-up 2,431-song playlist.',
-      source: { name: 'Favs', sub: '2,431 songs, 1964 to 2026', cover: 'mosaic' },
+      source: { name: 'Everything', sub: '2,431 songs, 1964 to 2026', cover: 'mosaic' },
       targets: [
         { name: '60s', count: 58, cover: COVER.unmatched },
         { name: '70s', count: 96, cover: COVER.worship },
@@ -426,7 +426,7 @@ export const splitPages: FeaturePage[] = [
       type: 'where',
       title: 'Example: where each song goes',
       lead: 'Made-up songs and artists. The original year comes from MusicBrainz; when it isn’t found, AutoSort uses the album year.',
-      caption: 'Songs from Favs, their Spotify album date, original year, and the decade playlist they are filed into',
+      caption: 'Songs from Everything, their Spotify album date, original year, and the decade playlist they are filed into',
       columns: ['Spotify album date', 'Original year'],
       rows: [
         { song: 'Dance Hall Saturday', artist: 'Billy Ray Cantrell', cells: ['2015 (Greatest Hits)', '1994'], to: '90s' },
@@ -480,9 +480,9 @@ export const splitPages: FeaturePage[] = [
       'AutoSort files each song into moods like Happy, Sad, Chill, Workout, Party and Focus. It plots energy against valence (how positive a song sounds) using scores from ReccoBeats, adds Last.fm crowd tags if you have a free key, and creates one playlist per mood. The rules are plain and editable, with no AI.',
     hero: {
       type: 'fanout',
-      ariaLabel: 'Example: a made-up 2,431-song playlist called Favs split into six mood playlists: Happy, Chill, Workout, Party, Sad and Focus',
+      ariaLabel: 'Example: a made-up 2,431-song playlist called Everything split into six mood playlists: Happy, Chill, Workout, Party, Sad and Focus',
       note: 'Example counts for a made-up 2,431-song playlist. A song can fit more than one mood.',
-      source: { name: 'Favs', sub: '2,431 songs, every mood', cover: 'mosaic' },
+      source: { name: 'Everything', sub: '2,431 songs, every mood', cover: 'mosaic' },
       targets: [
         { name: 'Happy', count: 418, cover: COVER.happy },
         { name: 'Chill', count: 362, cover: COVER.chill },
@@ -509,7 +509,7 @@ export const splitPages: FeaturePage[] = [
       cards: [
         {
           title: 'The right playlist for the moment',
-          text: 'Chill for dinner, Happy for the drive, Focus for work, all from the same Favs.',
+          text: 'Chill for dinner, Happy for the drive, Focus for work, all from the same playlist.',
           chips: ['Mood: Chill', 'Mood: Happy', 'Mood: Focus'],
         },
         {
@@ -538,7 +538,7 @@ export const splitPages: FeaturePage[] = [
       type: 'where',
       title: 'Example: where each song goes',
       lead: 'Made-up songs with example scores. Energy and valence run from 0 to 1, and one song can match more than one mood.',
-      caption: 'Songs from Favs, their energy, valence and tags, and the mood playlists they are filed into',
+      caption: 'Songs from Everything, their energy, valence and tags, and the mood playlists they are filed into',
       columns: ['Energy', 'Valence', 'Last.fm tags'],
       rows: [
         { song: 'Lemonade Skies', artist: 'Pearl & the Porch Lights', cells: ['0.62', '0.86', 'feel good, summer'], to: 'Happy' },
@@ -579,7 +579,7 @@ export const splitPages: FeaturePage[] = [
         a: 'It can still get a mood from Last.fm tags. A song with no scores and no tags doesn’t match a mood rule, so it stays out of mood playlists instead of being guessed.',
       },
     ],
-    cta: { title: 'Find the moods hiding in Favs', body: FREE_BODY },
+    cta: { title: 'Find the moods hiding in your playlist', body: FREE_BODY },
   },
   {
     kind: 'split',
@@ -590,14 +590,14 @@ export const splitPages: FeaturePage[] = [
     metaDescription:
       'Create a clean copy of any Spotify playlist that leaves out songs marked explicit and stays in sync as you add music. Free, open-source and self-hosted.',
     quickAnswer:
-      'AutoSort makes a clean copy of a Spotify playlist by leaving out every song Spotify marks as explicit. Do it for a whole playlist (Clean Favs) or one genre (Clean Rap). The copy updates daily, so new clean songs are added, explicit ones never get in, and your original stays untouched.',
+      'AutoSort makes a clean copy of a Spotify playlist by leaving out every song Spotify marks as explicit. Do it for a whole playlist (Clean Everything) or one genre (Clean Rap). The copy updates daily, so new clean songs are added, explicit ones never get in, and your original stays untouched.',
     hero: {
       type: 'fanout',
-      ariaLabel: 'Example: a made-up 2,431-song playlist called Favs, 469 of them explicit, turned into Clean Favs and four clean genre playlists',
+      ariaLabel: 'Example: a made-up 2,431-song playlist called Everything, 469 of them explicit, turned into Clean Everything and four clean genre playlists',
       note: 'Example counts for a made-up 2,431-song playlist.',
-      source: { name: 'Favs', sub: '2,431 songs, 469 explicit', cover: 'mosaic' },
+      source: { name: 'Everything', sub: '2,431 songs, 469 explicit', cover: 'mosaic' },
       targets: [
-        { name: 'Clean Favs', count: 1962, cover: COVER.fresh },
+        { name: 'Clean Everything', count: 1962, cover: COVER.fresh },
         { name: 'Clean Rap', count: 341, cover: COVER.rap },
         { name: 'Clean Pop', count: 437, cover: COVER.love },
         { name: 'Clean Country', count: 405, cover: COVER.country },
@@ -611,7 +611,7 @@ export const splitPages: FeaturePage[] = [
         { title: 'Check the explicit flag', text: 'Spotify marks each track as explicit or not. AutoSort reads that flag for every song.' },
         {
           title: 'Add the Clean only rule',
-          text: 'Use it alone for Clean Favs, or with a genre for Clean Rap. AutoSort suggests a clean version when a quarter or more of a genre is explicit.',
+          text: 'Use it alone for Clean Everything, or with a genre for Clean Rap. AutoSort suggests a clean version when a quarter or more of a genre is explicit.',
         },
         { title: 'It stays clean', text: 'The daily sync adds new songs that aren’t explicit and removes any song you take out of the source.' },
       ],
@@ -620,23 +620,23 @@ export const splitPages: FeaturePage[] = [
       title: 'When a clean version helps',
       cards: [
         { title: 'Car rides with the kids', text: 'Play Clean Rap on the school run without reaching for the skip button.', chips: ['Genre: Rap', 'Clean only'] },
-        { title: 'Shared spaces', text: 'A clean copy of Favs for the office, a family party or the gym floor.', chips: ['Clean only'] },
+        { title: 'Shared spaces', text: 'A clean copy of your main playlist for the office, a family party or the gym floor.', chips: ['Clean only'] },
         { title: 'Clean plus mood', text: 'Combine rules for a clean Workout or a clean Party playlist.', chips: ['Mood: Workout', 'Clean only'] },
       ],
     },
     example: {
       type: 'where',
       title: 'Example: where each song goes',
-      lead: 'Made-up songs. In this example the playlists are Rap, Clean Rap, Pop, Country, R&B and Clean Favs.',
-      caption: 'Songs from Favs, their explicit flag, and the playlists they are filed into',
+      lead: 'Made-up songs. In this example the playlists are Rap, Clean Rap, Pop, Country, R&B and Clean Everything.',
+      caption: 'Songs from Everything, their explicit flag, and the playlists they are filed into',
       columns: ['Genre', 'Explicit on Spotify'],
       rows: [
         { song: 'Concrete Halo', artist: 'Lil Tremaine', cells: ['Rap', 'Explicit'], to: 'Rap' },
-        { song: 'Concrete Halo (Radio Edit)', artist: 'Lil Tremaine', cells: ['Rap', 'Not explicit'], to: 'Rap, Clean Rap, Clean Favs' },
-        { song: 'Sunday Cypher', artist: 'Deacon Rhodes', cells: ['Rap', 'Not explicit'], to: 'Rap, Clean Rap, Clean Favs' },
+        { song: 'Concrete Halo (Radio Edit)', artist: 'Lil Tremaine', cells: ['Rap', 'Not explicit'], to: 'Rap, Clean Rap, Clean Everything' },
+        { song: 'Sunday Cypher', artist: 'Deacon Rhodes', cells: ['Rap', 'Not explicit'], to: 'Rap, Clean Rap, Clean Everything' },
         { song: 'Velvet Rearview', artist: 'Odessa Cole', cells: ['R&B', 'Explicit'], to: 'R&B' },
-        { song: 'Tailgate Summer', artist: 'Kacey Lynn Dorsey', cells: ['Country', 'Not explicit'], to: 'Country, Clean Favs' },
-        { song: 'Lemonade Skies', artist: 'Pearl & the Porch Lights', cells: ['Pop', 'Not explicit'], to: 'Pop, Clean Favs' },
+        { song: 'Tailgate Summer', artist: 'Kacey Lynn Dorsey', cells: ['Country', 'Not explicit'], to: 'Country, Clean Everything' },
+        { song: 'Lemonade Skies', artist: 'Pearl & the Porch Lights', cells: ['Pop', 'Not explicit'], to: 'Pop, Clean Everything' },
       ],
     },
     related: [
@@ -668,7 +668,7 @@ export const splitPages: FeaturePage[] = [
         a: 'Yes. Songs you add to the clean playlist yourself are kept on every sync, and you can pin or exclude any song.',
       },
     ],
-    cta: { title: 'Make a clean copy of Favs', body: FREE_BODY },
+    cta: { title: 'Make a clean copy of your playlist', body: FREE_BODY },
   },
   {
     kind: 'split',
@@ -720,8 +720,8 @@ export const splitPages: FeaturePage[] = [
           chips: ['Up to 5 users'],
         },
         {
-          title: 'Moving off a Favs playlist',
-          text: 'The optional Move Favs into Liked Songs keeps each song’s original date added and backs up Liked Songs first.',
+          title: 'Moving off a catch-all playlist',
+          text: 'The optional Move a playlist into Liked Songs keeps each song’s original date added and backs up Liked Songs first.',
           chips: ['Keeps date added', 'Backs up first'],
         },
       ],
@@ -761,10 +761,10 @@ export const splitPages: FeaturePage[] = [
       },
       {
         q: 'Will AutoSort change my Liked Songs?',
-        a: 'Not unless you ask. It reads Liked Songs and writes to the playlists it creates. The one exception is the optional Move Favs into Liked Songs, which backs up Liked Songs before it adds anything.',
+        a: 'Not unless you ask. It reads Liked Songs and writes to the playlists it creates. The one exception is the optional Move a playlist into Liked Songs, which backs up Liked Songs before it adds anything.',
       },
       {
-        q: 'Can I move my Favs playlist into Liked Songs?',
+        q: 'Can I move my main playlist into Liked Songs?',
         a: 'Yes, as an option. It keeps each song’s original date added, so newest-first order survives the move, and it backs up your Liked Songs first.',
       },
       {
@@ -1174,9 +1174,9 @@ export const sortPages: FeaturePage[] = [
       'AutoSort reorders a Spotify playlist by the date each song was added, newest first or oldest first, and saves that order into the playlist itself. Smart playlists it creates use newest added first by default, so the songs you just added sit at the top after each daily sync.',
     hero: {
       type: 'list',
-      ariaLabel: 'Example: six made-up songs in a playlist called Favs, sorted newest added first, from November 12, 2026 back to March 3, 2024',
+      ariaLabel: 'Example: six made-up songs in a playlist called Everything, sorted newest added first, from November 12, 2026 back to March 3, 2024',
       note: 'Example playlist with made-up songs and dates.',
-      title: 'Favs',
+      title: 'Everything',
       caption: 'newest added first',
       rows: sortRows(ADDED_BEFORE, 'desc').map((r) => ({ title: r.title, artist: r.artist, value: r.value })),
     },
@@ -1231,8 +1231,8 @@ export const sortPages: FeaturePage[] = [
         a: 'So the songs you just added show up at the top after each daily sync. You can switch any smart playlist to BPM, an energy arc, harmonic flow or release year instead.',
       },
       {
-        q: 'If I move my Favs playlist into Liked Songs, are the dates kept?',
-        a: 'With AutoSort’s optional Move Favs into Liked Songs, yes. It keeps each song’s original date added and backs up Liked Songs first.',
+        q: 'If I move my main playlist into Liked Songs, are the dates kept?',
+        a: 'With AutoSort’s optional Move a playlist into Liked Songs, yes. It keeps each song’s original date added and backs up Liked Songs first.',
       },
     ],
     cta: { title: 'Keep your newest songs on top', body: FREE_BODY },

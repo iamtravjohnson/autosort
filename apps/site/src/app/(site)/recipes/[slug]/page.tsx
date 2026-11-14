@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 function howToSteps(r: SiteRecipe) {
   return [
     { name: 'Copy the recipe', text: `Use Copy recipe to grab the ${r.name} rules as JSON, or import them into your AutoSort.` },
-    { name: 'Pick your source', text: 'Point it at the playlist you save songs to, like Favs or Liked Songs.' },
+    { name: 'Pick your source', text: 'Point it at the playlist you save songs to, or at Liked Songs.' },
     { name: 'Save it to Spotify', text: `The playlist appears in Spotify as "${r.name} (AutoSort)" and fills with the songs that match.` },
     {
       name: 'Let it update',

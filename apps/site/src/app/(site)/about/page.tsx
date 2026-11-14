@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Breadcrumbs, JsonLd } from '@/components/seo';
 import { QuickAnswer } from '@/components/ui';
-import { pageMetadata } from '@/lib/seo';
+import { pageMetadata , founderPerson } from '@/lib/seo';
 import { absoluteUrl, site } from '@/lib/site';
 
 const TITLE = "I built AutoSort for my family's Favs playlists";
@@ -30,11 +30,7 @@ const aboutJsonLd = {
   '@type': 'AboutPage',
   name: TITLE,
   url: absoluteUrl('/about'),
-  mainEntity: {
-    '@type': 'Person',
-    name: site.founder.name,
-    url: site.founder.url,
-  },
+  mainEntity: founderPerson,
 };
 
 export default function AboutPage() {
@@ -57,6 +53,10 @@ export default function AboutPage() {
             {site.founder.name} · creator of AutoSort ·{' '}
             <a href={site.founder.url} target="_blank" rel="noopener noreferrer author">
               travisjohnson.com ↗
+            </a>{' '}
+            ·{' '}
+            <a href={site.founder.twitterUrl} target="_blank" rel="noopener noreferrer me">
+              {site.founder.twitter} on X ↗
             </a>
           </p>
         </div>

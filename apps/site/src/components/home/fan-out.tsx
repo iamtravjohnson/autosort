@@ -45,7 +45,7 @@ const FAN_CSS = `
 }`;
 
 const total = 2431;
-const label = `Example: a Favs playlist of ${total.toLocaleString('en-US')} songs fanning out into seven smart playlists: ${PLAYLISTS.map(
+const label = `Example: a playlist called Everything with ${total.toLocaleString('en-US')} songs fanning out into seven smart playlists: ${PLAYLISTS.map(
   (p) => `${p.name} ${p.count}`,
 ).join(', ')}.`;
 
@@ -78,7 +78,7 @@ export function FanOutDiagram() {
             <span className="bg-[#4A4530]" />
           </div>
           <div className="flex flex-col gap-0.5">
-            <span className="text-[18px] font-extrabold tracking-[-0.02em] sm:text-[22px]">Favs</span>
+            <span className="text-[18px] font-extrabold tracking-[-0.02em] sm:text-[22px]">Everything</span>
             <span className="tnum text-[13px] text-text-2">{total.toLocaleString('en-US')} songs</span>
           </div>
           <div className="flex flex-1 flex-col gap-2 overflow-hidden">

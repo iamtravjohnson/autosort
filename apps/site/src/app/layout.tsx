@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   applicationName: site.name,
   authors: [{ name: site.founder.name, url: site.founder.url }],
   openGraph: { siteName: site.name, type: 'website', locale: 'en_US' },
-  twitter: { card: 'summary_large_image' },
+  twitter: { card: 'summary_large_image', creator: site.founder.twitter, site: site.founder.twitter },
 };
 
 export const viewport: Viewport = { themeColor: '#0B0B0C', colorScheme: 'dark' };
