@@ -91,7 +91,7 @@ export default function UpdatingPage() {
           label="update commands"
           lines={[
             `git clone --depth 1 ${site.github}.git /tmp/autosort-latest`,
-            'rsync -a --delete --exclude .git --exclude .github /tmp/autosort-latest/apps/web/ ./',
+            'rsync -a --checksum --delete --exclude .git --exclude .github /tmp/autosort-latest/apps/web/ ./',
             'git add -A && git commit -m "Update AutoSort" && git push',
           ]}
         />

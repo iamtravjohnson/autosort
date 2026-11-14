@@ -25,7 +25,7 @@ jobs:
 
       - name: Copy it into this repository
         # .github is left alone: GitHub doesn't let workflows edit workflow files.
-        run: rsync -a --delete --exclude .git --exclude .github "$RUNNER_TEMP/autosort/apps/web/" ./
+        run: rsync -a --checksum --delete --exclude .git --exclude .github "$RUNNER_TEMP/autosort/apps/web/" ./
 
       - name: Commit and push
         run: |
