@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { diffPlaylist, planSmartPlaylist, suggestPlaylists, unmatchedTracks, type SmartPlaylistDefinition } from '../src/index.js';
+import { diffPlaylist, planSmartPlaylist, suggestPlaylists,
+  suggestionSizes, unmatchedTracks, type SmartPlaylistDefinition } from '../src/index.js';
 import { facts, ref } from './fixtures.js';
 
 const day = (d: number) => new Date(Date.UTC(2024, 0, 1) + d * 86_400_000).toISOString();
@@ -19,8 +20,18 @@ describe('suggestPlaylists', () => {
   it('suggests genres, decades and clean versions from a Favs-style playlist', () => {
     const names = suggestPlaylists(favs()).map((s) => s.name);
     expect(names).toEqual(expect.arrayContaining(['Country', '90s Country', 'Rap', 'Clean Rap', 'Worship']));
-    expect(names).not.toContain('Pop'); // only 10 songs
+    expect(names).toContain('Pop'); // 10 songs is enough in a small library
+    expect(suggestPlaylists(favs(), { minSize: 25 }).map((s) => s.name)).not.toContain('Pop');
     expect(names.filter((n) => n === 'Worship')).toHaveLength(1); // genre and theme not duplicated
+  });
+
+  it('scales sizes to the library and skips near-duplicate genres', () => {
+    expect(suggestionSizes(360)).toEqual({ genre: 11, 'genre-decade': 9, clean: 9, theme: 6, mood: 18 });
+    expect(suggestionSizes(5000).genre).toBe(25);
+    // Every Indie song is also Folk: Folk is suggested, Indie is skipped.
+    const both = Array.from({ length: 20 }, (_, i) => facts({ id: `f${i}`, genres: ['indie folk'] }));
+    const names = suggestPlaylists(both).map((s) => s.name);
+    expect(names.filter((n) => n === 'Folk' || n === 'Indie')).toHaveLength(1);
   });
 
   it('skips rules that already have playlists and reports counts and samples', () => {
@@ -35,7 +46,7 @@ describe('suggestPlaylists', () => {
 
   it('finds unmatched songs', () => {
     const list = favs();
-    const rules = suggestPlaylists(list).map((s) => s.rule);
+    const rules = suggestPlaylists(list, { minSize: 25 }).map((s) => s.rule);
     expect(unmatchedTracks(list, rules)).toHaveLength(10); // the pop songs
   });
 });
