@@ -224,12 +224,12 @@ export function PreviewNotice({ className = '' }: { className?: string }) {
     <div role="note" className={`flex items-start gap-3 rounded-card border border-accent/40 bg-accent/10 px-[18px] py-4 text-[15px] leading-[1.6] text-[#EDE9FE] ${className}`}>
       <span className="mt-[7px] size-2 shrink-0 rounded-pill bg-accent" aria-hidden="true" />
       <span>
-        <strong className="text-text-1">The one-click deploy is coming soon.</strong> AutoSort&apos;s engine is open source and already
-        runs the founder&apos;s family setup. The self-hosted app these steps describe is being finished now.{' '}
+        <strong className="text-text-1">Coming soon: you can&apos;t set up your own AutoSort yet.</strong> It currently runs only for its
+        creator&apos;s family while the public version is finished.{' '}
         <a href="https://github.com/iamtravjohnson/autosort" target="_blank" rel="noopener noreferrer">
-          Star the repo on GitHub
+          Star it on GitHub
         </a>{' '}
-        to hear when it ships.
+        to get notified when it&apos;s ready.
       </span>
     </div>
   );
