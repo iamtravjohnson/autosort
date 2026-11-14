@@ -15,13 +15,17 @@ export interface AnalysisState {
   steps: Partial<Record<Step, Count>>;
   /** Genre lookups still to do after the last finished round. */
   genresLeft: number | null;
+  /** Genre lookups finished in earlier rounds (so counts keep climbing across rounds). */
+  genresDoneBefore: number;
+  /** What was still pending after the last finished round, per step. */
+  lastPending: Partial<Record<Step, number>> | null;
   startedAt: number | null;
   message?: string;
   reconnect?: boolean;
 }
 
 const MAX_ROUNDS = 5;
-const IDLE: AnalysisState = { status: 'idle', round: 0, songs: null, steps: {}, genresLeft: null, startedAt: null };
+const IDLE: AnalysisState = { status: 'idle', round: 0, songs: null, steps: {}, genresLeft: null, genresDoneBefore: 0, lastPending: null, startedAt: null };
 
 /**
  * Runs an analysis through the streaming route and keeps live counts. Each request is one round;
@@ -67,8 +71,12 @@ export function useAnalysis() {
             if (e.type === 'read') setState((s) => ({ ...s, songs: e.total }));
             if (e.type === 'step') setState((s) => ({ ...s, steps: { ...s.steps, [e.step]: { done: e.done, total: e.total } } }));
             if (e.type === 'done') {
-              left = (e.pending.tags ?? 0) + (e.pending.albumTags ?? 0) + (e.pending.artistTags ?? 0);
-              setState((s) => ({ ...s, songs: e.songs, genresLeft: left }));
+              const leftNow = (e.pending.tags ?? 0) + (e.pending.albumTags ?? 0) + (e.pending.artistTags ?? 0);
+              left = leftNow;
+              setState((s) => {
+                const roundGenres = (['tags', 'albumTags', 'artistTags'] as const).reduce((n, k) => n + (s.steps[k]?.total ?? 0), 0);
+                return { ...s, songs: e.songs, genresLeft: leftNow, genresDoneBefore: s.genresDoneBefore + roundGenres, lastPending: e.pending };
+              });
             }
           }
         }

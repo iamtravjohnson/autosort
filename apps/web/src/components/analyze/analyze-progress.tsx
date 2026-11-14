@@ -62,17 +62,30 @@ export function AnalyzeProgress({ name, state, doneLabel }: { name: string; stat
   const elapsed = state.startedAt ? now - state.startedAt : 0;
   const finished = state.status === 'done';
   const read = state.songs !== null;
+  const songs = state.songs ?? 0;
+  const pending = state.lastPending;
   const audio = sum(state.steps.audio);
-  const genres = sum(state.steps.tags, state.steps.albumTags, state.steps.artistTags);
+  const roundGenres = sum(state.steps.tags, state.steps.albumTags, state.steps.artistTags);
   const years = sum(state.steps.years);
-  const genreFrac = state.round > 1 ? 0.6 + 0.4 * frac(genres) : frac(genres);
-  const real = (read ? 0.1 : 0) + 0.2 * frac(audio) + 0.55 * genreFrac + 0.15 * frac(years);
-  const estimate = 0.92 * (1 - Math.exp(-elapsed / 90_000));
-  const pct = finished ? 100 : Math.min(99, Math.round(Math.max(real, estimate) * 100));
 
-  const stepState = (c: Count, started: boolean): 'waiting' | 'working' | 'done' =>
-    finished || (c.total > 0 && c.done >= c.total) ? 'done' : started ? 'working' : 'waiting';
-  const countLabel = (c: Count, noun: string) => (c.total > 0 ? `${c.done.toLocaleString('en-US')} of ${c.total.toLocaleString('en-US')} ${noun}` : read ? 'checking…' : '');
+  // Steps finished in an earlier round stay finished.
+  const audioDone = finished || pending?.audio === 0 || (audio.total > 0 && audio.done >= audio.total);
+  // Genre lookups count across rounds: earlier rounds plus this one, out of everything known so far.
+  const genresDone = state.genresDoneBefore + roundGenres.done;
+  const genresTotal = state.round > 1 && state.genresLeft !== null ? state.genresDoneBefore + state.genresLeft : roundGenres.total;
+  const genres = { done: Math.min(genresDone, genresTotal), total: genresTotal };
+  const genresComplete = finished || (pending !== null && state.genresLeft === 0);
+  const yearsKnown = pending ? Math.max(0, songs - (pending.years ?? 0)) : years.done;
+
+  const real = (read ? 0.1 : 0) + 0.2 * (audioDone ? 1 : frac(audio)) + 0.6 * (genresComplete ? 1 : frac(genres)) + 0.1 * (pending ? 1 : frac(years));
+  const estimate = 0.92 * (1 - Math.exp(-elapsed / 90_000));
+  const computed = finished ? 100 : Math.min(99, Math.round(Math.max(real, estimate) * 100));
+
+  // The bar only moves forward, even when a new round starts its counts from zero.
+  // (React's "adjust state while rendering" pattern: remember the highest value shown for this run.)
+  const [peak, setPeak] = useState({ run: state.startedAt, pct: 0 });
+  const pct = peak.run === state.startedAt ? Math.max(peak.pct, computed) : computed;
+  if (peak.run !== state.startedAt || pct !== peak.pct) setPeak({ run: state.startedAt, pct });
 
   const activity = finished
     ? doneLabel
@@ -80,7 +93,8 @@ export function AnalyzeProgress({ name, state, doneLabel }: { name: string; stat
       ? 'Reading your songs from Spotify…'
       : state.round > 1
         ? `Finishing genre lookups (round ${state.round})…`
-        : `Looking up tempo, key and genres for ${state.songs?.toLocaleString('en-US')} songs…`;
+        : `Looking up tempo, key and genres for ${songs.toLocaleString('en-US')} songs…`;
+  const of = (c: Count, noun: string) => `${c.done.toLocaleString('en-US')} of ${c.total.toLocaleString('en-US')} ${noun}`;
 
   return (
     <div className="tnum flex flex-col gap-5 rounded-panel bg-surface-2 p-5 sm:p-6">
@@ -99,19 +113,37 @@ export function AnalyzeProgress({ name, state, doneLabel }: { name: string; stat
       </div>
 
       <div role="progressbar" aria-label={`Analyzing ${name}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct} className="relative h-2.5 overflow-hidden rounded-pill bg-surface-3">
-        <span className="block h-full rounded-pill bg-gradient-to-r from-accent to-accent-soft transition-[width] duration-700 ease-out" style={{ width: `${pct}%` }} />
+        <span className="block h-full rounded-pill bg-gradient-to-r from-accent to-accent-soft transition-[width] duration-500 ease-out" style={{ width: `${pct}%` }} />
         {finished ? null : <span className="as-shimmer absolute inset-0" />}
       </div>
 
       <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
-        <Row label="Read your songs from Spotify" detail={read ? `${state.songs?.toLocaleString('en-US')} songs` : ''} state={read || finished ? 'done' : 'working'} />
-        <Row label="Tempo, key and energy" detail={countLabel(audio, 'songs')} state={stepState(audio, read)} />
+        <Row label="Read your songs from Spotify" detail={read ? `${songs.toLocaleString('en-US')} songs` : ''} state={read || finished ? 'done' : 'working'} />
         <Row
-          label={state.round > 1 ? `Genres (round ${state.round})` : 'Genres from song, album and artist tags'}
-          detail={countLabel(genres, 'lookups')}
-          state={stepState(genres, read)}
+          label="Tempo, key and energy"
+          detail={audioDone && read ? `${songs.toLocaleString('en-US')} songs` : audio.total > 0 ? of(audio, 'songs') : read ? 'checking…' : ''}
+          state={audioDone ? 'done' : read ? 'working' : 'waiting'}
         />
-        <Row label="Original release years" detail={finished ? 'the rest fill in each night' : countLabel(years, 'songs')} state={stepState(years, read)} />
+        <Row
+          label="Genres from song, album and artist tags"
+          detail={genresComplete && genres.total === 0 ? 'already looked up' : genres.total > 0 ? of(genres, 'lookups') : read ? 'checking…' : ''}
+          state={genresComplete ? 'done' : read ? 'working' : 'waiting'}
+        />
+        <Row
+          label="Original release years"
+          detail={
+            finished && pending && (pending.years ?? 0) > 0
+              ? `${yearsKnown.toLocaleString('en-US')} of ${songs.toLocaleString('en-US')} · the rest fill in each night`
+              : pending
+                ? `${yearsKnown.toLocaleString('en-US')} of ${songs.toLocaleString('en-US')} songs`
+                : years.total > 0
+                  ? of(years, 'songs')
+                  : read
+                    ? 'checking…'
+                    : ''
+          }
+          state={finished ? 'done' : read ? 'working' : 'waiting'}
+        />
       </ul>
 
       {finished ? null : <p className="m-0 text-[13px] text-text-3">Keep this page open. Big playlists can take a few minutes the first time.</p>}
