@@ -31,6 +31,7 @@ After that: **Settings → Update now**, or in your repository **Actions → Upd
 | `OPENROUTER_IMAGE_MODEL` | No | Image model, default `google/gemini-3-pro-image` |
 | `APP_URL` | No | Public address, including any `BASE_PATH`, if it can't be detected |
 | `BASE_PATH` | No | Serve AutoSort under a path on another site, e.g. `/autosort` (see below) |
+| `HOST_APP_URL`, `HOST_APP_NAME` | No | Show a "Back to …" link to that site, e.g. `https://example.com` and `My Dashboard` |
 
 ## Show it inside another site
 

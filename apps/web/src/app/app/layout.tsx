@@ -1,5 +1,6 @@
 import { missingScopes, SPOTIFY_ALL_SCOPES } from '@autosort/core';
 import Link from 'next/link';
+import { BackToHost } from '@/components/app/back-to-host';
 import { MobileTabs, SidebarNav } from '@/components/app/nav';
 import { Logo } from '@/components/logo';
 import { SpotifyLogo } from '@/components/ui';
@@ -32,9 +33,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           </a>
         </div>
       ) : null}
+      <BackToHost className="px-4 pt-3 lg:hidden" />
       <div className="flex flex-1 gap-2 p-2 pb-24 lg:pb-2">
         <aside aria-label="AutoSort navigation" className="hidden w-[288px] shrink-0 flex-col gap-2 lg:flex">
           <nav className="flex flex-col gap-0.5 rounded-panel bg-surface-1 px-3 py-4">
+            <BackToHost className="mb-3 px-3" />
             <div className="px-3 pb-3.5 pt-1">
               <Logo />
             </div>

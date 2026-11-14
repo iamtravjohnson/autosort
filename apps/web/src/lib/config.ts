@@ -30,3 +30,13 @@ export async function appUrl(): Promise<string> {
 export async function redirectUri(): Promise<string> {
   return `${await appUrl()}/api/auth/callback/spotify`;
 }
+
+/**
+ * Optional link back to the site AutoSort is shown inside (HOST_APP_URL + HOST_APP_NAME),
+ * e.g. a family dashboard that serves AutoSort at /autosort.
+ */
+export function hostLink(): { url: string; name: string } | null {
+  const url = process.env.HOST_APP_URL?.trim();
+  if (!url || !/^https?:\/\//.test(url)) return null;
+  return { url, name: process.env.HOST_APP_NAME?.trim() || 'Home' };
+}

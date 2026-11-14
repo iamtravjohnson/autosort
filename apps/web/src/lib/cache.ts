@@ -3,18 +3,26 @@ import type { Cache } from '@autosort/core';
 import { and, eq, gt, inArray, lt, sql } from 'drizzle-orm';
 import { db, schema } from '@/db';
 
+/**
+ * Postgres text can't hold NUL characters, and some engine cache keys use one as a separator
+ * ("artist\u0000title"). Store them with a visible separator instead.
+ */
+const toDbKey = (key: string) => key.replace(/\u0000/g, '\u241f');
+
 /** The engine's lookup cache, stored in Postgres with expiry. */
 export const dbCache: Cache = {
   async getMany<T>(namespace: string, keys: readonly string[]) {
     const out = new Map<string, T | null>();
     if (keys.length === 0) return out;
-    for (let i = 0; i < keys.length; i += 500) {
-      const slice = keys.slice(i, i + 500);
+    const original = new Map(keys.map((k) => [toDbKey(k), k]));
+    const dbKeys = [...original.keys()];
+    for (let i = 0; i < dbKeys.length; i += 500) {
+      const slice = dbKeys.slice(i, i + 500);
       const rows = await db()
         .select({ key: schema.cacheEntries.key, value: schema.cacheEntries.value })
         .from(schema.cacheEntries)
-        .where(and(eq(schema.cacheEntries.namespace, namespace), inArray(schema.cacheEntries.key, slice as string[]), gt(schema.cacheEntries.expiresAt, new Date())));
-      for (const r of rows) out.set(r.key, (r.value ?? null) as T | null);
+        .where(and(eq(schema.cacheEntries.namespace, namespace), inArray(schema.cacheEntries.key, slice), gt(schema.cacheEntries.expiresAt, new Date())));
+      for (const r of rows) out.set(original.get(r.key) ?? r.key, (r.value ?? null) as T | null);
     }
     return out;
   },
@@ -22,7 +30,7 @@ export const dbCache: Cache = {
     if (entries.length === 0) return;
     const expiresAt = new Date(Date.now() + ttlSeconds * 1000);
     for (let i = 0; i < entries.length; i += 500) {
-      const values = entries.slice(i, i + 500).map(([key, value]) => ({ namespace, key, value: value as unknown, expiresAt }));
+      const values = entries.slice(i, i + 500).map(([key, value]) => ({ namespace, key: toDbKey(key), value: value as unknown, expiresAt }));
       await db()
         .insert(schema.cacheEntries)
         .values(values)

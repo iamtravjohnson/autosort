@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Logo } from '@/components/logo';
+import { BackToHost } from '@/components/app/back-to-host';
 import { SpotifyLogo } from '@/components/ui';
 import { APP_VERSION, DISCLAIMER, DOCS_URL, GITHUB_URL } from '@/lib/config';
 
@@ -13,7 +14,8 @@ const GLOW = {
 /** Full-page frame for screens outside the app shell: glow, centered logo, footer. */
 export function AuthShell({ glow = 'connect', showVersion = false, children }: { glow?: keyof typeof GLOW; showVersion?: boolean; children: ReactNode }) {
   return (
-    <div className={`flex min-h-dvh flex-col items-center gap-6 px-4 pb-8 pt-7 sm:gap-8 sm:px-5 sm:pb-10 sm:pt-16 ${GLOW[glow]}`}>
+    <div className={`relative flex min-h-dvh flex-col items-center gap-6 px-4 pb-8 pt-7 sm:gap-8 sm:px-5 sm:pb-10 sm:pt-16 ${GLOW[glow]}`}>
+      <BackToHost className="self-start sm:absolute sm:left-6 sm:top-6" />
       <Logo size={34} wordmark={24} href="/" />
       {children}
       <footer className="mt-auto flex max-w-[520px] flex-col items-center gap-3 text-center text-[12px] text-text-3">
