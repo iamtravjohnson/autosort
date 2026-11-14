@@ -10,6 +10,7 @@ import {
   DocsEarlyReleaseNote,
   DocsSection,
   EnvTable,
+  OL,
   P,
   QuickAnswer,
   Screenshot,
@@ -117,8 +118,29 @@ export default function QuickStartPage() {
         </Step>
 
         <Step n={2} id="deploy" title="Deploy to Vercel">
-          <P>The button copies AutoSort to your GitHub and asks for these environment variables.</P>
+          <P>The button copies AutoSort to your GitHub, creates its database and asks for your two Spotify keys.</P>
           <DeployButton />
+          <P>Vercel walks you through a few screens. Here&apos;s what to pick:</P>
+          <OL>
+            <li>
+              <strong>Sign in to Vercel</strong> with GitHub. A free Hobby account is all you need.
+            </li>
+            <li>
+              <strong>Create the GitHub repository.</strong> Keep your own GitHub account and the suggested name. If you already have a
+              repository or Vercel project called <code>autosort</code>, use another name, like <code>autosort-family</code>. Keep it
+              private.
+            </li>
+            <li>
+              <strong>Add the Neon database.</strong> Region: keep <strong>Washington, D.C., USA (East)</strong>, where Vercel runs your
+              app by default. <strong>Auth:</strong> turn it off, since AutoSort signs people in with Spotify. <strong>Realtime:</strong>{' '}
+              leave it off. Plan: <strong>Free</strong>. If it asks for an environment variable prefix, leave it blank.
+            </li>
+            <li>
+              <strong>Paste your keys</strong> into <code>SPOTIFY_CLIENT_ID</code> and <code>SPOTIFY_CLIENT_SECRET</code>, then click{' '}
+              <strong>Deploy</strong>. It takes about two minutes.
+            </li>
+          </OL>
+          <P>The environment variables, for reference:</P>
           <EnvTable />
         </Step>
 

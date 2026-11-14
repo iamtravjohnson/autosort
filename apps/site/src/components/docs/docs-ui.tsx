@@ -418,6 +418,7 @@ export const ENV_VARS: Array<{ name: string; req: EnvRequirement; where: string 
   { name: 'DATABASE_URL', req: 'Auto', where: 'Filled in when Vercel creates the database' },
   { name: 'AUTH_SECRET', req: 'Auto', where: 'Generated during deploy' },
   { name: 'LASTFM_API_KEY', req: 'Optional', where: 'Free key from last.fm/api · improves mood and theme tags' },
+  { name: 'OPENROUTER_API_KEY', req: 'Optional', where: 'Key from openrouter.ai/keys · photo covers for new smart playlists' },
 ];
 
 const REQ_COLOR: Record<EnvRequirement, string> = {
