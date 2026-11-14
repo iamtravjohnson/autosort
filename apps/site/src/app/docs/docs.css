@@ -1,0 +1,182 @@
+/*
+ * Docs theme. Dark is the default; [data-theme="light"] on the docs wrapper swaps every --d-* token
+ * (light values from INVENTORY §1.7). Docs components read these variables, e.g. bg-[var(--d-bg)].
+ * Plain CSS on purpose: this file is imported by the docs layout only.
+ */
+.docs-root {
+  --d-bg: #0b0b0c;
+  --d-text: #ffffff;
+  --d-prose: #d4d4d8;
+  --d-text-2: #b3b3b8;
+  --d-text-3: #8a8a93;
+  --d-chip: #1c1c1f;
+  --d-panel: #141416;
+  --d-surface-2: #1c1c1f;
+  --d-input: #26262a;
+  --d-drawer: #141416;
+  --d-copy: #26262a;
+  --d-copy-hover: #303035;
+  --d-border: rgba(255, 255, 255, 0.08);
+  --d-border-strong: rgba(255, 255, 255, 0.12);
+  --d-border-card: rgba(255, 255, 255, 0.14);
+  --d-border-outline: rgba(255, 255, 255, 0.24);
+  --d-border-hover: rgba(255, 255, 255, 0.32);
+  --d-kbd-border: rgba(255, 255, 255, 0.16);
+  --d-link: #a78bfa;
+  --d-link-hover: #c4b5fd;
+  --d-accent: #8b5cf6;
+  --d-accent-text: #c4b5fd;
+  --d-tint: #241a3d;
+  --d-active-text: #ffffff;
+  --d-qa-text: #e4e4e7;
+  --d-qa-border: rgba(139, 92, 246, 0.4);
+  --d-code-text: #e4e4e7;
+  --d-success-text: #5eead4;
+  --d-seg-active-bg: #ffffff;
+  --d-seg-active-text: #0b0b0c;
+  --d-shot-a: #141416;
+  --d-shot-b: #18181b;
+  --d-deploy-bg: #ffffff;
+  --d-deploy-bg-hover: #e4e4e7;
+  --d-deploy-text: #0b0b0c;
+
+  --d-note-info-bg: rgba(56, 189, 248, 0.08);
+  --d-note-info-border: rgba(56, 189, 248, 0.3);
+  --d-note-info-text: #e0f2fe;
+  --d-note-info-icon: #7dd3fc;
+  --d-note-warning-bg: rgba(251, 191, 36, 0.08);
+  --d-note-warning-border: rgba(251, 191, 36, 0.35);
+  --d-note-warning-text: #fef3c7;
+  --d-note-warning-icon: #fcd34d;
+  --d-note-violet-bg: rgba(139, 92, 246, 0.1);
+  --d-note-violet-border: rgba(139, 92, 246, 0.4);
+  --d-note-violet-text: #ede9fe;
+  --d-note-violet-icon: #c4b5fd;
+
+  background: var(--d-bg);
+  color: var(--d-text);
+}
+
+.docs-root[data-theme='light'] {
+  color-scheme: light;
+
+  --d-bg: #ffffff;
+  --d-text: #0b0b0c;
+  --d-prose: #27272a;
+  --d-text-2: #52525b;
+  --d-text-3: #6b6b73;
+  --d-chip: #efeff1;
+  --d-panel: #f6f6f7;
+  --d-surface-2: #efeff1;
+  --d-input: #efeff1;
+  --d-drawer: #ffffff;
+  --d-copy: #e4e4e7;
+  --d-copy-hover: #d4d4d8;
+  --d-border: rgba(0, 0, 0, 0.08);
+  --d-border-strong: rgba(0, 0, 0, 0.14);
+  --d-border-card: rgba(0, 0, 0, 0.14);
+  --d-border-outline: rgba(0, 0, 0, 0.28);
+  --d-border-hover: rgba(0, 0, 0, 0.4);
+  --d-kbd-border: rgba(0, 0, 0, 0.14);
+  --d-link: #6d28d9;
+  --d-link-hover: #5b21b6;
+  --d-accent: #8b5cf6;
+  --d-accent-text: #6d28d9;
+  --d-tint: #ede9fe;
+  --d-active-text: #4c1d95;
+  --d-qa-text: #27272a;
+  --d-qa-border: #c4b5fd;
+  --d-code-text: #0b0b0c;
+  --d-success-text: #0f766e;
+  --d-seg-active-bg: #0b0b0c;
+  --d-seg-active-text: #ffffff;
+  --d-shot-a: #f6f6f7;
+  --d-shot-b: #efeff1;
+  --d-deploy-bg: #0b0b0c;
+  --d-deploy-bg-hover: #27272a;
+  --d-deploy-text: #ffffff;
+
+  --d-note-info-bg: #f0f9ff;
+  --d-note-info-border: #7dd3fc;
+  --d-note-info-text: #0c4a6e;
+  --d-note-info-icon: #0369a1;
+  --d-note-warning-bg: #fffbeb;
+  --d-note-warning-border: #fcd34d;
+  --d-note-warning-text: #78350f;
+  --d-note-warning-icon: #b45309;
+  --d-note-violet-bg: #f5f3ff;
+  --d-note-violet-border: #c4b5fd;
+  --d-note-violet-text: #4c1d95;
+  --d-note-violet-icon: #6d28d9;
+
+  /* Shared tokens, so shared components (PreviewNotice, WorksWithSpotify…) follow the light theme. */
+  --as-bg: #ffffff;
+  --as-surface-1: #f6f6f7;
+  --as-surface-2: #efeff1;
+  --as-surface-3: #e4e4e7;
+  --as-border: rgba(0, 0, 0, 0.08);
+  --as-text-1: #0b0b0c;
+  --as-text-2: #52525b;
+  --as-text-3: #6b6b73;
+  --as-prose: #27272a;
+}
+
+/* Paint the page edges (overscroll, short pages) in the docs background. */
+html:has(.docs-root[data-theme='light']),
+body:has(.docs-root[data-theme='light']) {
+  background: #ffffff;
+  color-scheme: light;
+}
+
+/* Anchor jumps: the mobile docs bar is sticky below 1280px; nothing is sticky above it. */
+html:has(.docs-root) {
+  scroll-padding-top: 76px;
+}
+@media (min-width: 1280px) {
+  html:has(.docs-root) {
+    scroll-padding-top: 24px;
+  }
+}
+
+/*
+ * Links. globals.css colors every <a> with an unlayered rule, which beats Tailwind's layered
+ * utilities. Inside the docs, plain prose links use the theme link color, and links that carry
+ * utility classes fall back to those utilities (revert-layer).
+ */
+.docs-root a {
+  color: var(--d-link);
+}
+.docs-root a:hover {
+  color: var(--d-link-hover);
+}
+.docs-root a[class] {
+  color: revert-layer;
+}
+
+/* Search inputs sit inside a pill that shows the focus ring (globals.css rings every :focus-visible). */
+.docs-root .docs-search-input {
+  outline: none;
+}
+.docs-root .docs-search-input:focus-visible {
+  outline: none;
+}
+
+/* The shared PreviewNotice is styled for dark backgrounds; restyle it for the light theme. */
+.docs-root[data-theme='light'] .docs-preview > [role='note'] {
+  background: var(--d-note-violet-bg);
+  border-color: var(--d-note-violet-border);
+  color: var(--d-note-violet-text);
+}
+
+/* Mobile docs drawer (<dialog>): dim the page and stop it scrolling underneath. */
+.docs-drawer::backdrop {
+  background: rgba(0, 0, 0, 0.6);
+}
+html:has(.docs-drawer[open]) {
+  overflow: hidden;
+}
+
+/* Striped screenshot placeholder. */
+.docs-shot {
+  background: repeating-linear-gradient(135deg, var(--d-shot-a) 0 12px, var(--d-shot-b) 12px 24px);
+}
