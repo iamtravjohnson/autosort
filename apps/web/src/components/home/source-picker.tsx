@@ -1,0 +1,95 @@
+'use client';
+
+import Image from 'next/image';
+import Link from 'next/link';
+import { useActionState, useState } from 'react';
+import { addSource } from '@/app/app/sources/new/actions';
+import type { ActionState } from '@/lib/stats';
+import { ActionMessage } from './action-message';
+import { ChevronRightGlyph } from './glyphs';
+
+export interface PickerOption {
+  value: string;
+  name: string;
+  meta: string;
+  songs: number | null;
+  imageUrl: string | null;
+  art: string;
+  /** Already a source: link to it instead. */
+  existingId: string | null;
+}
+
+/** The source picker: one tap adds the playlist, reads it, then opens Smart suggestions. */
+export function SourcePicker({ options }: { options: PickerOption[] }) {
+  const [state, formAction, pending] = useActionState<ActionState | null, FormData>(addSource, null);
+  const [picked, setPicked] = useState<PickerOption | null>(null);
+
+  return (
+    <form action={formAction} className="flex flex-col gap-4">
+      <div aria-live="polite" className="empty:hidden">
+        {pending && picked ? (
+          <div className="tnum flex flex-col gap-4 rounded-panel bg-surface-2 p-5 sm:p-6">
+            <div className="flex flex-col gap-1">
+              <span className="text-[20px] font-extrabold tracking-[-0.02em] sm:text-[22px]">Analyzing {picked.name}…</span>
+              <span className="text-[14px] text-text-2">
+                {picked.songs ? `Reading ${picked.songs.toLocaleString('en-US')} songs and looking up genres, tempo, key and mood.` : 'Reading your songs and looking up genres, tempo, key and mood.'}{' '}
+                This can take a minute.
+              </span>
+            </div>
+            <div role="progressbar" aria-label="Analyzing" className="h-1.5 overflow-hidden rounded-pill bg-surface-3">
+              <span className="block h-full w-2/5 animate-pulse rounded-pill bg-accent" />
+            </div>
+            <p className="m-0 text-[13px] text-text-3">Keep this page open. Smart suggestions open when it&apos;s done.</p>
+          </div>
+        ) : (
+          <ActionMessage state={state} />
+        )}
+      </div>
+      <ul className="m-0 grid list-none grid-cols-1 gap-2.5 p-0 sm:grid-cols-[repeat(auto-fill,minmax(320px,1fr))] sm:gap-3">
+        {options.map((o) => {
+          const inner = (
+            <>
+              <span className="size-14 shrink-0 overflow-hidden rounded-art" style={{ background: o.art }} aria-hidden="true">
+                {o.imageUrl ? <Image src={o.imageUrl} alt="" width={56} height={56} unoptimized className="size-full object-cover" /> : null}
+              </span>
+              <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                <span className="truncate text-[15px] font-bold">{o.name}</span>
+                <span className="tnum truncate text-[13px] text-text-2">{o.meta}</span>
+              </span>
+            </>
+          );
+          return (
+            <li key={o.value}>
+              {o.existingId ? (
+                <Link
+                  href={`/app/sources/${o.existingId}`}
+                  className="flex w-full items-center gap-3.5 rounded-card bg-surface-2 p-2.5 text-text-1 no-underline hover:bg-[#222226] hover:text-text-1"
+                >
+                  {inner}
+                  <span className="shrink-0 rounded-pill bg-success/[0.14] px-2.5 py-1 text-[12px] font-bold text-success-text">Added</span>
+                </Link>
+              ) : (
+                <button
+                  type="submit"
+                  name="pick"
+                  value={o.value}
+                  disabled={pending}
+                  onClick={() => setPicked(o)}
+                  aria-label={`Use ${o.name} as a source`}
+                  className="flex w-full items-center gap-3.5 rounded-card bg-surface-2 p-2.5 text-left text-text-1 hover:bg-[#222226] disabled:cursor-wait disabled:opacity-60"
+                >
+                  {inner}
+                  {pending && picked?.value === o.value ? (
+                    <span className="shrink-0 text-[13px] font-bold text-accent-soft">Analyzing…</span>
+                  ) : (
+                    <ChevronRightGlyph size={18} className="shrink-0 text-text-2" />
+                  )}
+                </button>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </form>
+  );
+}
