@@ -10,6 +10,7 @@ import { APP_VERSION, MAX_PEOPLE } from '@/lib/config';
 import { timeAgo } from '@/lib/format';
 import { spotifyStatus } from '@/lib/queries';
 import { requireUser } from '@/lib/session';
+import { updateLinks } from '@/lib/updates';
 import { deleteMyData } from './actions';
 import { withBase } from '@/lib/base-path';
 
@@ -30,11 +31,12 @@ function Row({ k, children, tone = 'text-text-1' }: { k: string; children: React
 export default async function SettingsPage() {
   const user = await requireUser();
   const isOwner = user.role === 'owner';
-  const [account, info, spots, successor] = await Promise.all([
+  const [account, info, spots, successor, updates] = await Promise.all([
     spotifyStatus(user.id),
     instanceInfo(),
     isOwner ? spotsUsed() : Promise.resolve(null),
     isOwner ? nextOwner(user.id) : Promise.resolve(null),
+    isOwner ? updateLinks() : Promise.resolve(null),
   ]);
   const connection = connectionState(account);
   const schedule = dailySchedule();
@@ -165,7 +167,21 @@ export default async function SettingsPage() {
           Instance
         </h2>
         <dl className="m-0 flex flex-col">
-          <Row k="Version">v{APP_VERSION}</Row>
+          <Row k="Version">
+            v{APP_VERSION}
+            {updates ? (
+              <>
+                {' · '}
+                <a href={updates.runUrl} target="_blank" rel="noopener noreferrer" className="font-bold">
+                  Update now
+                </a>
+                {' · '}
+                <a href={updates.setupUrl} target="_blank" rel="noopener noreferrer">
+                  First time? Add the update action
+                </a>
+              </>
+            ) : null}
+          </Row>
           <Row k="Deployment">{info.deployment ?? 'Local'}</Row>
           <Row k="Database" tone="text-success-text">
             {info.dbSize ? `Connected · ${info.dbSize}` : 'Connected'}

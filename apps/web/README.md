@@ -13,7 +13,9 @@ Free and open source (MIT). Up to 5 people per copy (Spotify's limit for develop
 
 ## Update
 
-In your repository on GitHub: **Actions → Update AutoSort → Run workflow**. It copies the latest AutoSort into your repo and Vercel redeploys. Your settings and data are kept; code changes you made are overwritten. Details: [autosort.app/docs/updating](https://autosort.app/docs/updating)
+First time only: open **Settings** in your AutoSort and click **Add the update action**. GitHub opens a new file that's already filled in; click **Commit changes**. (Deploy to Vercel doesn't copy the `.github` folder, so the action ships in `updater/` instead.)
+
+After that: **Settings → Update now**, or in your repository **Actions → Update AutoSort → Run workflow**. It copies the latest AutoSort into your repo and Vercel redeploys. Your settings and data are kept; code changes you made are overwritten. Details: [autosort.app/docs/updating](https://autosort.app/docs/updating)
 
 ## Environment variables
 

@@ -76,8 +76,8 @@ const BEFORE: Array<{ q: string; a: ReactNode }> = [
     q: 'How do I get updates?',
     a: (
       <>
-        Your copy lives in your own GitHub repository. When a new version is out, run the Update AutoSort action there (one click) and
-        Vercel redeploys it. See{' '}
+        Your copy lives in your own GitHub repository. When a new version is out, click Update now in your AutoSort&apos;s Settings and
+        Vercel redeploys it. The first time, you add the update action with one click. See{' '}
         <Link href="/docs/updating">Updating your AutoSort</Link> and the <Link href="/changelog">changelog</Link>.
       </>
     ),

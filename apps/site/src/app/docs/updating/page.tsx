@@ -7,23 +7,25 @@ import { site } from '@/lib/site';
 const PATH = '/docs/updating';
 const TITLE = 'Updating your AutoSort';
 const DESCRIPTION =
-  'Update your self-hosted AutoSort in about two minutes: run the Update AutoSort action in your GitHub repository, let Vercel redeploy, and roll back with Vercel’s Instant Rollback if something goes wrong.';
+  'Update your self-hosted AutoSort in about two minutes: add the Update AutoSort action once, run it from Settings, let Vercel redeploy, and roll back with Vercel’s Instant Rollback if something goes wrong.';
 
 export const metadata = pageMetadata({ title: TITLE, description: DESCRIPTION, path: PATH });
 
 const STEPS = [
   { name: 'Check what’s new', text: 'Open Settings in your AutoSort to see your version, then compare it with the latest release in the changelog.' },
   {
-    name: 'Run the Update AutoSort action',
-    text: 'In your autosort repository on GitHub, open Actions, choose Update AutoSort, then click Run workflow.',
+    name: 'Add the update action (first time only)',
+    text: 'In Settings, click First time? Add the update action. GitHub opens a prefilled file; click Commit changes.',
   },
+  { name: 'Run the update', text: 'In Settings, click Update now, then Run workflow on GitHub.' },
   { name: 'Wait for Vercel to redeploy', text: 'Vercel picks up the update and redeploys, usually within a few minutes.' },
 ];
 
 const TOC = [
   { id: 'u1', label: '1 · Check what’s new' },
-  { id: 'u2', label: '2 · Run the update' },
-  { id: 'u3', label: '3 · Wait for Vercel' },
+  { id: 'u2', label: '2 · Add the update action' },
+  { id: 'u3', label: '3 · Run the update' },
+  { id: 'u4', label: '4 · Wait for Vercel' },
   { id: 'command-line', label: 'From the command line' },
   { id: 'rollback', label: 'Rolling back' },
 ];
@@ -32,9 +34,10 @@ export default function UpdatingPage() {
   return (
     <DocsPage path={PATH} title={TITLE} meta="about 2 minutes" toc={TOC}>
       <QuickAnswer>
-        Open your AutoSort repository on GitHub, go to Actions, choose Update AutoSort and click Run workflow. It copies the newest version
-        into your repository, and Vercel redeploys within a few minutes. Your playlists, rules, family members and settings are kept, and
-        nothing in Spotify changes. If something breaks, roll back in Vercel.
+        Open Settings in your AutoSort and click Update now, then Run workflow on GitHub. It copies the newest version into your
+        repository, and Vercel redeploys within a few minutes. The first time, add the update action from Settings with one click.
+        Your playlists, rules, family members and settings are kept, and nothing in Spotify changes. If something breaks, roll back in
+        Vercel.
       </QuickAnswer>
 
       <Steps>
@@ -45,16 +48,29 @@ export default function UpdatingPage() {
           </P>
         </Step>
 
-        <Step n={2} id="u2" title="Run the Update AutoSort action">
+        <Step n={2} id="u2" title="Add the update action (first time only)">
           <P>
-            Go to your <code>autosort</code> repository on GitHub (Deploy to Vercel created it for you). Open the <strong>Actions</strong> tab,
-            choose <strong>Update AutoSort</strong>, then click <strong>Run workflow</strong>. If GitHub asks you to enable workflows first,
-            click the green button to turn them on.
+            Deploy to Vercel doesn&apos;t copy GitHub Actions into your repository, so you add the updater once. In{' '}
+            <strong>Settings</strong>, next to your version, click <strong>First time? Add the update action</strong>. GitHub opens a new
+            file called <code>.github/workflows/update-autosort.yml</code> that&apos;s already filled in. Click{' '}
+            <strong>Commit changes</strong>. That&apos;s it; you never need to do this again.
+          </P>
+          <P className="text-[15px]">
+            Prefer to do it by hand? In your repository choose <strong>Add file → Create new file</strong>, name it{' '}
+            <code>.github/workflows/update-autosort.yml</code>, and paste in{' '}
+            <a href={`${site.github}/blob/main/apps/web/updater/update-autosort.yml`}>the update action</a>.
+          </P>
+        </Step>
+
+        <Step n={3} id="u3" title="Run the update">
+          <P>
+            In <strong>Settings</strong>, click <strong>Update now</strong>. GitHub opens the Update AutoSort action; click{' '}
+            <strong>Run workflow</strong>. (You can also get there from your repository&apos;s <strong>Actions</strong> tab.)
           </P>
           <Screenshot url="github.com/you/autosort/actions" label="Update AutoSort, Run workflow" height={180} />
         </Step>
 
-        <Step n={3} id="u3" title="Wait for Vercel to redeploy">
+        <Step n={4} id="u4" title="Wait for Vercel to redeploy">
           <P>
             The action commits the update to your repository, and Vercel redeploys it, usually within a few minutes. Any database changes
             apply automatically during that deploy. Reload your AutoSort and check the version in Settings.

@@ -32,8 +32,8 @@ const nextConfig: NextConfig = {
     if (!basePath || !selfOrigin) return [];
     return [{ source: '/api/sync', destination: `${selfOrigin}${basePath}/api/sync`, basePath: false }];
   },
-  // The font used to draw playlist covers is read from disk at runtime.
-  outputFileTracingIncludes: { '/**': ['./assets/fonts/**'] },
+  // Read from disk at runtime: the font for playlist covers, and the update workflow (Settings).
+  outputFileTracingIncludes: { '/**': ['./assets/fonts/**', './updater/**'] },
   serverExternalPackages: ['sharp'],
   turbopack: {
     rules: {

@@ -1,4 +1,6 @@
-# Pulls the latest AutoSort into your copy. Run it from your repository's Actions tab:
+# Pulls the latest AutoSort into your copy. To turn it on, this file must live at
+# .github/workflows/update-autosort.yml in your repository (Deploy to Vercel doesn't copy
+# .github, so AutoSort's Settings page has a link that adds it for you). Then run it from
 # Actions → Update AutoSort → Run workflow. Vercel redeploys when the commit lands, and
 # database changes apply automatically during that deploy.
 #
