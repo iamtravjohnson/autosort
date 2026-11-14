@@ -2,8 +2,11 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useActionState, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useActionState, useEffect, useState } from 'react';
 import { addSource } from '@/app/app/sources/new/actions';
+import { AnalyzeProgress } from '@/components/analyze/analyze-progress';
+import { useAnalysis } from '@/components/analyze/use-analysis';
 import type { ActionState } from '@/lib/stats';
 import { ActionMessage } from './action-message';
 import { ChevronRightGlyph } from './glyphs';
@@ -21,28 +24,41 @@ export interface PickerOption {
 
 /** The source picker: one tap adds the playlist, reads it, then opens Smart suggestions. */
 export function SourcePicker({ options }: { options: PickerOption[] }) {
-  const [state, formAction, pending] = useActionState<ActionState | null, FormData>(addSource, null);
+  const [state, formAction, adding] = useActionState<ActionState | null, FormData>(addSource, null);
   const [picked, setPicked] = useState<PickerOption | null>(null);
+  const analysis = useAnalysis();
+  const router = useRouter();
+  const newSourceId = state?.sourceId;
+  const { run } = analysis;
+
+  // Once the source is added, analyze it with live progress, then open Smart suggestions.
+  useEffect(() => {
+    if (!newSourceId) return;
+    void run(newSourceId).then((ok) => {
+      if (ok) router.push(`/app/sources/${newSourceId}/suggestions`);
+    });
+  }, [newSourceId, run, router]);
+
+  const analyzing = analysis.state.status === 'running' || analysis.state.status === 'done';
+  const pending = adding || analyzing;
+  const failed = analysis.state.status === 'error';
 
   return (
     <form action={formAction} className="flex flex-col gap-4">
       <div aria-live="polite" className="empty:hidden">
         {pending && picked ? (
-          <div className="tnum flex flex-col gap-4 rounded-panel bg-surface-2 p-5 sm:p-6">
-            <div className="flex flex-col gap-1">
-              <span className="text-[20px] font-extrabold tracking-[-0.02em] sm:text-[22px]">Analyzing {picked.name}…</span>
-              <span className="text-[14px] text-text-2">
-                {picked.songs ? `Reading ${picked.songs.toLocaleString('en-US')} songs and looking up genres, tempo, key and mood.` : 'Reading your songs and looking up genres, tempo, key and mood.'}{' '}
-                This can take a minute.
-              </span>
-            </div>
-            <div role="progressbar" aria-label="Analyzing" className="h-1.5 overflow-hidden rounded-pill bg-surface-3">
-              <span className="block h-full w-2/5 animate-pulse rounded-pill bg-accent" />
-            </div>
-            <p className="m-0 text-[13px] text-text-3">Keep this page open. Smart suggestions open when it&apos;s done.</p>
-          </div>
+          <AnalyzeProgress name={picked.name} state={analysis.state} doneLabel="Opening your smart suggestions…" />
+        ) : failed && newSourceId ? (
+          <ActionMessage
+            state={{
+              message: `We added ${picked?.name ?? 'your playlist'} but couldn't finish reading it. ${analysis.state.message ?? ''}`.trim(),
+              reconnect: analysis.state.reconnect,
+              href: `/app/sources/${newSourceId}`,
+              hrefLabel: 'Open it and try again',
+            }}
+          />
         ) : (
-          <ActionMessage state={state} />
+          <ActionMessage state={state?.sourceId ? null : state} />
         )}
       </div>
       <ul className="m-0 grid list-none grid-cols-1 gap-2.5 p-0 sm:grid-cols-[repeat(auto-fill,minmax(320px,1fr))] sm:gap-3">

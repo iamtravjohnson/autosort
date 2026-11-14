@@ -1,32 +1,39 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useActionState, useState } from 'react';
-import { refreshAnalysis, removeSource } from '@/app/app/sources/[id]/actions';
+import { removeSource } from '@/app/app/sources/[id]/actions';
+import { AnalyzeProgress } from '@/components/analyze/analyze-progress';
+import { useAnalysis } from '@/components/analyze/use-analysis';
 import { buttonClass } from '@/components/ui';
 import type { ActionState } from '@/lib/stats';
 import { ActionMessage } from './action-message';
 import { SyncGlyph } from './glyphs';
 
-/** "Refresh analysis": re-reads the source with a pending state. */
-export function RefreshAnalysisButton({ sourceId, songs, variant = 'secondary' }: { sourceId: string; songs: number; variant?: 'primary' | 'secondary' }) {
-  const [state, formAction, pending] = useActionState<ActionState | null, FormData>(refreshAnalysis, null);
+/** "Refresh analysis": re-reads the source with live progress. */
+export function RefreshAnalysisButton({ sourceId, sourceName, variant = 'secondary' }: { sourceId: string; sourceName: string; variant?: 'primary' | 'secondary' }) {
+  const { state, run } = useAnalysis();
+  const router = useRouter();
+  const busy = state.status === 'running';
   return (
-    <form action={formAction} className="contents">
-      <input type="hidden" name="sourceId" value={sourceId} />
-      <button type="submit" disabled={pending} className={buttonClass(variant, 'md', 'disabled:cursor-wait disabled:opacity-70')}>
-        <SyncGlyph size={16} className={pending ? 'animate-spin' : ''} />
-        {pending ? 'Analyzing…' : 'Refresh analysis'}
+    <>
+      <button
+        type="button"
+        disabled={busy}
+        onClick={() => void run(sourceId).then((ok) => ok && router.refresh())}
+        className={buttonClass(variant, 'md', 'disabled:cursor-wait disabled:opacity-70')}
+      >
+        <SyncGlyph size={16} className={busy ? 'animate-spin' : ''} />
+        {busy ? 'Analyzing…' : 'Refresh analysis'}
       </button>
-      <div aria-live="polite" className="basis-full empty:hidden">
-        {pending ? (
-          <p className="m-0 text-[14px] text-text-2">
-            {songs ? `Analyzing ${songs.toLocaleString('en-US')} songs…` : 'Reading your songs…'} this can take a minute. Keep this page open.
-          </p>
-        ) : (
-          <ActionMessage state={state} />
-        )}
+      <div className="basis-full empty:hidden">
+        {state.status === 'running' || state.status === 'done' ? (
+          <AnalyzeProgress name={sourceName} state={state} doneLabel={`Done. Read ${state.songs?.toLocaleString('en-US') ?? 0} songs.`} />
+        ) : state.status === 'error' ? (
+          <ActionMessage state={{ message: state.message, reconnect: state.reconnect }} />
+        ) : null}
       </div>
-    </form>
+    </>
   );
 }
 

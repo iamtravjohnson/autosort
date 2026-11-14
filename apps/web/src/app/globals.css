@@ -169,6 +169,26 @@
   }
 }
 
+/* Analysis progress: a moving sheen on the bar and a little music visualizer. */
+@keyframes as-shimmer {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(100%); }
+}
+@keyframes as-eq {
+  0%, 100% { height: 25%; }
+  50% { height: 100%; }
+}
+@layer components {
+  .as-shimmer {
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.22) 50%, transparent 100%);
+    animation: as-shimmer 1.6s ease-in-out infinite;
+  }
+  .as-eq-bar {
+    height: 25%;
+    animation: as-eq 0.9s ease-in-out infinite;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

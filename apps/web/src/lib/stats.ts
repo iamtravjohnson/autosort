@@ -14,6 +14,8 @@ export interface ActionState {
   /** A link to show with the message, e.g. a source that was added but not read yet. */
   href?: string;
   hrefLabel?: string;
+  /** A source that was just added; the page analyzes it next (with live progress). */
+  sourceId?: string;
 }
 
 /** Turn a Spotify (or any) error into short, friendly copy. */

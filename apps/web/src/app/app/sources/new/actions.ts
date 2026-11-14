@@ -8,13 +8,15 @@ import { userSources } from '@/lib/queries';
 import { requireUser } from '@/lib/session';
 import { spotifyFor } from '@/lib/spotify';
 import { friendlyError, type ActionState } from '@/lib/stats';
-import { analyzeSource } from '@/lib/sync';
 
 const pickSchema = z.object({
   pick: z.union([z.literal('liked'), z.string().regex(/^playlist:[A-Za-z0-9]{1,64}$/)]),
 });
 
-/** Add a source (a playlist the user owns or collaborates on, or Liked Songs), read it, then show suggestions. */
+/**
+ * Add a source (a playlist the user owns or collaborates on, or Liked Songs). The page then
+ * analyzes it through the streaming route (live progress) and opens suggestions.
+ */
 export async function addSource(_prev: ActionState | null, form: FormData): Promise<ActionState> {
   const user = await requireUser();
   const parsed = pickSchema.safeParse({ pick: form.get('pick') });
@@ -47,7 +49,6 @@ export async function addSource(_prev: ActionState | null, form: FormData): Prom
       .values({ userId: user.id, ...row })
       .returning();
     sourceId = source!.id;
-    await analyzeSource(client, source!);
   } catch (err) {
     revalidatePath('/app', 'layout');
     const e = friendlyError(err);
@@ -61,5 +62,5 @@ export async function addSource(_prev: ActionState | null, form: FormData): Prom
   }
 
   revalidatePath('/app', 'layout');
-  redirect(`/app/sources/${sourceId}/suggestions`);
+  return { ok: true, sourceId: sourceId ?? undefined };
 }

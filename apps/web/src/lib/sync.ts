@@ -7,6 +7,7 @@ import {
   planSmartPlaylist,
   restorePlaylist,
   ruleChips,
+  type EnrichStep,
   type SmartPlaylistDefinition,
   type SpotifyClient,
   type TrackFacts,
@@ -112,15 +113,52 @@ async function readSourceTracks(client: SpotifyClient, source: Source): Promise<
   return client.playlistTracks(source.playlistId);
 }
 
+/**
+ * Budgets for one round of an analysis someone is watching. The three services run side by side,
+ * so a round takes about as long as its Last.fm lookups (Last.fm asks for ≤5 requests a second).
+ * The page runs rounds until every song's genre lookups are done.
+ */
+const INTERACTIVE_BUDGET = { artists: 0, audio: 4000, years: 60, tags: 220, albumTags: 150, artistTags: 150 };
+const NO_LOOKUPS = { artists: 0, audio: 0, years: 0, tags: 0, albumTags: 0, artistTags: 0 };
+
+/** Progress events streamed to the page while a source is analyzed. */
+export type AnalyzeEvent =
+  | { type: 'read'; total: number }
+  | { type: 'step'; step: EnrichStep; done: number; total: number }
+  | { type: 'done'; songs: number; pending: Record<EnrichStep, number> };
+
 /** Read a source from Spotify, look up its data (within budget), and save the snapshot. */
-export async function analyzeSource(client: SpotifyClient, source: Source): Promise<TrackFacts[]> {
+export async function analyzeSource(
+  client: SpotifyClient,
+  source: Source,
+  opts: { interactive?: boolean; onEvent?: (e: AnalyzeEvent) => void } = {},
+): Promise<TrackFacts[]> {
   const refs = await readSourceTracks(client, source);
+  opts.onEvent?.({ type: 'read', total: refs.length });
   const lastfm = process.env.LASTFM_API_KEY ? new LastfmClient({ apiKey: process.env.LASTFM_API_KEY }) : null;
-  const result = await enrichTracks(refs, { spotify: client, cache: dbCache, lastfm, budget: BUDGET });
+  const base = { spotify: client, cache: dbCache, lastfm };
+  const onProgress = (e: { step: EnrichStep; done: number; total: number }) => opts.onEvent?.({ type: 'step', ...e });
+
+  let result;
+  if (opts.interactive) {
+    const B = INTERACTIVE_BUDGET;
+    // ReccoBeats, MusicBrainz and Last.fm are separate services: look them up side by side,
+    // then classify everything from the cache.
+    await Promise.all([
+      enrichTracks(refs, { ...base, budget: { ...NO_LOOKUPS, audio: B.audio }, onProgress }),
+      enrichTracks(refs, { ...base, budget: { ...NO_LOOKUPS, years: B.years }, onProgress }),
+      lastfm ? enrichTracks(refs, { ...base, budget: { ...NO_LOOKUPS, tags: B.tags, albumTags: B.albumTags, artistTags: B.artistTags }, onProgress }) : null,
+    ]);
+    result = await enrichTracks(refs, { ...base, budget: NO_LOOKUPS });
+  } else {
+    result = await enrichTracks(refs, { ...base, budget: BUDGET, onProgress });
+  }
+
   await db()
     .update(schema.sources)
     .set({ snapshot: result.tracks.map(toSnapshot), snapshotAt: new Date(), pending: result.pending })
     .where(eq(schema.sources.id, source.id));
+  opts.onEvent?.({ type: 'done', songs: result.tracks.length, pending: result.pending });
   return result.tracks;
 }
 

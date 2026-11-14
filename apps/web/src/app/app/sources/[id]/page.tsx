@@ -114,7 +114,7 @@ export default async function SourcePage({ params }: Props) {
           >
             <ExternalGlyph size={18} />
           </a>
-          <RefreshAnalysisButton sourceId={source.id} songs={stats.songs} />
+          <RefreshAnalysisButton sourceId={source.id} sourceName={source.name} />
         </div>
 
         {!analyzed ? (
