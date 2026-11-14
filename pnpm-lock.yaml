@@ -54,8 +54,8 @@ importers:
   apps/web:
     dependencies:
       '@autosort/core':
-        specifier: ^0.3.1
-        version: 0.3.1
+        specifier: ^0.3.2
+        version: 0.3.2
       drizzle-orm:
         specifier: ^0.45.4
         version: 0.45.4(postgres@4.1.1)
@@ -131,8 +131,8 @@ packages:
     resolution: {integrity: sha512-U4+70Pc5ZS9osnCBCE5Jha/ciHM+Yp+CNMNC/7HvYbNRk1Ldd+f7qO65W5qfhu/TCv+/ozljlXXe9Nj8419DMA==}
     engines: {node: '>=10'}
 
-  '@autosort/core@0.3.1':
-    resolution: {integrity: sha512-IZCJoYDIisTUW8ji1Phj53S9+eSFyZZU4iiGkIehCo9r9Abwok5PYZC5/3equ9cPI501F3PqlbFP/A7LllYYmA==}
+  '@autosort/core@0.3.2':
+    resolution: {integrity: sha512-xcGn023LEc4tc5WkjPjO+8OId8nljCUSWAi8VJo6yP6XtCowQUhJCtcnj2pLg4UEavYTxtT3HcTsIc4RE69EKw==}
     engines: {node: '>=20'}
 
   '@babel/code-frame@7.29.7':
@@ -2975,7 +2975,7 @@ snapshots:
 
   '@alloc/quick-lru@5.3.0': {}
 
-  '@autosort/core@0.3.1':
+  '@autosort/core@0.3.2':
     dependencies:
       zod: 4.6.7
 
