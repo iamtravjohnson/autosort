@@ -1,32 +1,7 @@
 import { toCamelot } from './camelot.js';
+import { analyzeGenres } from './genre.js';
 import type { AudioFeatures, GenreBucket, Mood, Tag, Theme, TrackFacts, TrackRef } from './types.js';
 import { uniq } from './util.js';
-
-/**
- * Genre buckets are matched against Spotify artist genres and crowd tags.
- * A track can land in more than one bucket ("country rap" → country + hip-hop).
- */
-const BUCKET_PATTERNS: Array<[GenreBucket, RegExp]> = [
-  ['worship', /\b(worship|ccm|christian|gospel|praise)\b/],
-  ['country', /\b(country|americana|bluegrass|honky[- ]tonk|red dirt|outlaw)\b/],
-  ['hip-hop', /\b(hip[- ]?hop|rap|trap|drill|grime|crunk|boom bap)\b/],
-  ['r&b', /(\br&b\b|\brnb\b|\bsoul\b|\bneo[- ]soul\b|\bfunk\b|\bmotown\b|new jack swing|rhythm and blues)/],
-  ['metal', /\b(metal|metalcore|deathcore|thrash|djent)\b/],
-  ['rock', /\b(rock|grunge|punk|emo|britpop|shoegaze)\b/],
-  [
-    'electronic',
-    /\b(edm|house|techno|trance|dubstep|electro|electronic|electronica|drum and bass|dnb|garage|big room|future bass|hardstyle)\b/,
-  ],
-  ['latin', /\b(latin|reggaeton|bachata|salsa|cumbia|corrido|corridos|banda|regional mexican|urbano latino)\b/],
-  ['jazz', /\b(jazz|bebop|big band)\b/],
-  ['classical', /\b(classical|orchestra|orchestral|baroque|opera|symphony)\b/],
-  ['folk', /\b(folk|singer-songwriter)\b/],
-  ['reggae', /\b(reggae|dancehall|ska|dub)\b/],
-  ['blues', /(?<!rhythm and )\bblues\b/],
-  ['pop', /\bpop\b/],
-  ['indie', /\bindie\b/],
-  ['soundtrack', /\b(soundtrack|show tunes|musicals?|disney)\b/],
-];
 
 /** Display names, used for suggested playlist names. */
 export const GENRE_LABELS: Record<GenreBucket, string> = {
@@ -64,15 +39,6 @@ export const THEME_LABELS: Record<Theme, string> = {
   worship: 'Worship',
   christmas: 'Christmas',
 };
-
-export function genreBucketsFor(strings: readonly string[]): GenreBucket[] {
-  const found = new Set<GenreBucket>();
-  for (const raw of strings) {
-    const s = raw.toLowerCase();
-    for (const [bucket, pattern] of BUCKET_PATTERNS) if (pattern.test(s)) found.add(bucket);
-  }
-  return [...found];
-}
 
 /** Thresholds on the 0–1 audio scales. Exported so apps can show or tune them. */
 export const MOOD_RULES: Record<Mood, (a: AudioFeatures) => boolean> = {
@@ -120,14 +86,20 @@ export function yearFromDate(date: string | null | undefined): number | null {
 
 export interface ClassifyInput {
   track: TrackRef;
-  /** Union of the track's artists' Spotify genres. */
+  /** Spotify genres of the track's artists, main artist first (most apps no longer receive these). */
   artistGenres?: readonly string[];
   audio?: AudioFeatures | null;
   /** First release year of the recording (e.g. from MusicBrainz). */
   originalYear?: number | null;
-  /** Crowd tags, strongest first (e.g. from Last.fm). */
+  /** Crowd tags for the song itself, strongest first (e.g. Last.fm track tags). */
   tags?: readonly Tag[];
-  /** Tags weaker than this (0–100) are ignored. Default 20. */
+  /** Crowd tags for the song's album. */
+  albumTags?: readonly Tag[];
+  /** Crowd tags for the main artist. */
+  artistTags?: readonly Tag[];
+  /** Crowd tags for featured artists, merged. */
+  featuredTags?: readonly Tag[];
+  /** Tags weaker than this (0–100) are ignored for tag rules, moods and themes. Default 20. */
   minTagCount?: number;
 }
 
@@ -136,11 +108,21 @@ export function classifyTrack(input: ClassifyInput): TrackFacts {
   const { track } = input;
   const minTag = input.minTagCount ?? 20;
   const genres = uniq((input.artistGenres ?? []).map((g) => g.toLowerCase()));
-  const tags = (input.tags ?? []).filter((t) => t.count >= minTag).map((t) => t.name.toLowerCase().trim());
+  const names = (list: readonly Tag[] | undefined) => (list ?? []).filter((t) => t.count >= minTag).map((t) => t.name.toLowerCase().trim());
+  // Song and album tags describe this song; artist tags only describe the artist in general.
+  const songTags = uniq([...names(input.tags), ...names(input.albumTags)]);
+  const tags = uniq([...songTags, ...names(input.artistTags)]);
   const audio = input.audio ?? null;
 
-  // Spotify genres are the primary signal; the strongest few tags fill gaps.
-  const genreBuckets = uniq([...genreBucketsFor(genres), ...genreBucketsFor(tags.slice(0, 3))]);
+  const genre = analyzeGenres({
+    songTags: input.tags,
+    albumTags: input.albumTags,
+    artistTags: input.artistTags,
+    featuredTags: input.featuredTags,
+    spotifyGenres: genres,
+    audio,
+  });
+  const genreBuckets = genre.buckets;
 
   const albumYear = yearFromDate(track.album.releaseDate);
   const original = input.originalYear ?? null;
@@ -149,10 +131,10 @@ export function classifyTrack(input: ClassifyInput): TrackFacts {
 
   const moods = new Set<Mood>();
   if (audio) for (const [mood, test] of Object.entries(MOOD_RULES) as Array<[Mood, (a: AudioFeatures) => boolean]>) if (test(audio)) moods.add(mood);
-  for (const [mood, pattern] of Object.entries(MOOD_TAGS) as Array<[Mood, RegExp]>) if (tags.some((t) => pattern.test(t))) moods.add(mood);
+  for (const [mood, pattern] of Object.entries(MOOD_TAGS) as Array<[Mood, RegExp]>) if (songTags.some((t) => pattern.test(t))) moods.add(mood);
 
   const themes = new Set<Theme>();
-  for (const [theme, pattern] of Object.entries(THEME_TAGS) as Array<[Theme, RegExp]>) if (tags.some((t) => pattern.test(t))) themes.add(theme);
+  for (const [theme, pattern] of Object.entries(THEME_TAGS) as Array<[Theme, RegExp]>) if (songTags.some((t) => pattern.test(t))) themes.add(theme);
   for (const [theme, pattern] of Object.entries(THEME_TITLES) as Array<[Theme, RegExp]>) if (pattern.test(track.name)) themes.add(theme);
   if (genreBuckets.includes('worship')) themes.add('worship');
 
@@ -161,6 +143,10 @@ export function classifyTrack(input: ClassifyInput): TrackFacts {
     genres,
     tags,
     genreBuckets,
+    genreNear: genre.near,
+    genreScores: genre.scores,
+    genreConfidence: genre.confidence,
+    genreReasons: genre.reasons,
     year,
     yearSource,
     decade: year === null ? null : Math.floor(year / 10) * 10,

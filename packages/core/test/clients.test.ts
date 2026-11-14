@@ -159,12 +159,12 @@ describe('enrichTracks', () => {
     const musicbrainz = { originalYear: vi.fn(async () => 1994) };
     const cache = memoryCache();
 
-    const first = await enrichTracks(tracks, { spotify, reccobeats, musicbrainz, cache, budget: { years: 1 } });
+    const first = await enrichTracks(tracks, { spotify, reccobeats, musicbrainz, cache, budget: { years: 1, artists: 400 } });
     expect(first.pending.years).toBe(1);
     expect(first.complete).toBe(false);
     expect(first.tracks[0]).toMatchObject({ genreBuckets: ['country'], camelot: '8A', year: 1994 });
 
-    const second = await enrichTracks(tracks, { spotify, reccobeats, musicbrainz, cache });
+    const second = await enrichTracks(tracks, { spotify, reccobeats, musicbrainz, cache, budget: { artists: 400 } });
     expect(second.complete).toBe(true);
     expect(spotify.artists).toHaveBeenCalledTimes(1);
     expect(reccobeats.audioFeatures).toHaveBeenCalledTimes(1);

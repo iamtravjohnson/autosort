@@ -1,5 +1,6 @@
 import { DAY, memoryCache, type Cache } from './cache.js';
 import { classifyTrack } from './classify.js';
+import { cleanAlbum, cleanTitle } from './genre.js';
 import { MusicBrainzClient } from './sources/musicbrainz.js';
 import { ReccoBeatsClient } from './sources/reccobeats.js';
 import type { LastfmClient } from './sources/lastfm.js';
@@ -7,18 +8,25 @@ import type { SpotifyArtist, SpotifyClient } from './spotify/client.js';
 import type { AudioFeatures, Tag, TrackFacts, TrackRef } from './types.js';
 import { chunk, uniq } from './util.js';
 
-export type EnrichStep = 'artists' | 'audio' | 'years' | 'tags';
+export type EnrichStep = 'artists' | 'audio' | 'years' | 'tags' | 'albumTags' | 'artistTags';
 
 export interface EnrichOptions {
-  spotify: Pick<SpotifyClient, 'artists'>;
+  /**
+   * Only used for Spotify artist genres, which Spotify no longer returns to most apps. The step is
+   * off by default (budget 0); give `budget.artists` a value to try it.
+   */
+  spotify?: Pick<SpotifyClient, 'artists'>;
   /** Where looked-up data is kept between runs. Default: in-memory (nothing persists). */
   cache?: Cache;
   /** Audio features. Default: a keyless ReccoBeats client. Pass null to skip. */
   reccobeats?: Pick<ReccoBeatsClient, 'audioFeatures'> | null;
   /** Original release years. Default: a MusicBrainz client. Pass null to skip. */
   musicbrainz?: Pick<MusicBrainzClient, 'originalYear'> | null;
-  /** Crowd tags for moods/themes (love, worship…). Needs a Last.fm key; skipped when absent. */
-  lastfm?: Pick<LastfmClient, 'trackTopTags' | 'artistTopTags'> | null;
+  /**
+   * Crowd tags for the song, its album and its artists: the main genre evidence, plus moods and
+   * themes (love, worship…). Needs a Last.fm key; skipped when absent.
+   */
+  lastfm?: Pick<LastfmClient, 'trackTopTags' | 'artistTopTags' | 'albumTopTags'> | null;
   /**
    * Max uncached lookups per step in this run. Lookups are cached, so repeated runs
    * (e.g. a daily job) finish a big library over time. MusicBrainz allows ~1 request/second.
@@ -36,17 +44,31 @@ export interface EnrichResult {
   errors: Array<{ step: EnrichStep; message: string }>;
 }
 
-export const DEFAULT_BUDGET: Record<EnrichStep, number> = { artists: 400, audio: 4000, years: 40, tags: 300 };
-const DEFAULT_TTL_DAYS = { artists: 30, audio: 90, years: 180, tags: 60, misses: 7 };
+export const DEFAULT_BUDGET: Record<EnrichStep, number> = { artists: 0, audio: 4000, years: 40, tags: 250, albumTags: 150, artistTags: 150 };
+const DEFAULT_TTL_DAYS = { artists: 30, audio: 90, years: 180, tags: 60, albumTags: 60, artistTags: 30, misses: 7 };
 
 const NS = {
   artists: 'spotify:artist-genres',
   audio: 'reccobeats:audio',
   years: 'musicbrainz:year',
-  tags: 'lastfm:tags',
+  tags: 'lastfm:song-tags',
+  albumTags: 'lastfm:album-tags',
+  artistTags: 'lastfm:artist-tags',
 } as const;
 
-const tagKey = (t: TrackRef) => `${t.artists[0]?.name ?? ''}\u0000${t.name}`.toLowerCase();
+const mainArtist = (t: TrackRef) => t.artists[0]?.name ?? '';
+const tagKey = (t: TrackRef) => `${mainArtist(t)}\u0000${cleanTitle(t.name)}`.toLowerCase();
+const albumKey = (t: TrackRef) => `${mainArtist(t)}\u0000${cleanAlbum(t.album.name)}`.toLowerCase();
+
+/** Merge several tag lists, keeping each tag's highest count. */
+function mergeTags(lists: Array<readonly Tag[]>): Tag[] {
+  const best = new Map<string, Tag>();
+  for (const list of lists) for (const tag of list) {
+    const key = tag.name.toLowerCase();
+    if ((best.get(key)?.count ?? -1) < tag.count) best.set(key, tag);
+  }
+  return [...best.values()].sort((a, b) => b.count - a.count);
+}
 
 /**
  * Gather genres, audio features, original years and tags for tracks, then classify them.
@@ -59,7 +81,7 @@ export async function enrichTracks(tracks: readonly TrackRef[], opts: EnrichOpti
   const reccobeats = opts.reccobeats === undefined ? new ReccoBeatsClient() : opts.reccobeats;
   const musicbrainz = opts.musicbrainz === undefined ? new MusicBrainzClient() : opts.musicbrainz;
   const lastfm = opts.lastfm ?? null;
-  const pending: Record<EnrichStep, number> = { artists: 0, audio: 0, years: 0, tags: 0 };
+  const pending: Record<EnrichStep, number> = { artists: 0, audio: 0, years: 0, tags: 0, albumTags: 0, artistTags: 0 };
   const errors: EnrichResult['errors'] = [];
 
   /** Shared cache-then-fetch loop for each step. */
@@ -97,17 +119,21 @@ export async function enrichTracks(tracks: readonly TrackRef[], opts: EnrichOpti
     return known;
   }
 
-  // 1. Artist genres (Spotify).
+  // 1. Artist genres (Spotify). Off by default: Spotify stopped returning them to most apps.
+  const spotify = opts.spotify;
   const artistIds = uniq(tracks.flatMap((t) => t.artists.map((a) => a.id).filter((id): id is string => Boolean(id))));
-  const genres = await lookup<string[]>(
-    'artists',
-    artistIds,
-    async (ids) => {
-      const found: Map<string, SpotifyArtist | null> = await opts.spotify.artists(ids);
-      return new Map([...found].map(([id, a]) => [id, a ? a.genres : null]));
-    },
-    20,
-  );
+  const genres =
+    spotify && budget.artists > 0
+      ? await lookup<string[]>(
+          'artists',
+          artistIds,
+          async (ids) => {
+            const found: Map<string, SpotifyArtist | null> = await spotify.artists(ids);
+            return new Map([...found].map(([id, a]) => [id, a ? a.genres : null]));
+          },
+          20,
+        )
+      : new Map<string, string[] | null>();
 
   // 2. Audio features (ReccoBeats).
   const audio = reccobeats
@@ -128,9 +154,10 @@ export async function enrichTracks(tracks: readonly TrackRef[], opts: EnrichOpti
       )
     : new Map<string, number | null>();
 
-  // 4. Crowd tags (Last.fm), track first, falling back to the artist.
+  // 4. Crowd tags (Last.fm) for the song, its album and its artists, each cached on its own.
+  const none = new Map<string, Tag[] | null>();
   const byTagKey = new Map(tracks.map((t) => [tagKey(t), t]));
-  const tags = lastfm
+  const songTags = lastfm
     ? await lookup<Tag[]>(
         'tags',
         [...byTagKey.keys()],
@@ -138,26 +165,65 @@ export async function enrichTracks(tracks: readonly TrackRef[], opts: EnrichOpti
           const out = new Map<string, Tag[] | null>();
           for (const key of keys) {
             const t = byTagKey.get(key) as TrackRef;
-            const artist = t.artists[0]?.name ?? '';
-            let list = await lastfm.trackTopTags(artist, t.name);
-            if (list.length === 0 && artist) list = await lastfm.artistTopTags(artist);
-            out.set(key, list.length ? list.slice(0, 10) : null);
+            const list = mainArtist(t) ? await lastfm.trackTopTags(mainArtist(t), cleanTitle(t.name)) : [];
+            out.set(key, list.length ? list.slice(0, 12) : null);
           }
           return out;
         },
         10,
       )
-    : new Map<string, Tag[] | null>();
+    : none;
 
-  const facts = tracks.map((track) =>
-    classifyTrack({
+  const byAlbumKey = new Map(tracks.filter((t) => t.album.name).map((t) => [albumKey(t), t]));
+  const albumTags = lastfm
+    ? await lookup<Tag[]>(
+        'albumTags',
+        [...byAlbumKey.keys()],
+        async (keys) => {
+          const out = new Map<string, Tag[] | null>();
+          for (const key of keys) {
+            const t = byAlbumKey.get(key) as TrackRef;
+            const list = mainArtist(t) ? await lastfm.albumTopTags(mainArtist(t), cleanAlbum(t.album.name)) : [];
+            out.set(key, list.length ? list.slice(0, 12) : null);
+          }
+          return out;
+        },
+        10,
+      )
+    : none;
+
+  // Main artists first, so a tight budget still covers what matters most.
+  const artistNames = uniq([...tracks.map(mainArtist), ...tracks.flatMap((t) => t.artists.slice(1).map((a) => a.name))].filter(Boolean)).map((n) => n.toLowerCase());
+  const nameOf = new Map(tracks.flatMap((t) => t.artists.map((a) => [a.name.toLowerCase(), a.name] as const)));
+  const artistTags = lastfm
+    ? await lookup<Tag[]>(
+        'artistTags',
+        artistNames,
+        async (keys) => {
+          const out = new Map<string, Tag[] | null>();
+          for (const key of keys) {
+            const list = await lastfm.artistTopTags(nameOf.get(key) ?? key);
+            out.set(key, list.length ? list.slice(0, 12) : null);
+          }
+          return out;
+        },
+        10,
+      )
+    : none;
+
+  const facts = tracks.map((track) => {
+    const [main, ...featured] = track.artists;
+    return classifyTrack({
       track,
-      artistGenres: track.artists.flatMap((a) => (a.id ? (genres.get(a.id) ?? []) : [])),
+      artistGenres: main?.id ? (genres.get(main.id) ?? []) : [],
       audio: audio.get(track.id) ?? null,
       originalYear: track.isrc ? (years.get(track.isrc) ?? null) : null,
-      tags: tags.get(tagKey(track)) ?? [],
-    }),
-  );
+      tags: songTags.get(tagKey(track)) ?? [],
+      albumTags: track.album.name ? (albumTags.get(albumKey(track)) ?? []) : [],
+      artistTags: main ? (artistTags.get(main.name.toLowerCase()) ?? []) : [],
+      featuredTags: mergeTags(featured.map((a) => artistTags.get(a.name.toLowerCase()) ?? [])),
+    });
+  });
 
   return { tracks: facts, pending, complete: Object.values(pending).every((n) => n === 0), errors };
 }

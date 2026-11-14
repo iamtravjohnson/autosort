@@ -1,0 +1,22 @@
+[
+  {"title": "I Had Some Help", "artist": "Post Malone featuring Morgan Wallen", "labels": ["country"]},
+  {"title": "Pour Me a Drink", "artist": "Post Malone featuring Blake Shelton", "labels": ["country"]},
+  {"title": "Save Me", "artist": "Jelly Roll", "labels": ["country"]},
+  {"title": "Need a Favor", "artist": "Jelly Roll", "labels": ["country"]},
+  {"title": "Last Night", "artist": "Morgan Wallen", "labels": ["country"]},
+  {"title": "Dial Drunk", "artist": "Noah Kahan with Post Malone", "labels": ["pop"]},
+  {"title": "Rockstar", "artist": "Post Malone featuring 21 Savage", "labels": ["hip-hop"]},
+  {"title": "Lose Yourself", "artist": "Eminem", "labels": ["hip-hop"]},
+  {"title": "God's Plan", "artist": "Drake", "labels": ["hip-hop"]},
+  {"title": "Old Town Road", "artist": "Lil Nas X featuring Billy Ray Cyrus", "labels": ["hip-hop", "country"]},
+  {"title": "Way Maker", "artist": "Leeland", "labels": ["worship"]},
+  {"title": "Gratitude", "artist": "Brandon Lake", "labels": ["worship"]},
+  {"title": "Tennessee Whiskey", "artist": "Chris Stapleton", "labels": ["country"]},
+  {"title": "Fancy Like", "artist": "Walker Hayes", "labels": ["country"]},
+  {"title": "Sunflower", "artist": "Post Malone and Swae Lee", "labels": ["hip-hop", "pop"]},
+  {"title": "Circles", "artist": "Post Malone", "labels": ["pop"]},
+  {"title": "Thinkin' Bout Me", "artist": "Morgan Wallen", "labels": ["country"]},
+  {"title": "Mockingbird", "artist": "Eminem", "labels": ["hip-hop"]},
+  {"title": "Blinding Lights", "artist": "The Weeknd", "labels": ["pop"]},
+  {"title": "Can't Hold Us", "artist": "Macklemore & Ryan Lewis featuring Ray Dalton", "labels": ["hip-hop"]}
+]

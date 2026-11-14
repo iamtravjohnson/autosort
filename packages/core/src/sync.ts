@@ -11,9 +11,14 @@ export interface SyncSettings {
   removeMissing: boolean;
   /** Keep songs the user added to the smart playlist by hand. Default true. */
   keepManualAdds: boolean;
+  /**
+   * When the user deletes a song AutoSort added, don't add it back: report it in
+   * `userRemovedTrackIds` so the app can store it in `exclude`. Default true.
+   */
+  rememberRemovals: boolean;
 }
 
-export const DEFAULT_SYNC: SyncSettings = { addNew: true, removeMissing: true, keepManualAdds: true };
+export const DEFAULT_SYNC: SyncSettings = { addNew: true, removeMissing: true, keepManualAdds: true, rememberRemovals: true };
 
 export interface SmartPlaylistDefinition {
   id: string;
@@ -46,13 +51,15 @@ export interface SmartPlaylistPlan {
   currentUris: string[];
   addedTrackIds: string[];
   removedTrackIds: string[];
+  /** Songs the user deleted from the playlist that still match. Add them to `exclude`. */
+  userRemovedTrackIds: string[];
   change: Change;
   nextState: SyncState;
 }
 
 /** Minimal facts for a track that isn't in the source (e.g. added to the smart playlist by hand). */
 function bareFacts(ref: TrackRef): TrackFacts {
-  return { ...ref, genres: [], tags: [], genreBuckets: [], year: null, yearSource: null, decade: null, audio: null, camelot: null, moods: [], themes: [] };
+  return { ...ref, genres: [], tags: [], genreBuckets: [], genreNear: [], genreScores: {}, genreConfidence: 'low', genreReasons: [], year: null, yearSource: null, decade: null, audio: null, camelot: null, moods: [], themes: [] };
 }
 
 function sameList(a: readonly string[], b: readonly string[]): boolean {
@@ -96,7 +103,15 @@ export function planSmartPlaylist(input: {
   const currentIds = new Set(current.map((t) => t.id));
   const source = new Map(input.sourceTracks.map((t) => [t.id, t]));
 
+  // Songs AutoSort added that are gone from the playlist were deleted by the user. Skip this when
+  // the playlist reads back empty or most songs vanished at once (a failed read or a cleared
+  // playlist), so a glitch can't exclude a whole playlist.
+  const vanished = current.length > 0 ? [...managed].filter((id) => !currentIds.has(id) && !include.has(id)) : [];
+  const userRemoved = new Set(settings.rememberRemovals && vanished.length <= Math.max(10, managed.size / 2) ? vanished : []);
+
   let matches = [...source.values()].filter((t) => !exclude.has(t.id) && (include.has(t.id) || matchesRule(t, def.rule)));
+  const userRemovedTrackIds = matches.filter((t) => userRemoved.has(t.id)).map((t) => t.id);
+  matches = matches.filter((t) => !userRemoved.has(t.id));
   if (!settings.addNew) matches = matches.filter((t) => currentIds.has(t.id));
   const matchIds = new Set(matches.map((t) => t.id));
 
@@ -120,6 +135,7 @@ export function planSmartPlaylist(input: {
     currentUris,
     addedTrackIds: ordered.filter((t) => !currentIds.has(t.id)).map((t) => t.id),
     removedTrackIds: current.filter((t) => !desiredIds.has(t.id)).map((t) => t.id),
+    userRemovedTrackIds,
     change: diffPlaylist(currentUris, desiredUris),
     nextState: { managedTrackIds: ordered.filter((t) => matchIds.has(t.id) || managed.has(t.id)).map((t) => t.id) },
   };

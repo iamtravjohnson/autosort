@@ -52,4 +52,8 @@ export class LastfmClient {
   artistTopTags(artist: string): Promise<Tag[]> {
     return this.topTags({ method: 'artist.gettoptags', artist });
   }
+
+  albumTopTags(artist: string, album: string): Promise<Tag[]> {
+    return this.topTags({ method: 'album.gettoptags', artist, album });
+  }
 }

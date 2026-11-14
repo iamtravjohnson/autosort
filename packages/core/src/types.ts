@@ -79,9 +79,17 @@ export interface Tag {
 export interface TrackFacts extends TrackRef {
   /** Raw genre strings from the track's artists (Spotify). */
   genres: string[];
-  /** Crowd tags (lowercased), strongest first. */
+  /** Crowd tags (lowercased): the song's and album's first, then the artist's. */
   tags: string[];
+  /** The song's genres: its main genre plus any close second. Empty when the evidence is thin. */
   genreBuckets: GenreBucket[];
+  /** Likely genres that didn't make the cut, for an optional review. */
+  genreNear: GenreBucket[];
+  /** Analyzer score per genre. */
+  genreScores: Partial<Record<GenreBucket, number>>;
+  genreConfidence: 'high' | 'medium' | 'low';
+  /** Plain-English reasons for the genre, e.g. "Album tagged country". */
+  genreReasons: string[];
   /** Best-known original release year. */
   year: number | null;
   /** Where `year` came from: the recording's first release, or the album it's on. */

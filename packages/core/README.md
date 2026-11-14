@@ -26,7 +26,8 @@ const result = await syncSmartPlaylists({
   - Playlist items: add, replace, bulk-remove, move up/down (`moveItems` + `moveArgs`).
   - Liked Songs and library: read, save/remove (`saveToLibrary`, `removeFromLibrary`), and like with original dates (`saveTracksWithDates`).
 - **Scopes:** `SPOTIFY_SCOPES` covers AutoSort's features; `SPOTIFY_ALL_SCOPES` grants full personal access. `missingScopes` shows what an existing connection lacks.
-- **Data:** `enrichTracks` gathers artist genres, ReccoBeats audio features, MusicBrainz original years and Last.fm tags. It is cached and runs within a budget, so a big library fills in over a few runs.
+- **Data:** `enrichTracks` gathers ReccoBeats audio features, MusicBrainz original years and Last.fm tags for each song, album and artist. It is cached and runs within a budget, so a big library fills in over a few runs.
+- **Genres:** `analyzeGenres` scores each genre from the song's own tags, then its album's, then its main artist's, and checks rap against how much rapping is in the audio. Featured artists barely count. When the evidence is thin the song gets no genre (it's left out, not misfiled) and its likely genres go in `genreNear`. Every result has plain-English `genreReasons`. Spotify no longer returns artist genres to most apps, so the old Spotify step is off by default.
 - **Rules:** `matchesRule`, `parseRule` (zod), `ruleChips` ("Genre: Country", "Clean only").
 - **Suggestions:** `suggestPlaylists` proposes Country, 90s Country, Clean Rap, Worship, Love Songs, Workout…; `unmatchedTracks` lists songs no rule claims.
 - **Sorting:** `sortTracks` by any field, `harmonic` (Camelot + BPM), `energyArc`, seeded `shuffle`, with pinned positions.

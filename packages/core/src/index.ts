@@ -1,6 +1,7 @@
 export * from './types.js';
 export * from './camelot.js';
 export * from './classify.js';
+export * from './genre.js';
 export * from './rules.js';
 export * from './sort.js';
 export * from './suggest.js';
