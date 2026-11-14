@@ -255,22 +255,19 @@ export class SpotifyClient {
     return new Map(ids.map((id, i) => [id, results[i] ?? null]));
   }
 
-  /** Create a playlist (private unless `public: true`). */
+  /**
+   * Create a playlist. Asks for private unless `public: true`, but Spotify currently ignores
+   * `public: false` for Development Mode apps (and ignores a later change to private), so check
+   * the returned `public` field; users can make it private in the Spotify app.
+   */
   async createPlaylist(input: { name: string; description?: string; public?: boolean }): Promise<PlaylistSummary> {
-    const wantPublic = input.public ?? false;
     const raw = await this.request<RawPlaylist>(
       'POST',
       '/me/playlists',
-      { name: input.name, public: wantPublic, ...(input.description ? { description: input.description } : {}) },
+      { name: input.name, public: input.public ?? false, ...(input.description ? { description: input.description } : {}) },
       false,
     );
-    const playlist = toPlaylist(raw);
-    // Spotify has been seen to create playlists as public despite `public: false`; enforce it.
-    if (!wantPublic && playlist.public !== false) {
-      await this.updatePlaylistDetails(playlist.id, { public: false });
-      playlist.public = false;
-    }
-    return playlist;
+    return toPlaylist(raw);
   }
 
   /** Rename, re-describe, or change a playlist's visibility. */

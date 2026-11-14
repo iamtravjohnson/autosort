@@ -30,14 +30,12 @@ describe('library and playlist management', () => {
     expect(bodyOf(calls[0])).toEqual({ timestamped_ids: [{ id: 'a', added_at: '2019-03-01T12:00:00Z' }] });
   });
 
-  it('keeps new playlists private even if Spotify makes them public', async () => {
-    const { fetch, calls } = fakeFetch((url, init) =>
-      init?.method === 'POST' ? json({ id: 'p', uri: 'spotify:playlist:p', name: 'Rap (AutoSort)', public: true }, 201) : new Response(null, { status: 200 }),
-    );
+  it('asks for private playlists and reports what Spotify actually did', async () => {
+    const { fetch, calls } = fakeFetch(() => json({ id: 'p', uri: 'spotify:playlist:p', name: 'Rap (AutoSort)', public: true }, 201));
     const p = await client(fetch).createPlaylist({ name: 'Rap (AutoSort)' });
-    expect(p.public).toBe(false);
-    expect(calls[1]?.url).toBe('https://api.spotify.com/v1/playlists/p');
-    expect(bodyOf(calls[1])).toEqual({ public: false });
+    expect(bodyOf(calls[0])).toMatchObject({ public: false });
+    expect(calls).toHaveLength(1); // no follow-up call: Spotify ignores it
+    expect(p.public).toBe(true);
   });
 
   it('moves tracks and renames playlists', async () => {

@@ -22,7 +22,7 @@ const result = await syncSmartPlaylists({
 ## Building blocks
 
 - **Spotify:** `buildAuthorizeUrl`, `createPkcePair`, `exchangeCode`, `refreshTokens` and `SpotifyClient`, with retries and quota detection. The client covers:
-  - Playlists: list, create (kept private), rename, cover upload.
+  - Playlists: list, create, rename, cover upload.
   - Playlist items: add, replace, bulk-remove, move up/down (`moveItems` + `moveArgs`).
   - Liked Songs and library: read, save/remove (`saveToLibrary`, `removeFromLibrary`), and like with original dates (`saveTracksWithDates`).
 - **Scopes:** `SPOTIFY_SCOPES` covers AutoSort's features; `SPOTIFY_ALL_SCOPES` grants full personal access. `missingScopes` shows what an existing connection lacks.
