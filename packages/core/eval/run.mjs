@@ -66,6 +66,8 @@ let searched = 0;
 for (const s of songs) {
   const key = `${s.title}\u0000${s.artist}`;
   if (key in found) continue;
+  // NO_SEARCH=1 measures only songs already found (Spotify rate-limits heavy searching).
+  if (process.env.NO_SEARCH) continue;
   const main = mainArtistOf(s.artist), first = firstNameOf(s.artist), title = norm(cleanTitle(s.title));
   let pick = null;
   for (const q of [`track:"${s.title}" artist:"${main}"`, `track:"${s.title}" artist:"${first}"`, `${s.title} ${first}`]) {
@@ -81,6 +83,7 @@ await writeFile(searchFile, JSON.stringify(found));
 
 // 2. Enrich and classify with the real engine (same code the app runs).
 const rows = songs.map((s) => ({ ...s, ref: found[`${s.title}\u0000${s.artist}`] })).filter((r) => r.ref);
+const searchedCount = songs.filter((s) => `${s.title}\u0000${s.artist}` in found).length;
 const cache = await fileCache(join(CACHE_DIR, 'enrich.json'));
 const big = 100000;
 const { tracks, pending } = await enrichTracks(rows.map((r) => r.ref), {
@@ -129,7 +132,7 @@ for (const r of rows) {
 }
 const pct = (a, b) => (b ? `${((a / b) * 100).toFixed(1)}%` : '–');
 const lines = [
-  `Songs: ${songs.length} · found on Spotify: ${rows.length} · lookups still pending: ${JSON.stringify(pending)}`,
+  `Chart songs: ${songs.length} · searched on Spotify: ${searchedCount} · found: ${rows.length} · lookups still pending: ${JSON.stringify(pending)}`,
   '',
   '| Genre | Chart songs | Got the genre | No genre (left out) | Placed in genre | Wrong placements |',
   '|---|---|---|---|---|---|',

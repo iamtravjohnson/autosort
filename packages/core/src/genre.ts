@@ -31,11 +31,17 @@ export const BUCKET_PATTERNS: Array<[GenreBucket, RegExp]> = [
   ['soundtrack', /\b(soundtrack|show tunes|musicals?|disney)\b/],
 ];
 
+/** Tags that deny a genre ("not country", "non-rap") say nothing useful about it. */
+const NEGATED = /\b(not|non|no|never|anti)[ -]/;
+
 export function genreBucketsFor(strings: readonly string[]): GenreBucket[] {
   const found = new Set<GenreBucket>();
   for (const raw of strings) {
     const s = raw.toLowerCase();
-    for (const [bucket, pattern] of BUCKET_PATTERNS) if (pattern.test(s)) found.add(bucket);
+    if (NEGATED.test(s)) continue;
+    const hits = BUCKET_PATTERNS.filter(([, pattern]) => pattern.test(s)).map(([bucket]) => bucket);
+    // "Christian rock", "gospel rap": worship music in that style, so it counts as worship only.
+    for (const b of hits.includes('worship') ? (['worship'] as GenreBucket[]) : hits) found.add(b);
   }
   return [...found];
 }
@@ -63,10 +69,16 @@ export const GENRE_TUNING = {
   reinforce: 0.3,
   /** A second genre needs this share of the main genre's song-and-album evidence. */
   secondaryOwnShare: 0.5,
+  /** With only artist tags to go on, a second genre needs this share of the top score. */
+  artistOnlySecondaryShare: 0.8,
+  /** Metal needs at least this much energy in the audio (troll tags put pop songs in metal). */
+  metalMinEnergy: 0.55,
   /** Rap only counts as a second genre with at least this much rapping in the audio. */
   secondaryRapSpeechiness: 0.06,
   /** Worship wins unless another genre scores at least this many times higher. */
   worshipDominance: 1.25,
+  /** Worship counts at this score even when another genre leads (a worship artist's "pop" album). */
+  worshipStickyScore: 1.4,
 } as const;
 
 export interface GenreEvidence {
@@ -179,6 +191,8 @@ export function analyzeGenres(e: GenreEvidence): GenreResult {
   add('featured', e.featuredTags);
   if (e.spotifyGenres?.length) add('spotifyGenres', e.spotifyGenres.map((name, i) => ({ name, count: 100 - i * 5 })));
 
+  if (e.audio && Number.isFinite(e.audio.energy) && e.audio.energy < t.metalMinEnergy && scores.has('metal')) scores.set('metal', (scores.get('metal') ?? 0) * 0.3);
+
   const rap = rapAudioFactor(e.audio);
   if (scores.has('hip-hop')) {
     scores.set('hip-hop', (scores.get('hip-hop') ?? 0) * rap.factor);
@@ -198,9 +212,12 @@ export function analyzeGenres(e: GenreEvidence): GenreResult {
   // a pop song by an artist who also raps isn't rap.
   const ownTop = buckets[0] ? (own.get(buckets[0]) ?? 0) : 0;
   if (ownTop > 0) buckets = buckets.filter((b, i) => i === 0 || (own.get(b) ?? 0) >= ownTop * t.secondaryOwnShare);
+  // With no song or album tags at all, a second genre from artist tags alone must be close to the top.
+  else buckets = buckets.filter((b, i) => i === 0 || score(b) >= top * t.artistOnlySecondaryShare);
   // Rap as a *second* genre needs actual rapping; a rapper's sung pop song isn't rap.
   const speech = e.audio?.speechiness;
   if (buckets[0] !== 'hip-hop' && speech !== undefined && Number.isFinite(speech) && speech < t.secondaryRapSpeechiness) buckets = buckets.filter((b) => b !== 'hip-hop');
+  if (!buckets.includes('worship') && score('worship') >= t.worshipStickyScore && buckets.length > 0) buckets = [...buckets, 'worship'];
   // A worship song is worship first. Style tags that only come from the artist (rock, soul) need to
   // be much stronger to count; a genre the song's own or album tags back (Christian country) stays,
   // so the song lands in both playlists.
