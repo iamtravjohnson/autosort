@@ -6,6 +6,7 @@ export const SPOTIFY_API_URL = 'https://api.spotify.com/v1';
 /** Spotify's max items per page and per write request. */
 const PAGE = 50;
 const WRITE_BATCH = 100;
+const LIBRARY_BATCH = 40;
 
 export class SpotifyApiError extends Error {
   constructor(
@@ -94,6 +95,14 @@ interface Paging<T> {
   total?: number;
 }
 
+/**
+ * Arguments for `moveItems` that move one track from index `from` to end up at index `to`
+ * (e.g. "move up" = to: from - 1, "move down" = to: from + 1, "to top" = to: 0).
+ */
+export function moveArgs(from: number, to: number): { rangeStart: number; insertBefore: number } {
+  return { rangeStart: from, insertBefore: to > from ? to + 1 : to };
+}
+
 export function toTrackRef(raw: RawTrack | null | undefined, addedAt: string | null): TrackRef | null {
   if (!raw || raw.type !== 'track' || raw.is_local || !raw.id) return null;
   return {
@@ -142,16 +151,31 @@ export class SpotifyClient {
     this.baseUrl = opts.baseUrl ?? SPOTIFY_API_URL;
   }
 
-  async request<T>(method: string, pathOrUrl: string, body?: unknown, idempotent = method === 'GET' || method === 'PUT'): Promise<T> {
+  /**
+   * Call any Web API endpoint (JSON in, JSON out) with retries, quota detection and one
+   * token refresh on 401. Pass `raw` to send a non-JSON body (e.g. a JPEG cover image).
+   */
+  async request<T>(
+    method: string,
+    pathOrUrl: string,
+    body?: unknown,
+    idempotent = method === 'GET' || method === 'PUT',
+    raw?: { body: string; contentType: string },
+  ): Promise<T> {
     const url = pathOrUrl.startsWith('http') ? pathOrUrl : `${this.baseUrl}${pathOrUrl}`;
+    const content: { headers: Record<string, string>; body: string | undefined } = raw
+      ? { headers: { 'Content-Type': raw.contentType }, body: raw.body }
+      : body === undefined
+        ? { headers: {}, body: undefined }
+        : { headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) };
     const send = async (token: string) =>
       fetchWithRetry(
         this.fetchFn,
         url,
         {
           method,
-          headers: { Authorization: `Bearer ${token}`, ...(body === undefined ? {} : { 'Content-Type': 'application/json' }) },
-          ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+          headers: { Authorization: `Bearer ${token}`, ...content.headers },
+          ...(content.body === undefined ? {} : { body: content.body }),
         },
         {
           maxRetries: this.opts.maxRetries ?? 4,
@@ -231,14 +255,83 @@ export class SpotifyClient {
     return new Map(ids.map((id, i) => [id, results[i] ?? null]));
   }
 
+  /** Create a playlist (private unless `public: true`). */
   async createPlaylist(input: { name: string; description?: string; public?: boolean }): Promise<PlaylistSummary> {
+    const wantPublic = input.public ?? false;
     const raw = await this.request<RawPlaylist>(
       'POST',
       '/me/playlists',
-      { name: input.name, public: input.public ?? false, ...(input.description ? { description: input.description } : {}) },
+      { name: input.name, public: wantPublic, ...(input.description ? { description: input.description } : {}) },
       false,
     );
-    return toPlaylist(raw);
+    const playlist = toPlaylist(raw);
+    // Spotify has been seen to create playlists as public despite `public: false`; enforce it.
+    if (!wantPublic && playlist.public !== false) {
+      await this.updatePlaylistDetails(playlist.id, { public: false });
+      playlist.public = false;
+    }
+    return playlist;
+  }
+
+  /** Rename, re-describe, or change a playlist's visibility. */
+  async updatePlaylistDetails(
+    playlistId: string,
+    details: { name?: string; description?: string; public?: boolean; collaborative?: boolean },
+  ): Promise<void> {
+    await this.request('PUT', `/playlists/${encodeURIComponent(playlistId)}`, details);
+  }
+
+  /** Upload a cover image: base64-encoded JPEG, at most 256 KB. */
+  async uploadPlaylistCover(playlistId: string, jpegBase64: string): Promise<void> {
+    await this.request('PUT', `/playlists/${encodeURIComponent(playlistId)}/images`, undefined, true, {
+      body: jpegBase64,
+      contentType: 'image/jpeg',
+    });
+  }
+
+  /**
+   * Move a block of tracks: `rangeLength` items starting at `rangeStart` go before the item now
+   * at `insertBefore` (use the playlist length to move to the end). Positions are zero-based.
+   */
+  async moveItems(
+    playlistId: string,
+    move: { rangeStart: number; insertBefore: number; rangeLength?: number; snapshotId?: string },
+  ): Promise<string | null> {
+    const body = {
+      range_start: move.rangeStart,
+      insert_before: move.insertBefore,
+      range_length: move.rangeLength ?? 1,
+      ...(move.snapshotId ? { snapshot_id: move.snapshotId } : {}),
+    };
+    return (await this.request<{ snapshot_id: string }>('PUT', `/playlists/${encodeURIComponent(playlistId)}/items`, body)).snapshot_id;
+  }
+
+  /**
+   * Save items to the user's library: tracks go to Liked Songs; albums, shows and playlists
+   * are followed/saved. Accepts any Spotify URI, 40 per request.
+   */
+  async saveToLibrary(uris: readonly string[]): Promise<void> {
+    for (const batch of chunk(uris, LIBRARY_BATCH)) {
+      await this.request('PUT', `/me/library?uris=${batch.map(encodeURIComponent).join(',')}`);
+    }
+  }
+
+  /** Remove items from the user's library (un-like tracks, unfollow playlists…), 40 per request. */
+  async removeFromLibrary(uris: readonly string[]): Promise<void> {
+    for (const batch of chunk(uris, LIBRARY_BATCH)) {
+      await this.request('DELETE', `/me/library?uris=${batch.map(encodeURIComponent).join(',')}`, undefined, true);
+    }
+  }
+
+  /**
+   * Like tracks with chosen "date added" values, so Liked Songs keeps an existing order
+   * (e.g. when moving a playlist into Liked Songs). Uses Spotify's older `PUT /me/tracks`
+   * with `timestamped_ids`, which Spotify marks deprecated; minute-level ordering.
+   */
+  async saveTracksWithDates(tracks: ReadonlyArray<{ id: string; addedAt: string }>): Promise<void> {
+    for (const batch of chunk(tracks, 50)) {
+      await this.request('PUT', '/me/tracks', { timestamped_ids: batch.map((t) => ({ id: t.id, added_at: t.addedAt })) });
+    }
   }
 
   /** Add tracks, in order, at `position` (or the end). Returns the last snapshot id. */

@@ -2,14 +2,43 @@ import type { FetchLike } from '../util.js';
 
 export const SPOTIFY_ACCOUNTS_URL = 'https://accounts.spotify.com';
 
-/** Everything AutoSort needs: read playlists and Liked Songs, create and update playlists. */
+/**
+ * What AutoSort's features use: read and write playlists, read and change Liked Songs,
+ * and upload smart-playlist cover images.
+ */
 export const SPOTIFY_SCOPES = [
   'playlist-read-private',
   'playlist-read-collaborative',
   'playlist-modify-private',
   'playlist-modify-public',
   'user-library-read',
+  'user-library-modify',
+  'ugc-image-upload',
 ] as const;
+
+/**
+ * Every Web API scope useful to a personal library manager: the above plus follows, top
+ * tracks, recently played, profile and playback. Excludes SDK-only and partner scopes.
+ */
+export const SPOTIFY_ALL_SCOPES = [
+  ...SPOTIFY_SCOPES,
+  'user-follow-read',
+  'user-follow-modify',
+  'user-top-read',
+  'user-read-recently-played',
+  'user-read-private',
+  'user-read-email',
+  'user-read-playback-state',
+  'user-modify-playback-state',
+  'user-read-currently-playing',
+  'user-read-playback-position',
+] as const;
+
+/** Scopes the user granted (from a token's `scope`) that `required` still lacks. */
+export function missingScopes(granted: string, required: readonly string[] = SPOTIFY_SCOPES): string[] {
+  const have = new Set(granted.split(/\s+/).filter(Boolean));
+  return required.filter((s) => !have.has(s));
+}
 
 export interface TokenSet {
   accessToken: string;

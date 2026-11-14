@@ -1,6 +1,6 @@
 {
   "name": "@autosort/core",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "The AutoSort engine: split a Spotify playlist into rule-based smart playlists, sort by BPM, key and the Camelot wheel, and keep everything in sync.",
   "license": "MIT",
   "type": "module",
