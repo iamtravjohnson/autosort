@@ -3,7 +3,7 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { ChevronDownIcon, VercelIcon } from '@/components/icons';
 import { Breadcrumbs, JsonLd } from '@/components/seo';
-import { ButtonLink, PreviewNotice, QuickAnswer, StepNumber } from '@/components/ui';
+import { ButtonLink, EarlyReleaseNote, QuickAnswer, StepNumber } from '@/components/ui';
 import { howToJsonLd, pageMetadata } from '@/lib/seo';
 import { site } from '@/lib/site';
 
@@ -76,7 +76,8 @@ const BEFORE: Array<{ q: string; a: ReactNode }> = [
     q: 'How do I get updates?',
     a: (
       <>
-        Your copy is a fork of the AutoSort repo on GitHub. When a new version is out, sync your fork and Vercel redeploys it. See{' '}
+        Your copy lives in your own GitHub repository. When a new version is out, run the Update AutoSort action there (one click) and
+        Vercel redeploys it. See{' '}
         <Link href="/docs/updating">Updating your AutoSort</Link> and the <Link href="/changelog">changelog</Link>.
       </>
     ),
@@ -117,19 +118,19 @@ export default function StartPage() {
           <div className="tnum flex min-w-0 flex-[0_1_300px] flex-col items-start gap-3.5 rounded-panel bg-surface-2 p-6">
             <span className="text-[13px] text-text-2">Total time</span>
             <span className="text-[48px] font-extrabold leading-none tracking-[-0.03em]">~15 min</span>
-            <ButtonLink href={site.github} variant="white" size="lg" className="!px-6" aria-describedby="deploy-note">
+            <ButtonLink href={site.deployUrl} variant="white" size="lg" className="!px-6" aria-describedby="deploy-note">
               <VercelIcon />
               Deploy to Vercel
             </ButtonLink>
             <span id="deploy-note" className="text-[13px] leading-[1.45] text-text-3">
-              Opens the GitHub repo until the one-click deploy ships.
+              Opens Vercel. Have your Spotify Client ID and Client Secret ready.
             </span>
             <Link href="/docs/quick-start" className="text-[14px] font-bold">
               Read the quick start first <span aria-hidden="true">→</span>
             </Link>
           </div>
         </div>
-        <PreviewNotice />
+        <EarlyReleaseNote />
       </div>
 
       <section aria-labelledby="h-need" className="flex flex-col gap-4">

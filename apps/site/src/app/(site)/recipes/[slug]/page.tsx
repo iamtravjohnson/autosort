@@ -7,7 +7,7 @@ import { CopyRecipeButton } from '@/components/content/copy-recipe-button';
 import { chipsFor, coverGradient, explainRule, orderExplain, orderLabel, orderShort } from '@/components/content/recipe-format';
 import { HeaderChips, MiniChip, RecipeThumb, ruleSummary } from '@/components/content/recipe-parts';
 import { Breadcrumbs, JsonLd } from '@/components/seo';
-import { ButtonLink, PreviewNotice, QuickAnswer, StepNumber } from '@/components/ui';
+import { ButtonLink, QuickAnswer, StepNumber } from '@/components/ui';
 import { getRecipe, recipeGroups, recipeJson, recipes, type SiteRecipe } from '@/content/recipes';
 import { howToJsonLd, pageMetadata } from '@/lib/seo';
 import { site } from '@/lib/site';
@@ -218,7 +218,6 @@ export default async function RecipePage({ params }: Props) {
                 </li>
               ))}
             </ol>
-            <PreviewNotice />
           </section>
         </div>
 

@@ -7,7 +7,7 @@ import {
   DocsFaq,
   DocsNote,
   DocsPage,
-  DocsPreviewNotice,
+  DocsEarlyReleaseNote,
   DocsSection,
   EnvTable,
   P,
@@ -84,7 +84,7 @@ export default function QuickStartPage() {
         Vercel create the database. Add your Redirect URI to the Spotify app, then connect your Spotify account and pick the playlist to
         organize. Plan on about 15 minutes.
       </QuickAnswer>
-      <DocsPreviewNotice />
+      <DocsEarlyReleaseNote />
 
       <DocsSection id="need" title="What you need">
         <UL>

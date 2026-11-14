@@ -3,7 +3,7 @@ import { Suspense, type CSSProperties, type ReactNode } from 'react';
 import { StarIcon, VercelIcon } from '@/components/icons';
 import { WheelMark } from '@/components/logo';
 import { JsonLd } from '@/components/seo';
-import { PreviewNotice, WorksWithSpotify } from '@/components/ui';
+import { EarlyReleaseNote, WorksWithSpotify } from '@/components/ui';
 import { formatCount, getRepoStats } from '@/lib/github';
 import { breadcrumbJsonLd, faqJsonLd, type Crumb, type FaqItem } from '@/lib/seo';
 import { formatDate, site } from '@/lib/site';
@@ -265,15 +265,12 @@ export function DocsNote({ tone = 'info', label, children }: { tone?: keyof type
   );
 }
 
-/**
- * The design's white "Deploy to Vercel" button. The Vercel template isn't published yet, so it
- * opens the GitHub repository, and a caption says so.
- */
+/** The design's white "Deploy to Vercel" button (Vercel's one-click clone flow). */
 export function DeployButton() {
   return (
     <div className="flex flex-col items-start gap-2">
       <a
-        href={site.github}
+        href={site.deployUrl}
         target="_blank"
         rel="noopener noreferrer"
         className="inline-flex h-11 items-center gap-2.5 rounded-pill bg-[var(--d-deploy-bg)] px-5 text-[15px] font-bold text-[var(--d-deploy-text)] no-underline transition-colors duration-[120ms] hover:bg-[var(--d-deploy-bg-hover)] hover:text-[var(--d-deploy-text)]"
@@ -281,16 +278,16 @@ export function DeployButton() {
         <VercelIcon size={14} />
         Deploy to Vercel
       </a>
-      <span className="text-[13px] text-[var(--d-text-3)]">The one-click template isn&apos;t published yet, so this opens the AutoSort repository on GitHub.</span>
+      <span className="text-[13px] text-[var(--d-text-3)]">Opens Vercel in a new tab. Have your Spotify Client ID and Client Secret ready.</span>
     </div>
   );
 }
 
-/** The shared PreviewNotice, wrapped so docs.css can restyle it for the light theme. */
-export function DocsPreviewNotice() {
+/** The shared EarlyReleaseNote, wrapped so docs.css can restyle it for the light theme. */
+export function DocsEarlyReleaseNote() {
   return (
     <div className="docs-preview">
-      <PreviewNotice />
+      <EarlyReleaseNote />
     </div>
   );
 }

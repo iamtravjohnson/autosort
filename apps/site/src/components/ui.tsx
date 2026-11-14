@@ -215,21 +215,19 @@ export function WorksWithSpotify({ className = '', tone = 'white' }: { className
 }
 
 /**
- * Honest status note for the self-hosted app: the engine is published and running in the
- * founder's family instance, but the one-click deploy isn't released yet. Use it wherever the
- * design shows "Deploy to Vercel" or step-by-step setup.
+ * Status note shown next to "Deploy to Vercel" and the setup steps: the self-hosted app is new,
+ * so point people at GitHub issues if something doesn't work.
  */
-export function PreviewNotice({ className = '' }: { className?: string }) {
+export function EarlyReleaseNote({ className = '' }: { className?: string }) {
   return (
     <div role="note" className={`flex items-start gap-3 rounded-card border border-accent/40 bg-accent/10 px-[18px] py-4 text-[15px] leading-[1.6] text-[#EDE9FE] ${className}`}>
       <span className="mt-[7px] size-2 shrink-0 rounded-pill bg-accent" aria-hidden="true" />
       <span>
-        <strong className="text-text-1">Coming soon: you can&apos;t set up your own AutoSort yet.</strong> It currently runs only for its
-        creator&apos;s family while the public version is finished.{' '}
-        <a href="https://github.com/iamtravjohnson/autosort" target="_blank" rel="noopener noreferrer">
-          Star it on GitHub
+        <strong className="text-text-1">Early release.</strong> The self-hosted app is brand new. If something doesn&apos;t work,{' '}
+        <a href="https://github.com/iamtravjohnson/autosort/issues" target="_blank" rel="noopener noreferrer">
+          open an issue on GitHub
         </a>{' '}
-        to get notified when it&apos;s ready.
+        and it&apos;ll get fixed.
       </span>
     </div>
   );

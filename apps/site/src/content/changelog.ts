@@ -7,7 +7,7 @@ export type ChangeKind = 'New' | 'Improved' | 'Fixed';
 export interface Release {
   /** Anchor id on /changelog and RSS guid. */
   id: string;
-  product: 'Engine' | 'Website';
+  product: 'App' | 'Engine' | 'Website';
   /** e.g. "v0.2.1"; the website entry uses its domain instead. */
   version: string;
   /** ISO date (YYYY-MM-DD). */
@@ -21,6 +21,21 @@ export interface Release {
 }
 
 export const releases: Release[] = [
+  {
+    id: 'app-v0-1-0',
+    product: 'App',
+    version: 'v0.1.0',
+    date: '2026-11-14',
+    title: 'Deploy your own AutoSort (early release)',
+    items: [
+      { kind: 'New', text: 'The self-hosted app, with one-click Deploy to Vercel. Vercel creates the database and the daily sync schedule for you.' },
+      { kind: 'New', text: 'Smart playlists with a rule editor, suggestions, unmatched songs, undo for every sync, and family invites (up to 5 people).' },
+      { kind: 'New', text: 'Sort any playlist by BPM, Camelot key, energy or date, then save the order back to Spotify.' },
+      { kind: 'New', text: 'Optional photo covers for new smart playlists with your own OpenRouter key. Only the playlist name and rule are sent.' },
+      { kind: 'New', text: 'An Update AutoSort action in your repository to pull in new versions with one click.' },
+    ],
+    notesUrl: `${site.github}/tree/main/apps/web`,
+  },
   {
     id: 'website-launch',
     product: 'Website',

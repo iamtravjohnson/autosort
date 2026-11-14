@@ -109,7 +109,7 @@
   --d-note-violet-text: #4c1d95;
   --d-note-violet-icon: #6d28d9;
 
-  /* Shared tokens, so shared components (PreviewNotice, WorksWithSpotify…) follow the light theme. */
+  /* Shared tokens, so shared components (EarlyReleaseNote, WorksWithSpotify…) follow the light theme. */
   --as-bg: #ffffff;
   --as-surface-1: #f6f6f7;
   --as-surface-2: #efeff1;
@@ -161,7 +161,7 @@ html:has(.docs-root) {
   outline: none;
 }
 
-/* The shared PreviewNotice is styled for dark backgrounds; restyle it for the light theme. */
+/* The shared EarlyReleaseNote is styled for dark backgrounds; restyle it for the light theme. */
 .docs-root[data-theme='light'] .docs-preview > [role='note'] {
   background: var(--d-note-violet-bg);
   border-color: var(--d-note-violet-border);

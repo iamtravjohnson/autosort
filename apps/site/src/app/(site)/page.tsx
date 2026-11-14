@@ -10,7 +10,7 @@ import { SyncTimeline } from '@/components/home/sync-timeline';
 import { GitHubIcon } from '@/components/icons';
 import { Faq, JsonLd } from '@/components/seo';
 import { CtaBand } from '@/components/site-chrome';
-import { ButtonLink, Container, PreviewNotice, QuickAnswer, StepNumber, buttonClass } from '@/components/ui';
+import { ButtonLink, Container, QuickAnswer, StepNumber, buttonClass } from '@/components/ui';
 import { formatCount, getRepoStats } from '@/lib/github';
 import { pageMetadata, softwareJsonLd, sourceCodeJsonLd, type FaqItem } from '@/lib/seo';
 import { site } from '@/lib/site';
@@ -200,7 +200,6 @@ export default function HomePage() {
             </li>
           ))}
         </ol>
-        <PreviewNotice />
       </Band>
 
       {/* Recipes */}

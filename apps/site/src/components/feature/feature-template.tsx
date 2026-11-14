@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { ArrowRightIcon } from '@/components/icons';
 import { Breadcrumbs, Faq, JsonLd } from '@/components/seo';
 import { CtaBand } from '@/components/site-chrome';
-import { ButtonLink, PreviewNotice, QuickAnswer, StepNumber, TransitionChip } from '@/components/ui';
+import { ButtonLink, QuickAnswer, StepNumber, TransitionChip } from '@/components/ui';
 import { featurePath, transitionGuide, type FeaturePage } from '@/content/features';
 import { howToJsonLd, softwareJsonLd } from '@/lib/seo';
 import { formatDate, site } from '@/lib/site';
@@ -180,9 +180,6 @@ export function FeatureTemplate({ page }: { page: FeaturePage }) {
         <Faq items={page.faq} />
       </section>
 
-      <div className="mx-auto max-w-[1200px] px-6">
-        <PreviewNotice />
-      </div>
       <CtaBand title={page.cta.title} body={page.cta.body} />
 
       <JsonLd

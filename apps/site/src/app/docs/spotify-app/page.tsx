@@ -4,7 +4,7 @@ import {
   CopyRow,
   DocsNote,
   DocsPage,
-  DocsPreviewNotice,
+  DocsEarlyReleaseNote,
   DocsSection,
   DocsTable,
   ENV_VARS,
@@ -62,7 +62,7 @@ export default function SpotifyAppPage() {
         only Web API, accept the terms, and save. Then copy the Client ID and Client Secret from the app&apos;s Settings. The Spotify account
         that owns the app needs Premium.
       </QuickAnswer>
-      <DocsPreviewNotice />
+      <DocsEarlyReleaseNote />
 
       <DocsSection id="requirements" title="Account requirements">
         <UL>

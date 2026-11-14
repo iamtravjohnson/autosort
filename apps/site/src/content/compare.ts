@@ -40,7 +40,7 @@ export const AUTOSORT: Record<FeatureKey, { value: string; tone: 'yes' | 'plain'
   dates: { value: 'Yes, both', tone: 'yes' },
   more: { value: 'Artist, title', tone: 'plain' },
   premium: { value: 'The Spotify app owner needs Premium; up to 5 people per copy', tone: 'plain' },
-  ready: { value: 'Engine is on npm; the one-click app is coming soon', tone: 'plain' },
+  ready: { value: 'Yes: one-click Deploy to Vercel (early release)', tone: 'yes' },
   setup: { value: 'Self-hosted: your own Spotify developer app and hosting', tone: 'plain' },
 };
 

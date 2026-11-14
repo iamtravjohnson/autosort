@@ -42,7 +42,7 @@ const FAQ: FaqItem[] = [
   },
   {
     q: 'Can AutoSort sort my playlist this way?',
-    a: "Yes. AutoSort's harmonic mix sort orders a playlist you own by compatible keys while keeping tempo changes small; by default it favors moves within 8 BPM. The sorting engine is open source on npm today, and the one-click self-hosted app is coming soon.",
+    a: "Yes. AutoSort's harmonic mix sort orders a playlist you own by compatible keys while keeping tempo changes small; by default it favors moves within 8 BPM. AutoSort is free and open source: deploy your own copy to Vercel in about 15 minutes.",
   },
   {
     q: "Where does AutoSort get each song's key?",
