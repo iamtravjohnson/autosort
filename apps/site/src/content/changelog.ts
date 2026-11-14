@@ -22,6 +22,63 @@ export interface Release {
 
 export const releases: Release[] = [
   {
+    id: 'app-v0-4-0',
+    product: 'App',
+    version: 'v0.4.0',
+    date: '2026-11-14',
+    title: 'Album mosaic covers and cleaning up your source',
+    latest: true,
+    items: [
+      { kind: 'New', text: 'Choose a cover style in Settings: Spotify’s own album mosaic (the new default), a photo, or a designed cover. Switching existing playlists to mosaics rebuilds them as fresh copies with the same songs.' },
+      { kind: 'New', text: 'Remove songs from your source playlist right from Unmatched, handy for versions Spotify no longer offers.' },
+      { kind: 'Improved', text: 'A redesigned Add to menu: search, playlists grouped by genre, decade, mood and theme, covers and song counts, keyboard support and a bottom sheet on phones.' },
+      { kind: 'Improved', text: 'Autopilot creates more of the playlists you’d expect (90s Country, Worship, Love Songs, Clean Rap) by scaling sizes to your library.' },
+      { kind: 'New', text: 'Optional photo covers with your own OpenRouter key, and New covers for all to redo every cover at once.' },
+    ],
+    notesUrl: `${site.github}/tree/main/apps/web`,
+  },
+  {
+    id: 'engine-v0-3-2',
+    product: 'Engine',
+    version: 'v0.3.2',
+    date: '2026-11-14',
+    title: 'Suggestions sized to your library',
+    items: [
+      { kind: 'Improved', text: 'suggestionSizes scales the minimum songs per suggestion with the library (for about 360 songs: genres 11, decades and clean versions 9, themes 6, moods 18) instead of a fixed 25.' },
+      { kind: 'Improved', text: 'Near-duplicate genres are skipped, decade splits only come from big genres, and over the 30-suggestion cap the smallest decade and clean playlists go first.' },
+    ],
+    notesUrl: `${site.github}/commits/main/packages/core`,
+    npmUrl: `${site.npm}/v/0.3.2`,
+  },
+  {
+    id: 'engine-v0-3-1',
+    product: 'Engine',
+    version: 'v0.3.1',
+    date: '2026-11-14',
+    title: 'Genre fixes from the chart test',
+    items: [
+      { kind: 'Fixed', text: 'Negated tags like “not country” are ignored, and “Christian rock” or “gospel rap” count as Worship only.' },
+      { kind: 'Fixed', text: 'Worship artists stay in Worship even when an album is tagged pop; metal needs energetic audio; second genres from the artist alone must be close to the top score.' },
+      { kind: 'Improved', text: 'On 602 Billboard chart number ones, Rock wrong placements fell from 20 to 10 and Worship found went from 67% to 76%, with Country and Worship still at 0 wrong.' },
+    ],
+    notesUrl: `${site.github}/blob/main/packages/core/eval/RESULTS.md`,
+    npmUrl: `${site.npm}/v/0.3.1`,
+  },
+  {
+    id: 'app-v0-3-0',
+    product: 'App',
+    version: 'v0.3.0',
+    date: '2026-11-14',
+    title: 'Autopilot and Ask for a playlist',
+    items: [
+      { kind: 'New', text: 'Autopilot (on by default) creates every smart playlist AutoSort recommends and adds new ones as your library grows. Delete one and it won’t come back.' },
+      { kind: 'New', text: 'Ask for a playlist in your own words, like “90s country love songs”. AutoSort turns it into rules and shows how many songs match.' },
+      { kind: 'Improved', text: 'Live analysis progress that only moves forward, and the first analysis finishes every genre lookup.' },
+      { kind: 'New', text: 'Serve AutoSort under a path on another site (BASE_PATH), with an optional Back link to it.' },
+    ],
+    notesUrl: `${site.github}/tree/main/apps/web`,
+  },
+  {
     id: 'app-v0-2-0',
     product: 'App',
     version: 'v0.2.0',
@@ -41,7 +98,6 @@ export const releases: Release[] = [
     version: 'v0.3.0',
     date: '2026-11-14',
     title: 'A new genre analyzer',
-    latest: true,
     items: [
       { kind: 'New', text: 'analyzeGenres scores each genre from the song’s own tags, then its album’s, then its main artist’s, and checks rap against how much rapping is in the audio.' },
       { kind: 'Improved', text: 'Featured artists barely count, a second genre needs the song’s own tags to back it, and thin evidence leaves a song out instead of misfiling it.' },

@@ -6,7 +6,16 @@ Keep adding songs to the one playlist you always use (say, "Everything"). AutoSo
 
 Website: [autosort.app](https://autosort.app) · Made by [Travis Johnson](https://travisjohnson.com) ([@iamtravjohnson](https://x.com/iamtravjohnson))
 
-> **Status:** early. The engine (`@autosort/core`) works and is tested. The self-hosted app and the website come next.
+> **Status:** early release. Deploy your own copy from [autosort.app/start](https://autosort.app/start). Changelog: [autosort.app/changelog](https://autosort.app/changelog)
+
+## What it does
+
+- **Autopilot** (on by default): reads your playlist and creates every smart playlist worth having, sized to your library, then adds new ones as it grows. Delete one and it stays gone.
+- **Ask for a playlist** in your own words, like "90s country love songs" or "clean rap for the gym".
+- **Accurate genres** from each song's own Last.fm tags, then its album's and artist's, checked against the audio. [Measured on Billboard chart number ones](packages/core/eval/RESULTS.md).
+- A song goes in **every playlist it fits**. Songs you delete from a smart playlist stay out. Every sync can be undone.
+- **Covers**: Spotify's own album mosaic by default, or optional photo covers.
+- **Sort** any playlist by BPM, energy or harmonically around the Camelot wheel.
 
 ## Why self-hosted?
 
@@ -17,8 +26,8 @@ Since 2026, Spotify limits new developer apps to 5 users. So AutoSort runs as **
 | Path | What it is |
 |---|---|
 | [`packages/core`](packages/core) | The engine: Spotify client, data lookups, rules, smart-playlist suggestions, sorting (BPM, key, Camelot, energy arcs) and the daily sync planner. No framework or database. |
-| `apps/web` | *(coming)* The self-hosted app, with one-click deploy to Vercel. |
-| `apps/site` | *(coming)* autosort.app. |
+| [`apps/web`](apps/web) | The self-hosted app (Next.js + Postgres), with one-click deploy to Vercel. |
+| [`apps/site`](apps/site) | The autosort.app website and docs. |
 
 ## Where the data comes from
 

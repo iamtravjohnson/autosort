@@ -8,7 +8,7 @@ import { pageMetadata } from '@/lib/seo';
 const base = pageMetadata({
   title: 'Changelog',
   description:
-    'Every AutoSort release: the @autosort/core engine on npm (latest v0.2.1) and the autosort.app website. New features, improvements and fixes, newest first.',
+    'Every AutoSort release: the self-hosted app, the @autosort/core engine on npm and the autosort.app website. New features, improvements and fixes, newest first.',
   path: '/changelog',
 });
 
@@ -35,9 +35,10 @@ export default function ChangelogPage() {
       </div>
 
       <QuickAnswer>
-        AutoSort&apos;s latest releases are the self-hosted app v0.2.0 and engine v0.3.0 (@autosort/core on npm), published November 14,
-        2026, with a new genre analyzer that keeps songs out of the wrong playlists. The app first shipped as v0.1.0, an early release with
-        one-click Deploy to Vercel. The autosort.app website launched November 14, 2026.
+        AutoSort&apos;s latest releases are the self-hosted app v0.4.0 and engine v0.3.2 (@autosort/core on npm), published November 14,
+        2026. Recent versions added Autopilot, which creates recommended playlists for you, asking for a playlist in your own words, album
+        mosaic covers and a genre analyzer measured on Billboard charts. The app first shipped as v0.1.0, an early release with one-click
+        Deploy to Vercel.
       </QuickAnswer>
 
       <ol className="m-0 flex list-none flex-col p-0">

@@ -4,6 +4,13 @@ Your own copy of AutoSort: point it at the Spotify playlist you always add to, a
 
 Free and open source (MIT). Up to 5 people per copy (Spotify's limit for developer apps). Guide: [autosort.app/docs/quick-start](https://autosort.app/docs/quick-start)
 
+- **Autopilot** creates the smart playlists AutoSort recommends (on by default; switch it off on a source's page to pick yourself).
+- **Ask for a playlist** in your own words on Smart Playlists.
+- **Unmatched** lists songs that fit nowhere: add them to a playlist, or remove them from your source.
+- **Playlist covers** in Settings: Spotify's album mosaic (default), photo (needs `OPENROUTER_API_KEY`) or designed.
+
+How it all works: [autosort.app/docs/how-it-works](https://autosort.app/docs/how-it-works)
+
 ## Deploy
 
 1. Create a Spotify developer app at [developer.spotify.com/dashboard](https://developer.spotify.com/dashboard) (Web API only). You need Spotify Premium. Also get a free Last.fm API key at [last.fm/api/account/create](https://www.last.fm/api/account/create): AutoSort uses Last.fm tags to tell genres apart, since Spotify no longer shares them.

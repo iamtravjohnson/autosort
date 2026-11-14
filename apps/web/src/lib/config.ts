@@ -2,7 +2,7 @@ import 'server-only';
 import { headers } from 'next/headers';
 import { BASE_PATH } from './base-path';
 
-export const APP_VERSION = '0.3.0';
+export const APP_VERSION = '0.4.0';
 export const MAX_PEOPLE = 5; // Spotify Development Mode: 5 users per developer app
 export const GITHUB_URL = 'https://github.com/iamtravjohnson/autosort';
 export const DOCS_URL = 'https://autosort.app/docs/quick-start';

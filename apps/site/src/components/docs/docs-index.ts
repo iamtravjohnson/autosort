@@ -16,7 +16,7 @@ const KEYWORDS: Record<string, string> = {
     'spotify developer dashboard create app client id client secret web api redirect uri premium development mode account requirements form fields',
   '/docs/family': 'family members invite users user management email 5 users five people share household 403',
   '/docs/how-it-works':
-    'smart playlists rules genre decade release year mood energy bpm tempo camelot key clean explicit last.fm tags reccobeats musicbrainz daily sync unmatched pin exclude overrides',
+    'smart playlists rules genre decade release year mood energy bpm tempo camelot key clean explicit last.fm tags reccobeats musicbrainz daily sync unmatched pin exclude overrides autopilot automatic recommended playlists ask for a playlist describe in your own words covers album mosaic photo covers openrouter remove from source deleted songs stay out genre accuracy',
   '/docs/updating': 'update upgrade new version github actions update autosort workflow run redeploy vercel rollback instant rollback changelog',
   '/docs/troubleshooting':
     'errors problems 403 not registered INVALID_CLIENT invalid redirect uri 429 rate limit too many requests retry-after daily sync cron not running public playlists private',
