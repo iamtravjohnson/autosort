@@ -1,0 +1,1 @@
+ALTER TABLE "users" ADD COLUMN "cover_style" text DEFAULT 'mosaic' NOT NULL;

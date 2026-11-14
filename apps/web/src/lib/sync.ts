@@ -289,15 +289,23 @@ export async function syncUser(userId: string, opts: SyncOptions): Promise<strin
         results.push(result);
       }
 
-      // Covers: one for every new playlist, plus any playlist still showing Spotify's automatic
-      // mosaic (an earlier upload failed). A cover the user set in Spotify is left alone. Then
-      // remember each cover's address so AutoSort can show it. Failures don't fail the run.
-      const coverQueue = new Map(needCovers.map((c) => [c.playlistId, c]));
+      // Covers. "Album mosaic" (the default): Spotify makes the cover itself from the playlist's
+      // albums, so nothing is uploaded; just remember its current address. Photo or designed: one for
+      // every new playlist, plus any still showing Spotify's mosaic (an earlier upload failed); a
+      // cover the user set in Spotify is left alone. Failures don't fail the run.
+      const [person] = await d.select({ coverStyle: schema.users.coverStyle }).from(schema.users).where(eq(schema.users.id, userId));
+      const coverStyle = person?.coverStyle ?? 'mosaic';
+      const coverQueue = new Map(coverStyle === 'mosaic' ? [] : needCovers.map((c) => [c.playlistId, c]));
       const images = new Map<string, string | null>();
       for (const r of results) {
         if (!r.playlistId || r.error || coverQueue.has(r.playlistId)) continue;
         const p = playlists.find((x) => x.id === r.smartPlaylistId);
-        if (!p || (p.imageUrl && !isMosaic(p.imageUrl))) continue;
+        if (!p) continue;
+        if (coverStyle === 'mosaic') {
+          images.set(r.playlistId, await playlistImage(client, r.playlistId).catch(() => p.imageUrl));
+          continue;
+        }
+        if (p.imageUrl && !isMosaic(p.imageUrl)) continue;
         const url = await playlistImage(client, r.playlistId).catch(() => undefined);
         if (url === undefined) continue;
         images.set(r.playlistId, url);
@@ -306,7 +314,7 @@ export async function syncUser(userId: string, opts: SyncOptions): Promise<strin
       const queue = [...coverQueue.values()].slice(0, 24);
       for (let i = 0; i < queue.length; i += COVER_CONCURRENCY) {
         const batch = queue.slice(i, i + COVER_CONCURRENCY);
-        const settled = await Promise.allSettled(batch.map((c) => uploadCover(client, c.playlistId, c)));
+        const settled = await Promise.allSettled(batch.map((c) => uploadCover(client, c.playlistId, c, coverStyle === 'photo' ? 'photo' : 'designed')));
         settled.forEach((s, j) => {
           if (s.status === 'rejected') console.error(`Cover upload failed for "${batch[j]!.name}":`, s.reason instanceof Error ? s.reason.message : s.reason);
         });

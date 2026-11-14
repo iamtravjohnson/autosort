@@ -27,7 +27,7 @@ After that: **Settings → Update now**, or in your repository **Actions → Upd
 | `AUTH_SECRET` | No | Generated and stored in the database if unset |
 | `CRON_SECRET` | No | Protects the daily sync endpoint |
 | `LASTFM_API_KEY` | Yes | Free key from [last.fm/api](https://www.last.fm/api/account/create). Genre playlists (Country, Rap, Worship…) need it: Spotify no longer shares artist genres |
-| `OPENROUTER_API_KEY` | No | Photo covers for new smart playlists (only the playlist's name and rule are sent) |
+| `OPENROUTER_API_KEY` | No | Photo covers, when you pick Photo in Settings → Playlist covers (only the playlist's name and rule are sent). By default Spotify makes covers from each playlist's albums |
 | `OPENROUTER_IMAGE_MODEL` | No | Image model, default `google/gemini-3-pro-image` |
 | `APP_URL` | No | Public address, including any `BASE_PATH`, if it can't be detected |
 | `BASE_PATH` | No | Serve AutoSort under a path on another site, e.g. `/autosort` (see below) |

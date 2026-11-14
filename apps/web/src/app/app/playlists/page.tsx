@@ -54,7 +54,7 @@ export default async function PlaylistsPage() {
 
       <div className="flex flex-col gap-6 px-6 pb-8 sm:px-8">
         <AskPlaylist sources={askSources} />
-        {playlists.some((p) => p.spotifyPlaylistId) ? (
+        {user.coverStyle !== 'mosaic' && playlists.some((p) => p.spotifyPlaylistId) ? (
           <NewCoversButton count={playlists.filter((p) => p.spotifyPlaylistId).length} photos={aiCoversEnabled()} />
         ) : null}
         {playlists.length === 0 ? (

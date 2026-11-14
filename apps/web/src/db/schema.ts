@@ -7,6 +7,11 @@ export const users = pgTable('users', {
   spotifyId: text('spotify_id').notNull().unique(),
   displayName: text('display_name'),
   role: text('role', { enum: ['owner', 'member'] }).notNull().default('member'),
+  /**
+   * Covers for this person's smart playlists: Spotify's own album mosaic (no upload), a photo
+   * (needs OPENROUTER_API_KEY) or AutoSort's designed cover.
+   */
+  coverStyle: text('cover_style', { enum: ['mosaic', 'photo', 'designed'] }).notNull().default('mosaic'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 

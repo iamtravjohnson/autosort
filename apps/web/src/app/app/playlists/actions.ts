@@ -172,7 +172,7 @@ export async function regenerateCover(input: { id: string }): Promise<ActionResu
   if (!p.spotifyPlaylistId) return { ok: false, error: 'Save the playlist to Spotify first, then make a cover.' };
   try {
     const client = await spotifyFor(user.id);
-    const kind = await uploadCover(client, p.spotifyPlaylistId, p);
+    const kind = await uploadCover(client, p.spotifyPlaylistId, p, user.coverStyle === 'designed' ? 'designed' : 'photo');
     await new Promise((resolve) => setTimeout(resolve, 1500));
     const imageUrl = await playlistImage(client, p.spotifyPlaylistId).catch(() => null);
     if (imageUrl) await db().update(schema.smartPlaylists).set({ imageUrl }).where(eq(schema.smartPlaylists.id, p.id));
@@ -210,7 +210,7 @@ export async function regenerateAllCovers(): Promise<ActionResult & { made?: num
   let plain = 0;
   for (let i = 0; i < rows.length; i += COVER_CONCURRENCY) {
     const batch = rows.slice(i, i + COVER_CONCURRENCY);
-    const settled = await Promise.allSettled(batch.map((p) => uploadCover(client, p.spotifyPlaylistId!, p)));
+    const settled = await Promise.allSettled(batch.map((p) => uploadCover(client, p.spotifyPlaylistId!, p, user.coverStyle === 'designed' ? 'designed' : 'photo')));
     settled.forEach((s, j) => {
       if (s.status === 'fulfilled') {
         made++;

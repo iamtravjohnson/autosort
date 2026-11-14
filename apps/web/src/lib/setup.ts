@@ -87,8 +87,8 @@ export async function setupStatus(): Promise<SetupStatus> {
       label: 'AI playlist covers',
       state: process.env.OPENROUTER_API_KEY ? 'done' : 'optional',
       detail: process.env.OPENROUTER_API_KEY
-        ? 'Found OPENROUTER_API_KEY: new smart playlists get a photo cover'
-        : 'Optional: add OPENROUTER_API_KEY for photo covers. Without it, AutoSort uploads its own designed covers.',
+        ? 'Found OPENROUTER_API_KEY: pick Photo in Settings → Playlist covers to use photo covers'
+        : 'Optional: add OPENROUTER_API_KEY for photo covers. By default Spotify makes each cover from the playlist’s albums.',
     },
   ];
   return { ready: Boolean(creds) && dbOk && migrated, hasOwner, checks };

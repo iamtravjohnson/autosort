@@ -8,7 +8,9 @@ import { buttonClass, SpotifyLogo } from '@/components/ui';
 import { connectionState, dailySchedule, instanceInfo, nextOwner, SPOTIFY_MANAGE_APPS_URL, spotsUsed } from '@/lib/access';
 import { APP_VERSION, MAX_PEOPLE } from '@/lib/config';
 import { timeAgo } from '@/lib/format';
-import { spotifyStatus } from '@/lib/queries';
+import { spotifyStatus, userSmartPlaylists } from '@/lib/queries';
+import { CoverStyleSettings } from '@/components/app/cover-style';
+import { aiCoversEnabled, isMosaic } from '@/lib/covers';
 import { requireUser } from '@/lib/session';
 import { updateLinks } from '@/lib/updates';
 import { deleteMyData } from './actions';
@@ -31,12 +33,13 @@ function Row({ k, children, tone = 'text-text-1' }: { k: string; children: React
 export default async function SettingsPage() {
   const user = await requireUser();
   const isOwner = user.role === 'owner';
-  const [account, info, spots, successor, updates] = await Promise.all([
+  const [account, info, spots, successor, updates, myPlaylists] = await Promise.all([
     spotifyStatus(user.id),
     instanceInfo(),
     isOwner ? spotsUsed() : Promise.resolve(null),
     isOwner ? nextOwner(user.id) : Promise.resolve(null),
     isOwner ? updateLinks() : Promise.resolve(null),
+    userSmartPlaylists(user.id),
   ]);
   const connection = connectionState(account);
   const schedule = dailySchedule();
@@ -160,6 +163,17 @@ export default async function SettingsPage() {
             . To change it, edit that line and let Vercel redeploy. It&apos;s one schedule for everyone in your family.
           </p>
         </div>
+      </section>
+
+      <section aria-labelledby="covers" className={section}>
+        <h2 id="covers" className={h2}>
+          Playlist covers
+        </h2>
+        <CoverStyleSettings
+          style={user.coverStyle}
+          photoAvailable={aiCoversEnabled()}
+          customCovers={myPlaylists.filter((p) => p.spotifyPlaylistId && p.imageUrl && !isMosaic(p.imageUrl)).length}
+        />
       </section>
 
       <section aria-labelledby="inst" className={section}>

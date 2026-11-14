@@ -299,9 +299,12 @@ async function aiPhoto(name: string, rule: Rule): Promise<Buffer> {
   throw new Error(`Image generation failed: ${lastError}`);
 }
 
-/** The cover image for a playlist: a titled photo when OPENROUTER_API_KEY is set (falling back to the designed cover), else the designed cover. */
-export async function renderCover(p: { name: string; rule: Rule }): Promise<{ jpegBase64: string; kind: 'ai' | 'designed' }> {
-  if (aiCoversEnabled()) {
+/**
+ * The cover image for a playlist: a titled photo when the style is "photo" and OPENROUTER_API_KEY
+ * is set (falling back to the designed cover), else the designed cover.
+ */
+export async function renderCover(p: { name: string; rule: Rule }, style: 'photo' | 'designed' = 'photo'): Promise<{ jpegBase64: string; kind: 'ai' | 'designed' }> {
+  if (style === 'photo' && aiCoversEnabled()) {
     try {
       return { jpegBase64: await toSpotifyJpeg(await titledPhoto(await aiPhoto(p.name, p.rule), p.name)), kind: 'ai' };
     } catch (err) {
@@ -323,8 +326,8 @@ export async function playlistImage(client: SpotifyClient, playlistId: string): 
 }
 
 /** Make and upload a cover for a smart playlist. */
-export async function uploadCover(client: SpotifyClient, playlistId: string, p: { name: string; rule: Rule }): Promise<'ai' | 'designed'> {
-  const { jpegBase64, kind } = await renderCover(p);
+export async function uploadCover(client: SpotifyClient, playlistId: string, p: { name: string; rule: Rule }, style: 'photo' | 'designed' = 'photo'): Promise<'ai' | 'designed'> {
+  const { jpegBase64, kind } = await renderCover(p, style);
   await client.uploadPlaylistCover(playlistId, jpegBase64);
   return kind;
 }
