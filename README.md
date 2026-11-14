@@ -34,7 +34,7 @@ Since 2026, Spotify limits new developer apps to 5 users. So AutoSort runs as **
 | Data | Source |
 |---|---|
 | Your playlists, songs, explicit flag, release date | Spotify Web API (your account) |
-| BPM, key, energy, mood (valence), danceability | [ReccoBeats](https://reccobeats.com) (free, no key) |
+| BPM, key, energy, mood (valence), danceability, speechiness (tells rapping apart) | [ReccoBeats](https://reccobeats.com) (free, no key) |
 | Original release year (fixes "Greatest Hits" dates) | [MusicBrainz](https://musicbrainz.org) |
 | Genres and crowd tags (country, rap, worship, love songs, sad…) for each song, album and artist | [Last.fm](https://www.last.fm/api) (free key, needed for genre playlists) |
 

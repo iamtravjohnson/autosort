@@ -5,7 +5,7 @@ The AutoSort engine: split a Spotify playlist into rule-based smart playlists, s
 ## Daily sync in one call
 
 ```ts
-import { SpotifyClient, syncSmartPlaylists, RECIPES } from '@autosort/core';
+import { LastfmClient, SpotifyClient, syncSmartPlaylists } from '@autosort/core';
 
 const client = new SpotifyClient({ getAccessToken: () => getTokenFromYourDb() });
 
@@ -13,10 +13,12 @@ const result = await syncSmartPlaylists({
   client,
   sources: [{ type: 'playlist', id: FAVS_PLAYLIST_ID }],
   targets: savedDefinitions, // { id, name, rule, order, playlistId?, state? }
-  enrich: { cache: yourCache, lastfm: null },
+  // Genres come from Last.fm tags, so genre rules need a free Last.fm key.
+  enrich: { cache: yourCache, lastfm: new LastfmClient({ apiKey: LASTFM_API_KEY }) },
 });
 
 // Save each outcome's plan.nextState + playlistId, and previousUris as an undo point.
+// plan.userRemovedTrackIds lists songs the user deleted in Spotify: add them to the target's exclude list.
 ```
 
 ## Building blocks
@@ -29,8 +31,8 @@ const result = await syncSmartPlaylists({
 - **Data:** `enrichTracks` gathers ReccoBeats audio features, MusicBrainz original years and Last.fm tags for each song, album and artist. It is cached and runs within a budget, so a big library fills in over a few runs.
 - **Genres:** `analyzeGenres` scores each genre from the song's own tags, then its album's, then its main artist's, and checks rap against how much rapping is in the audio. Featured artists barely count. When the evidence is thin the song gets no genre (it's left out, not misfiled) and its likely genres go in `genreNear`. Every result has plain-English `genreReasons`. Spotify no longer returns artist genres to most apps, so the old Spotify step is off by default. Accuracy on Billboard genre-chart songs is measured in [eval/RESULTS.md](eval/RESULTS.md) (for example: Country 94% found, 0 wrong placements; Rap 92%, 3 debatable).
 - **Rules:** `matchesRule`, `parseRule` (zod), `ruleChips` ("Genre: Country", "Clean only").
-- **Suggestions:** `suggestPlaylists` proposes Country, 90s Country, Clean Rap, Worship, Love Songs, Workout…; `unmatchedTracks` lists songs no rule claims.
+- **Suggestions:** `suggestPlaylists` proposes Country, 90s Country, Clean Rap, Worship, Love Songs, Workout… with minimum sizes that scale with the library (`suggestionSizes`), skipping near-duplicates; `unmatchedTracks` lists songs no rule claims.
 - **Sorting:** `sortTracks` by any field, `harmonic` (Camelot + BPM), `energyArc`, seeded `shuffle`, with pinned positions.
 - **Camelot:** `toCamelot`, `transition`, `compatibleKeys`, `camelotTable`.
-- **Sync:** `planSmartPlaylist` (pure, idempotent) and `applyChange` / `restorePlaylist`.
+- **Sync:** `planSmartPlaylist` (pure, idempotent; keeps songs the user deleted out and reports them as `userRemovedTrackIds`) and `applyChange` / `restorePlaylist`.
 - **Recipes:** built-in rule sets in `RECIPES`.
