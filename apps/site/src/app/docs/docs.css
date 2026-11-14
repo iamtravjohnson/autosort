@@ -180,3 +180,9 @@ html:has(.docs-drawer[open]) {
 .docs-shot {
   background: repeating-linear-gradient(135deg, var(--d-shot-a) 0 12px, var(--d-shot-b) 12px 24px);
 }
+
+/* Spotify attribution: white logo on dark, black logo on light (Spotify's logo color rules). */
+.docs-root[data-theme='light'] .docs-spotify-on-dark,
+.docs-root:not([data-theme='light']) .docs-spotify-on-light {
+  display: none;
+}

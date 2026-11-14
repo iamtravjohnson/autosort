@@ -75,7 +75,10 @@ export function DocsFooter() {
           </span>
           <span>{site.disclaimer}</span>
         </span>
-        <WorksWithSpotify />
+        <span className="inline-flex">
+          <WorksWithSpotify className="docs-spotify-on-dark" />
+          <WorksWithSpotify tone="black" className="docs-spotify-on-light" />
+        </span>
       </div>
     </footer>
   );

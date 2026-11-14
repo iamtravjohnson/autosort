@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import type { ComponentProps, ReactNode } from 'react';
 import { toCamelot } from '@autosort/core';
@@ -183,12 +184,32 @@ export function StepNumber({ n, size = 36 }: { n: number; size?: number }) {
   );
 }
 
-/** "Works with Spotify" attribution. The dashed circle stands in for Spotify's official logo asset. */
-export function WorksWithSpotify({ className = '' }: { className?: string }) {
+const SPOTIFY_LOGO_RATIO = 225.25 / 823.46;
+
+/**
+ * Spotify attribution with Spotify's official full logo (unmodified files from
+ * developer.spotify.com/documentation/design, in /public/brand/spotify).
+ * Spotify's rules: white logo on dark backgrounds, black on light (green only on pure black or white),
+ * at least 70px wide, clear space of half the icon's height, and never used inside a sentence.
+ */
+export function SpotifyLogo({ tone = 'white', width = 84, className = '' }: { tone?: 'white' | 'black'; width?: number; className?: string }) {
   return (
-    <span className={`inline-flex items-center gap-2 ${className}`}>
-      <span role="img" aria-label="Spotify logo" className="box-border inline-block size-[18px] rounded-pill border-[1.5px] border-dashed border-current" />
-      Works with Spotify
+    <Image
+      src={tone === 'white' ? '/brand/spotify/Full_Logo_White_RGB.svg' : '/brand/spotify/Full_Logo_Black_RGB.svg'}
+      alt="Spotify"
+      width={Math.max(70, width)}
+      height={Math.round(Math.max(70, width) * SPOTIFY_LOGO_RATIO)}
+      unoptimized
+      className={`inline-block shrink-0 ${className}`}
+    />
+  );
+}
+
+/** Attribution block for page footers: the official Spotify logo on its own (not inside a sentence). */
+export function WorksWithSpotify({ className = '', tone = 'white' }: { className?: string; tone?: 'white' | 'black' }) {
+  return (
+    <span className={`inline-flex items-center p-1.5 ${className}`}>
+      <SpotifyLogo tone={tone} />
     </span>
   );
 }
