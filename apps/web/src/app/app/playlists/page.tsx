@@ -2,10 +2,12 @@ import { RECIPES, ruleChips } from '@autosort/core';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { AskPlaylist } from '@/components/editor/ask-playlist';
+import { NewCoversButton } from '@/components/editor/new-covers-button';
 import { SmartPlaylistCard } from '@/components/editor/playlist-card';
 import { ChevronDownIcon } from '@/components/icons';
 import { buttonClass } from '@/components/ui';
 import { userSmartPlaylists, userSources } from '@/lib/queries';
+import { aiCoversEnabled } from '@/lib/covers';
 import { requireUser } from '@/lib/session';
 import { editorSources } from './load';
 
@@ -52,6 +54,9 @@ export default async function PlaylistsPage() {
 
       <div className="flex flex-col gap-6 px-6 pb-8 sm:px-8">
         <AskPlaylist sources={askSources} />
+        {playlists.some((p) => p.spotifyPlaylistId) ? (
+          <NewCoversButton count={playlists.filter((p) => p.spotifyPlaylistId).length} photos={aiCoversEnabled()} />
+        ) : null}
         {playlists.length === 0 ? (
           <div className="flex flex-col items-start gap-3 rounded-card bg-surface-2 p-6">
             <h2 className="m-0 text-[18px] font-bold">No smart playlists yet</h2>

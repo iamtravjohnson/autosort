@@ -191,6 +191,43 @@ export async function regenerateCover(input: { id: string }): Promise<ActionResu
   }
 }
 
+/**
+ * Make a new cover for every smart playlist in Spotify: a photo when OPENROUTER_API_KEY is set,
+ * else AutoSort's designed cover. Replaces their current covers. A few at a time (photos take ~20 s).
+ */
+export async function regenerateAllCovers(): Promise<ActionResult & { made?: number; failed?: number }> {
+  const user = await requireUser();
+  const rows = (await db().select().from(schema.smartPlaylists).where(eq(schema.smartPlaylists.userId, user.id))).filter((p) => p.spotifyPlaylistId);
+  if (rows.length === 0) return { ok: false, error: 'Your smart playlists aren’t in Spotify yet. Sync first, then try again.' };
+  let client;
+  try {
+    client = await spotifyFor(user.id);
+  } catch (err) {
+    return spotifyErrorResult(err);
+  }
+  let made = 0;
+  let failed = 0;
+  for (let i = 0; i < rows.length; i += 4) {
+    const batch = rows.slice(i, i + 4);
+    const settled = await Promise.allSettled(batch.map((p) => uploadCover(client, p.spotifyPlaylistId!, p)));
+    settled.forEach((s, j) => {
+      if (s.status === 'fulfilled') made++;
+      else {
+        failed++;
+        console.error(`Cover upload failed for "${batch[j]!.name}":`, s.reason instanceof Error ? s.reason.message : s.reason);
+      }
+    });
+  }
+  await new Promise((resolve) => setTimeout(resolve, 1500));
+  for (const p of rows) {
+    const imageUrl = await playlistImage(client, p.spotifyPlaylistId!).catch(() => null);
+    if (imageUrl) await db().update(schema.smartPlaylists).set({ imageUrl }).where(eq(schema.smartPlaylists.id, p.id));
+  }
+  revalidatePath('/app', 'layout');
+  if (failed) return { ok: false, made, failed, error: `${failed} cover${failed === 1 ? '' : 's'} didn’t upload. Try again in a minute.` };
+  return { ok: true, made, failed };
+}
+
 /** "Ask for a playlist": save the rule built from the user's words, build it in Spotify, then open it. */
 export async function createAskedPlaylist(input: { name: string; rule: unknown; sourceIds: string[] }): Promise<ActionResult> {
   const user = await requireUser();
