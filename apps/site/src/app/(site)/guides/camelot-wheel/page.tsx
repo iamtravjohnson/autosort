@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { camelotTable, camelotToKeyName } from '@autosort/core';
 import { CamelotChip } from '@/components/camelot/chip';
@@ -100,6 +101,10 @@ export default function CamelotWheelGuide() {
           smoothly when their codes match, sit one number apart with the same letter, or share a number with the other letter. Moving up
           two numbers adds energy.
         </QuickAnswer>
+
+        <figure className="relative m-0 aspect-[16/9] overflow-hidden rounded-panel bg-surface-2">
+          <Image src="/images/guides/camelot-wheel.jpg" alt="" fill sizes="(max-width: 768px) 100vw, 720px" className="object-cover" />
+        </figure>
 
         <CamelotWheel />
 

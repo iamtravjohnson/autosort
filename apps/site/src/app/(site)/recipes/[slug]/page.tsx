@@ -1,11 +1,11 @@
+import Image from 'next/image';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ruleChips } from '@autosort/core';
 import { CopyRecipeButton } from '@/components/content/copy-recipe-button';
-import { chipsFor, coverGradient, coverInk, explainRule, orderExplain, orderLabel, orderShort } from '@/components/content/recipe-format';
+import { chipsFor, coverGradient, explainRule, orderExplain, orderLabel, orderShort } from '@/components/content/recipe-format';
 import { HeaderChips, MiniChip, RecipeThumb, ruleSummary } from '@/components/content/recipe-parts';
-import { MusicIcon } from '@/components/icons';
 import { Breadcrumbs, JsonLd } from '@/components/seo';
 import { ButtonLink, PreviewNotice, QuickAnswer, StepNumber } from '@/components/ui';
 import { getRecipe, recipeGroups, recipeJson, recipes, type SiteRecipe } from '@/content/recipes';
@@ -62,7 +62,6 @@ export default async function RecipePage({ params }: Props) {
 
   const path = `/recipes/${recipe.slug}`;
   const h1 = `${recipe.name} smart playlist for Spotify`;
-  const ink = coverInk(recipe.cover);
   const { chips, any } = chipsFor(recipe.rule);
   const rows = explainRule(recipe.rule);
   const steps = howToSteps(recipe);
@@ -77,11 +76,12 @@ export default async function RecipePage({ params }: Props) {
       <header className="mx-auto flex max-w-[1200px] flex-wrap items-end gap-10 px-4 pb-8 pt-5 sm:px-6 sm:pb-12">
         <div
           aria-hidden="true"
-          className="box-border flex size-[240px] shrink-0 flex-col justify-between rounded-card p-[22px] shadow-[0_24px_64px_rgba(0,0,0,0.5)]"
-          style={{ background: coverGradient(recipe.cover), color: ink }}
+          className="relative box-border flex size-[240px] shrink-0 flex-col justify-end overflow-hidden rounded-card p-[22px] shadow-[0_24px_64px_rgba(0,0,0,0.5)]"
+          style={{ background: coverGradient(recipe.cover) }}
         >
-          <MusicIcon size={34} />
-          <span className="text-[28px] font-extrabold leading-none tracking-[-0.03em] sm:text-[36px]">{recipe.name}</span>
+          <Image src={`/images/recipes/${recipe.slug}.jpg`} alt="" fill priority sizes="240px" className="object-cover" />
+          <span className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+          <span className="relative text-[28px] font-extrabold leading-none tracking-[-0.03em] text-white sm:text-[36px]">{recipe.name}</span>
         </div>
         <div className="flex min-w-0 flex-[1_1_440px] flex-col gap-4">
           <span className="text-[13px] font-bold text-accent-soft">Smart playlist recipe</span>

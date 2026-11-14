@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { findRecipe, ruleChips, type OrderSpec, type Recipe } from '@autosort/core';
 
@@ -44,7 +45,14 @@ export function RecipeCards() {
             href={`/recipes/${recipe.slug}`}
             className="flex w-full gap-4 rounded-card bg-surface-2 p-4 text-text-1 no-underline transition-colors duration-[120ms] hover:bg-[#232327] hover:text-text-1"
           >
-            <span className="size-[72px] shrink-0 rounded-sm sm:size-[88px]" style={{ background: cover }} aria-hidden="true" />
+            <Image
+              src={`/images/recipes/${recipe.slug}.jpg`}
+              alt=""
+              width={88}
+              height={88}
+              className="size-[72px] shrink-0 rounded-sm object-cover sm:size-[88px]"
+              style={{ background: cover }}
+            />
             <span className="flex min-w-0 flex-col gap-2">
               <span className="text-[17px] font-bold">{recipe.name}</span>
               <span className="text-[14px] leading-[1.4] text-text-2">{recipe.description}</span>

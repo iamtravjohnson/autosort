@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -84,6 +85,10 @@ export default async function GuidePage({ params }: Props) {
         </div>
 
         <QuickAnswer>{guide.quickAnswer}</QuickAnswer>
+
+        <figure className="relative m-0 aspect-[16/9] overflow-hidden rounded-panel bg-surface-2">
+          <Image src={`/images/guides/${guide.slug}.jpg`} alt="" fill priority sizes="(max-width: 768px) 100vw, 720px" className="object-cover" />
+        </figure>
 
         <div className="flex flex-col gap-2.5 rounded-card bg-surface-2 px-[22px] py-5">
           <h2 className="m-0 text-[16px] font-extrabold">Key takeaways</h2>

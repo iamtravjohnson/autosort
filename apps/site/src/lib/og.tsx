@@ -26,7 +26,7 @@ function Mark({ size = 40 }: { size?: number }) {
 export type OgArt =
   | { kind: 'stack' }
   | { kind: 'bars' }
-  | { kind: 'cover'; from: string; to: string; label: string }
+  | { kind: 'cover'; from: string; to: string; label: string; image?: string }
   | { kind: 'wheel' }
   | { kind: 'compare'; other: string }
   | { kind: 'docs'; lines?: string[] };
@@ -61,6 +61,14 @@ function Art({ art }: { art: OgArt }) {
         </div>
       );
     case 'cover':
+      if (art.image) {
+        return (
+          <div style={{ width: 340, height: 340, borderRadius: 14, overflow: 'hidden', display: 'flex', position: 'relative' }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={art.image} width={340} height={340} alt="" style={{ position: 'absolute', inset: 0 }} />
+          </div>
+        );
+      }
       return (
         <div style={{ width: 320, height: 320, borderRadius: 12, padding: 30, display: 'flex', alignItems: 'flex-end', background: `linear-gradient(145deg, ${art.from}, ${art.to})` }}>
           <span style={{ fontSize: 52, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1, color: '#0B0B0C' }}>{art.label}</span>
@@ -98,6 +106,16 @@ function Art({ art }: { art: OgArt }) {
           </div>
         </div>
       );
+  }
+}
+
+/** A file under /public as a data URL, for images inside share images. Returns undefined if missing. */
+export async function publicImage(path: string): Promise<string | undefined> {
+  try {
+    const buf = await readFile(join(process.cwd(), 'public', path));
+    return `data:image/jpeg;base64,${buf.toString('base64')}`;
+  } catch {
+    return undefined;
   }
 }
 

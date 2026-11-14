@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Breadcrumbs, JsonLd } from '@/components/seo';
@@ -12,24 +13,6 @@ const DESCRIPTION =
   'Plain-English guides to splitting a big Spotify playlist, keeping smaller playlists updated, and ordering songs by BPM, energy or Camelot key.';
 
 export const metadata: Metadata = pageMetadata({ title: TITLE, description: DESCRIPTION, path: PATH });
-
-/** Decorative "one tall playlist fans out into many" art for the featured card. */
-function FanOutArt() {
-  return (
-    <span
-      aria-hidden="true"
-      className="flex aspect-video flex-[0_1_320px] items-center justify-center gap-1.5 rounded-card bg-[radial-gradient(400px_220px_at_70%_50%,#4C1D95_0%,#141416_75%)]"
-    >
-      <span className="h-[110px] w-5 rounded-sm bg-accent" />
-      <span className="h-0.5 w-6 bg-disabled" />
-      <span className="flex flex-col gap-1.5">
-        {['#D97706', '#0284C7', '#DB2777', '#0D9488'].map((c) => (
-          <span key={c} className="h-4 w-[70px] rounded-art" style={{ background: c }} />
-        ))}
-      </span>
-    </span>
-  );
-}
 
 export default function GuidesPage() {
   const featured = getGuide(FEATURED_GUIDE);
@@ -53,7 +36,9 @@ export default function GuidesPage() {
           href={`/guides/${featured.slug}`}
           className="flex flex-wrap items-center gap-7 rounded-panel bg-surface-2 p-6 text-text-1 no-underline transition-colors duration-[120ms] hover:bg-[#222226] hover:text-text-1"
         >
-          <FanOutArt />
+          <span className="relative aspect-[16/9] w-full shrink-0 overflow-hidden rounded-card sm:w-[320px]">
+            <Image src={`/images/guides/${featured.slug}.jpg`} alt="" fill sizes="(max-width: 640px) 100vw, 320px" className="object-cover" />
+          </span>
           <span className="flex flex-[1_1_320px] flex-col gap-2.5">
             <span className="text-[12px] font-bold uppercase tracking-[0.08em] text-accent-soft">Start here</span>
             <h2 className="m-0 text-[24px] font-extrabold leading-[1.1] tracking-[-0.02em] sm:text-[30px]">{featured.title}</h2>
