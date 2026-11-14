@@ -1,0 +1,39 @@
+# Pulls the latest AutoSort into your copy. Run it from your repository's Actions tab:
+# Actions → Update AutoSort → Run workflow. Vercel redeploys when the commit lands, and
+# database changes apply automatically during that deploy.
+#
+# It replaces AutoSort's files with the newest version, so code changes you made are overwritten.
+# Your settings (Vercel environment variables) and your data (the database) are not touched.
+name: Update AutoSort
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download the latest AutoSort
+        run: git clone --depth 1 https://github.com/iamtravjohnson/autosort.git "$RUNNER_TEMP/autosort"
+
+      - name: Copy it into this repository
+        # .github is left alone: GitHub doesn't let workflows edit workflow files.
+        run: rsync -a --delete --exclude .git --exclude .github "$RUNNER_TEMP/autosort/apps/web/" ./
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Already up to date."
+            exit 0
+          fi
+          version=$(node -p "require('./package.json').version")
+          git commit -m "Update AutoSort to v$version"
+          git push

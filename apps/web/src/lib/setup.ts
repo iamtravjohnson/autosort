@@ -1,5 +1,6 @@
 import 'server-only';
 import { eq, sql } from 'drizzle-orm';
+import { connection } from 'next/server';
 import { db, hasDatabaseUrl, schema } from '@/db';
 import { dailySchedule } from './access';
 import { spotifyCredentials } from './config';
@@ -15,6 +16,9 @@ export interface SetupStatus {
 
 /** What's configured on this instance, for the first-run checklist. */
 export async function setupStatus(): Promise<SetupStatus> {
+  // Always check at request time. Otherwise Next can prerender a page that calls this during the
+  // build and bake in a redirect to /setup.
+  await connection();
   const creds = spotifyCredentials();
   let dbOk = false;
   let migrated = false;

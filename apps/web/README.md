@@ -11,6 +11,10 @@ Free and open source (MIT). Up to 5 people per copy (Spotify's limit for develop
 3. In your Spotify app, add the Redirect URI shown on your AutoSort's setup page: `https://<your-app>.vercel.app/api/auth/callback/spotify`.
 4. Open your AutoSort and connect Spotify. The first person to connect is the owner and can invite up to 4 more.
 
+## Update
+
+In your repository on GitHub: **Actions → Update AutoSort → Run workflow**. It copies the latest AutoSort into your repo and Vercel redeploys. Your settings and data are kept; code changes you made are overwritten. Details: [autosort.app/docs/updating](https://autosort.app/docs/updating)
+
 ## Environment variables
 
 | Name | Required | Notes |
