@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useActionState, useEffect, useId, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
-import { addToSmartPlaylist, createFromSuggestion } from '@/app/app/sources/[id]/unmatched/actions';
+import { addToSmartPlaylist, createFromSuggestion, removeFromSource } from '@/app/app/sources/[id]/unmatched/actions';
 import { buttonClass } from '@/components/ui';
 import type { ActionState } from '@/lib/stats';
 import { ActionMessage } from './action-message';
@@ -201,6 +201,52 @@ function AddToMenu({
   );
 }
 
+/** "Remove from Favs": deletes the selected songs from the source in Spotify, after a confirm step. */
+function RemoveFromSource({ sourceId, sourceName, trackIds, onDone }: { sourceId: string; sourceName: string; trackIds: string[]; onDone: () => void }) {
+  const [state, formAction, pending] = useActionState<ActionState | null, FormData>(async (prev: ActionState | null, form: FormData) => {
+    const res = await removeFromSource(prev, form);
+    if (res.ok) onDone();
+    return res;
+  }, null);
+  const [confirming, setConfirming] = useState(false);
+  const n = trackIds.length;
+  return (
+    <div className="flex flex-col items-end gap-2">
+      {confirming && n ? (
+        <form action={formAction} onSubmit={() => setConfirming(false)} className="flex flex-wrap items-center justify-end gap-2 rounded-card bg-surface-3 px-3 py-2 text-[13px]">
+          <input type="hidden" name="sourceId" value={sourceId} />
+          {trackIds.map((id) => (
+            <input key={id} type="hidden" name="trackId" value={id} />
+          ))}
+          <span>
+            Remove {n} song{n === 1 ? '' : 's'} from {sourceName} in Spotify?
+          </span>
+          <button type="submit" className="h-8 rounded-pill bg-error px-3 text-[13px] font-bold text-white hover:bg-error/90">
+            Remove
+          </button>
+          <button type="button" onClick={() => setConfirming(false)} className="h-8 rounded-pill px-3 text-[13px] font-bold text-text-2 hover:text-text-1">
+            Cancel
+          </button>
+        </form>
+      ) : (
+        <button
+          type="button"
+          disabled={!n || pending}
+          onClick={() => setConfirming(true)}
+          className="inline-flex h-10 items-center rounded-pill border border-white/24 px-4 text-[14px] font-bold text-text-1 hover:border-error/70 hover:text-error-text disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {pending ? 'Removing…' : `Remove from ${sourceName}`}
+        </button>
+      )}
+      {state?.message ? (
+        <p role={state.ok ? 'status' : 'alert'} className={`m-0 text-[13px] ${state.ok ? 'text-success-text' : 'text-error-text'}`}>
+          {state.message}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
 export function UnmatchedList({ sourceId, sourceName, rows, targets }: { sourceId: string; sourceName: string; rows: UnmatchedRow[]; targets: MenuTarget[] }) {
   const [state, formAction, pending] = useActionState<ActionState | null, FormData>(addToSmartPlaylist, null);
   const [selected, setSelected] = useState<Set<string>>(() => new Set());
@@ -236,16 +282,19 @@ export function UnmatchedList({ sourceId, sourceName, rows, targets }: { sourceI
             </button>
           ) : null}
         </div>
-        <AddToMenu
-          action={formAction}
-          sourceId={sourceId}
-          variant="bulk"
-          label={chosen.length ? `Add ${chosen.length.toLocaleString('en-US')} to…` : 'Add to…'}
-          trackIds={chosen}
-          targets={targets}
-          sourceName={sourceName}
-          disabled={!chosen.length || pending}
-        />
+        <div className="flex flex-wrap items-start justify-end gap-2.5">
+          <RemoveFromSource sourceId={sourceId} sourceName={sourceName} trackIds={chosen} onDone={() => setSelected(new Set())} />
+          <AddToMenu
+            action={formAction}
+            sourceId={sourceId}
+            variant="bulk"
+            label={chosen.length ? `Add ${chosen.length.toLocaleString('en-US')} to…` : 'Add to…'}
+            trackIds={chosen}
+            targets={targets}
+            sourceName={sourceName}
+            disabled={!chosen.length || pending}
+          />
+        </div>
       </div>
       <div aria-live="polite" className="empty:hidden">
         {pending ? <p className="m-0 text-[14px] text-text-2">Adding and syncing with Spotify… this can take a minute.</p> : <ActionMessage state={state} />}

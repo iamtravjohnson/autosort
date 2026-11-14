@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { db, schema } from '@/db';
 import { getSmartPlaylist, getSource, userSmartPlaylists } from '@/lib/queries';
 import { requireUser } from '@/lib/session';
+import { spotifyFor } from '@/lib/spotify';
 import { friendlyError, unmatchedTracks, type ActionState } from '@/lib/stats';
 import { fromSnapshot, syncUser } from '@/lib/sync';
 
@@ -90,4 +91,38 @@ export async function addToSmartPlaylist(_prev: ActionState | null, form: FormDa
   revalidatePath('/app', 'layout');
   if (!runId) return { ok: true, message: `Saved. ${what} will be added to ${playlist.name} on the next sync (another one is running).` };
   return { ok: true, message: `Added ${what} to ${playlist.name}.` };
+}
+
+const removeSchema = z.object({ sourceId: z.uuid(), trackIds: z.array(z.string().regex(/^[A-Za-z0-9]{1,64}$/)).min(1).max(500) });
+
+/**
+ * Remove songs from the source itself in Spotify (e.g. versions Spotify no longer offers), after
+ * the user confirmed. Playlists lose the songs; Liked Songs un-likes them. AutoSort's copy of the
+ * source drops them right away, and smart playlists catch up on the next sync.
+ */
+export async function removeFromSource(_prev: ActionState | null, form: FormData): Promise<ActionState> {
+  const user = await requireUser();
+  const parsed = removeSchema.safeParse({ sourceId: form.get('sourceId'), trackIds: form.getAll('trackId') });
+  if (!parsed.success) return { message: 'Pick at least one song first.' };
+  const source = await getSource(user.id, parsed.data.sourceId);
+  if (!source) return { message: "We couldn't find that source." };
+  const uris = parsed.data.trackIds.map((id) => `spotify:track:${id}`);
+  try {
+    const client = await spotifyFor(user.id);
+    if (source.kind === 'liked') await client.removeFromLibrary(uris);
+    else if (source.playlistId) await client.removeItems(source.playlistId, uris);
+    else return { message: "We couldn't find that playlist in Spotify." };
+  } catch (err) {
+    return friendlyError(err);
+  }
+  const gone = new Set(parsed.data.trackIds);
+  if (source.snapshot) {
+    await db()
+      .update(schema.sources)
+      .set({ snapshot: source.snapshot.filter((t) => !gone.has(t.id)) })
+      .where(and(eq(schema.sources.id, source.id), eq(schema.sources.userId, user.id)));
+  }
+  revalidatePath('/app', 'layout');
+  const n = gone.size;
+  return { ok: true, message: `Removed ${n} song${n === 1 ? '' : 's'} from ${source.name} in Spotify.` };
 }
