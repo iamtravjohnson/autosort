@@ -1,17 +1,19 @@
 import { RECIPES, ruleChips } from '@autosort/core';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { AskPlaylist } from '@/components/editor/ask-playlist';
 import { SmartPlaylistCard } from '@/components/editor/playlist-card';
 import { ChevronDownIcon } from '@/components/icons';
 import { buttonClass } from '@/components/ui';
 import { userSmartPlaylists, userSources } from '@/lib/queries';
 import { requireUser } from '@/lib/session';
+import { editorSources } from './load';
 
 export const metadata: Metadata = { title: 'Smart playlists' };
 
 export default async function PlaylistsPage() {
   const user = await requireUser();
-  const [playlists, sources] = await Promise.all([userSmartPlaylists(user.id), userSources(user.id)]);
+  const [playlists, sources, askSources] = await Promise.all([userSmartPlaylists(user.id), userSources(user.id), editorSources(user.id)]);
   const sourceName = new Map(sources.map((s) => [s.id, s.name]));
   const starter = sources.find((s) => s.snapshot) ?? sources[0];
 
@@ -49,6 +51,7 @@ export default async function PlaylistsPage() {
       </header>
 
       <div className="flex flex-col gap-6 px-6 pb-8 sm:px-8">
+        <AskPlaylist sources={askSources} />
         {playlists.length === 0 ? (
           <div className="flex flex-col items-start gap-3 rounded-card bg-surface-2 p-6">
             <h2 className="m-0 text-[18px] font-bold">No smart playlists yet</h2>

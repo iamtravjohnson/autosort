@@ -17,6 +17,7 @@ import { and, eq, inArray, lt } from 'drizzle-orm';
 import { db, schema } from '@/db';
 import type { RunPlaylistResult, SmartPlaylist, Source, TrackSnapshot } from '@/db/schema';
 import { dbCache, pruneCache } from './cache';
+import { saveAutopilotPicks } from './autopilot';
 import { uploadCover } from './covers';
 import { spotifyFor } from './spotify';
 
@@ -220,7 +221,8 @@ export async function syncUser(userId: string, opts: SyncOptions): Promise<strin
     const needCovers: Array<{ playlistId: string; name: string; rule: SmartPlaylist['rule'] }> = [];
     try {
       const client = await spotifyFor(userId);
-      let playlists = await d.select().from(schema.smartPlaylists).where(eq(schema.smartPlaylists.userId, userId));
+      const everyPlaylist = await d.select().from(schema.smartPlaylists).where(eq(schema.smartPlaylists.userId, userId));
+      let playlists = everyPlaylist;
       playlists = opts.smartPlaylistIds ? playlists.filter((p) => opts.smartPlaylistIds!.includes(p.id)) : playlists.filter((p) => !p.paused);
       const userSources = await d.select().from(schema.sources).where(eq(schema.sources.userId, userId));
       const neededSourceIds = new Set(opts.smartPlaylistIds ? playlists.flatMap((p) => p.sourceIds) : userSources.map((s) => s.id));
@@ -228,6 +230,19 @@ export async function syncUser(userId: string, opts: SyncOptions): Promise<strin
       const factsBySource = new Map<string, TrackFacts[]>();
       for (const source of userSources.filter((s) => neededSourceIds.has(s.id))) {
         factsBySource.set(source.id, await analyzeSource(client, source));
+      }
+
+      // Autopilot: on a full run, create any new playlists AutoSort now recommends (e.g. the
+      // library grew into a new genre), so they sync in this same run.
+      if (!opts.smartPlaylistIds) {
+        const known = [...everyPlaylist];
+        for (const source of userSources) {
+          const facts = factsBySource.get(source.id);
+          if (!facts) continue;
+          const added = await saveAutopilotPicks(userId, source, facts, known);
+          known.push(...added);
+          playlists.push(...added);
+        }
       }
 
       for (const p of playlists) {

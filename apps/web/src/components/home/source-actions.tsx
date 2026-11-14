@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useActionState, useState } from 'react';
 import { removeSource } from '@/app/app/sources/[id]/actions';
 import { AnalyzeProgress } from '@/components/analyze/analyze-progress';
-import { useAnalysis } from '@/components/analyze/use-analysis';
+import { useAnalyzeAndAutopilot } from '@/components/analyze/use-analyze-and-autopilot';
 import { buttonClass } from '@/components/ui';
 import type { ActionState } from '@/lib/stats';
 import { ActionMessage } from './action-message';
@@ -12,7 +12,7 @@ import { SyncGlyph } from './glyphs';
 
 /** "Refresh analysis": re-reads the source with live progress. */
 export function RefreshAnalysisButton({ sourceId, sourceName, variant = 'secondary' }: { sourceId: string; sourceName: string; variant?: 'primary' | 'secondary' }) {
-  const { state, run } = useAnalysis();
+  const { state, extra, run } = useAnalyzeAndAutopilot();
   const router = useRouter();
   const busy = state.status === 'running';
   return (
@@ -20,7 +20,7 @@ export function RefreshAnalysisButton({ sourceId, sourceName, variant = 'seconda
       <button
         type="button"
         disabled={busy}
-        onClick={() => void run(sourceId).then((ok) => ok && router.refresh())}
+        onClick={() => void run(sourceId).then(({ ok }) => ok && router.refresh())}
         className={buttonClass(variant, 'md', 'disabled:cursor-wait disabled:opacity-70')}
       >
         <SyncGlyph size={16} className={busy ? 'animate-spin' : ''} />
@@ -28,7 +28,7 @@ export function RefreshAnalysisButton({ sourceId, sourceName, variant = 'seconda
       </button>
       <div className="basis-full empty:hidden">
         {state.status === 'running' || state.status === 'done' ? (
-          <AnalyzeProgress name={sourceName} state={state} doneLabel={`Done. Read ${state.songs?.toLocaleString('en-US') ?? 0} songs.`} />
+          <AnalyzeProgress name={sourceName} state={state} extra={extra} doneLabel={`Done. Read ${state.songs?.toLocaleString('en-US') ?? 0} songs.`} />
         ) : state.status === 'error' ? (
           <ActionMessage state={{ message: state.message, reconnect: state.reconnect }} />
         ) : null}

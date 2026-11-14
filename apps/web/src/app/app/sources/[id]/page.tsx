@@ -9,6 +9,7 @@ import { GenreTreemap } from '@/components/charts/genre-treemap';
 import { MoodScatter } from '@/components/charts/mood-scatter';
 import { ChevronLeftGlyph, ExternalGlyph } from '@/components/home/glyphs';
 import { Mosaic } from '@/components/home/mosaic';
+import { AutopilotToggle } from '@/components/home/autopilot-toggle';
 import { RefreshAnalysisButton, RemoveSource } from '@/components/home/source-actions';
 import { buttonClass, SpotifyLogo } from '@/components/ui';
 import { timeAgo } from '@/lib/format';
@@ -119,6 +120,8 @@ export default async function SourcePage({ params }: Props) {
           </a>
           <RefreshAnalysisButton sourceId={source.id} sourceName={source.name} />
         </div>
+
+        <AutopilotToggle sourceId={source.id} sourceName={source.name} on={source.autopilot} />
 
         {!analyzed ? (
           <div className="flex flex-col gap-2 rounded-card bg-surface-2 p-5">

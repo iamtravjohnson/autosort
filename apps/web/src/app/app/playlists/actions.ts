@@ -1,7 +1,7 @@
 'use server';
 
-import { parseRule, ruleChips, type Rule } from '@autosort/core';
-import { and, eq } from 'drizzle-orm';
+import { parseRule, ruleChips, ruleKey, type Rule } from '@autosort/core';
+import { and, eq, inArray } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
@@ -150,6 +150,14 @@ export async function deleteSmartPlaylist(input: { id: string; removeFromSpotify
   await db()
     .delete(schema.smartPlaylists)
     .where(and(eq(schema.smartPlaylists.id, p.id), eq(schema.smartPlaylists.userId, user.id)));
+  // Autopilot won't recreate a playlist the user deleted.
+  const key = ruleKey(p.rule);
+  const fed = p.sourceIds.length
+    ? await db().select().from(schema.sources).where(and(eq(schema.sources.userId, user.id), inArray(schema.sources.id, p.sourceIds)))
+    : [];
+  for (const s of fed) {
+    if (!s.dismissedRules.includes(key)) await db().update(schema.sources).set({ dismissedRules: [...s.dismissedRules, key] }).where(eq(schema.sources.id, s.id));
+  }
   revalidatePath('/app', 'layout');
   redirect('/app/playlists');
 }
@@ -176,4 +184,31 @@ export async function regenerateCover(input: { id: string }): Promise<ActionResu
   } catch (err) {
     return spotifyErrorResult(err, { prefix: "The cover wasn't uploaded." });
   }
+}
+
+/** "Ask for a playlist": save the rule built from the user's words, build it in Spotify, then open it. */
+export async function createAskedPlaylist(input: { name: string; rule: unknown; sourceIds: string[] }): Promise<ActionResult> {
+  const user = await requireUser();
+  const parsed = z.object({ name: z.string().trim().min(1).max(100), rule: z.unknown(), sourceIds: z.array(idSchema).min(1).max(20) }).safeParse(input);
+  if (!parsed.success) return { ok: false, error: 'Give the playlist a name and pick a source, then try again.' };
+  let rule: Rule;
+  try {
+    rule = parseRule(parsed.data.rule);
+  } catch {
+    return { ok: false, error: "That request didn't turn into a rule. Try different words." };
+  }
+  const owned = new Set((await userSources(user.id)).map((s) => s.id));
+  const sourceIds = parsed.data.sourceIds.filter((id) => owned.has(id));
+  if (!sourceIds.length) return { ok: false, error: "We couldn't find that source." };
+  const [row] = await db()
+    .insert(schema.smartPlaylists)
+    .values({ userId: user.id, sourceIds, name: parsed.data.name, rule, order: { by: 'addedAt', direction: 'desc' }, sync: {} })
+    .returning({ id: schema.smartPlaylists.id });
+  try {
+    await syncUser(user.id, { kind: 'create', smartPlaylistIds: [row!.id] });
+  } catch (err) {
+    console.error('createAskedPlaylist sync failed', err);
+  }
+  revalidatePath('/app', 'layout');
+  redirect(`/app/playlists/${row!.id}`);
 }

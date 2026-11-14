@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useActionState, useEffect, useState } from 'react';
 import { addSource } from '@/app/app/sources/new/actions';
 import { AnalyzeProgress } from '@/components/analyze/analyze-progress';
-import { useAnalysis } from '@/components/analyze/use-analysis';
+import { useAnalyzeAndAutopilot } from '@/components/analyze/use-analyze-and-autopilot';
 import type { ActionState } from '@/lib/stats';
 import { ActionMessage } from './action-message';
 import { ChevronRightGlyph } from './glyphs';
@@ -26,7 +26,7 @@ export interface PickerOption {
 export function SourcePicker({ options }: { options: PickerOption[] }) {
   const [state, formAction, adding] = useActionState<ActionState | null, FormData>(addSource, null);
   const [picked, setPicked] = useState<PickerOption | null>(null);
-  const analysis = useAnalysis();
+  const analysis = useAnalyzeAndAutopilot();
   const router = useRouter();
   const newSourceId = state?.sourceId;
   const { run } = analysis;
@@ -34,8 +34,8 @@ export function SourcePicker({ options }: { options: PickerOption[] }) {
   // Once the source is added, analyze it with live progress, then open Smart suggestions.
   useEffect(() => {
     if (!newSourceId) return;
-    void run(newSourceId).then((ok) => {
-      if (ok) router.push(`/app/sources/${newSourceId}/suggestions`);
+    void run(newSourceId).then(({ ok, created }) => {
+      if (ok) router.push(created.length ? '/app/playlists' : `/app/sources/${newSourceId}/suggestions`);
     });
   }, [newSourceId, run, router]);
 
@@ -47,7 +47,7 @@ export function SourcePicker({ options }: { options: PickerOption[] }) {
     <form action={formAction} className="flex flex-col gap-4">
       <div aria-live="polite" className="empty:hidden">
         {pending && picked ? (
-          <AnalyzeProgress name={picked.name} state={analysis.state} doneLabel="Opening your smart suggestions…" />
+          <AnalyzeProgress name={picked.name} state={analysis.state} extra={analysis.extra} doneLabel="Creating your smart playlists…" />
         ) : failed && newSourceId ? (
           <ActionMessage
             state={{

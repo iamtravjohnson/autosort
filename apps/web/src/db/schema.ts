@@ -80,6 +80,10 @@ export const sources = pgTable(
     snapshotAt: timestamp('snapshot_at', { withTimezone: true }),
     /** Lookups still pending from the last analysis (BPM/key, years, tags). */
     pending: jsonb('pending').$type<Record<string, number>>(),
+    /** Autopilot: create the smart playlists AutoSort recommends, now and as the library grows. */
+    autopilot: boolean('autopilot').notNull().default(true),
+    /** Rule keys of recommended playlists the user deleted, so Autopilot doesn't make them again. */
+    dismissedRules: jsonb('dismissed_rules').$type<string[]>().notNull().default([]),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [index('sources_user_idx').on(t.userId)],

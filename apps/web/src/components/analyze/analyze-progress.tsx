@@ -51,7 +51,13 @@ function Row({ label, detail, state }: { label: string; detail: string; state: '
  * Live progress for an analysis: real counts per step, an elapsed clock, and a bar that keeps
  * moving (it never shows less than a slow, time-based estimate, so it can't look frozen).
  */
-export function AnalyzeProgress({ name, state, doneLabel }: { name: string; state: AnalysisState; doneLabel: string }) {
+export interface ExtraStep {
+  label: string;
+  detail: string;
+  state: 'waiting' | 'working' | 'done';
+}
+
+export function AnalyzeProgress({ name, state, doneLabel, extra }: { name: string; state: AnalysisState; doneLabel: string; extra?: ExtraStep | null }) {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     if (state.status !== 'running') return;
@@ -144,6 +150,7 @@ export function AnalyzeProgress({ name, state, doneLabel }: { name: string; stat
           }
           state={finished ? 'done' : read ? 'working' : 'waiting'}
         />
+        {extra ? <Row label={extra.label} detail={extra.detail} state={extra.state} /> : null}
       </ul>
 
       {finished ? null : <p className="m-0 text-[13px] text-text-3">Keep this page open. Big playlists can take a few minutes the first time.</p>}

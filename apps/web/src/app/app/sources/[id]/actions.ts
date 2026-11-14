@@ -9,7 +9,8 @@ import { getSource, userSmartPlaylists } from '@/lib/queries';
 import { requireUser } from '@/lib/session';
 import { spotifyFor } from '@/lib/spotify';
 import { friendlyError, type ActionState } from '@/lib/stats';
-import { analyzeSource } from '@/lib/sync';
+import { saveAutopilotPicks } from '@/lib/autopilot';
+import { analyzeSource, fromSnapshot, syncUser } from '@/lib/sync';
 
 const idSchema = z.object({ sourceId: z.uuid() });
 
@@ -53,4 +54,39 @@ export async function removeSource(_prev: ActionState | null, form: FormData): P
   await d.delete(schema.sources).where(and(eq(schema.sources.id, source.id), eq(schema.sources.userId, user.id)));
   revalidatePath('/app', 'layout');
   redirect('/app/sources');
+}
+
+/**
+ * Autopilot, right after an analysis: create every smart playlist AutoSort recommends for this
+ * source (skipping ones the user deleted before), then build them in Spotify.
+ */
+export async function autopilotNow(sourceId: string): Promise<{ ok: true; created: string[] } | { ok: false; error: string }> {
+  const user = await requireUser();
+  const id = z.uuid().safeParse(sourceId);
+  const source = id.success ? await getSource(user.id, id.data) : null;
+  if (!source) return { ok: false, error: "We couldn't find that source." };
+  if (!source.autopilot || !source.snapshot?.length) return { ok: true, created: [] };
+  const rows = await saveAutopilotPicks(user.id, source, source.snapshot.map(fromSnapshot), await userSmartPlaylists(user.id));
+  if (rows.length) {
+    try {
+      await syncUser(user.id, { kind: 'create', smartPlaylistIds: rows.map((r) => r.id) });
+    } catch (err) {
+      // They're saved; the next sync builds them in Spotify.
+      console.error('autopilotNow sync failed', err);
+    }
+  }
+  revalidatePath('/app', 'layout');
+  return { ok: true, created: rows.map((r) => r.name) };
+}
+
+/** Turn Autopilot on or off for a source. */
+export async function setAutopilot(sourceId: string, on: boolean): Promise<void> {
+  const user = await requireUser();
+  const id = z.uuid().safeParse(sourceId);
+  if (!id.success) return;
+  await db()
+    .update(schema.sources)
+    .set({ autopilot: on })
+    .where(and(eq(schema.sources.id, id.data), eq(schema.sources.userId, user.id)));
+  revalidatePath('/app', 'layout');
 }
