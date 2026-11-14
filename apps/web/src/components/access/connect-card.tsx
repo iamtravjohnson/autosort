@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { CheckIcon, XIcon } from '@/components/icons';
 import { Avatar } from './people';
+import { withBase } from '@/lib/base-path';
 
 const CAN = [
   { t: 'See your playlists and Liked Songs', d: 'To find what you want to organize.' },
@@ -82,7 +83,7 @@ export function ConnectCard({
         <>
           <PermissionList />
           <a
-            href={href}
+            href={withBase(href)}
             className="inline-flex h-14 w-full items-center justify-center rounded-pill bg-accent px-7 text-[17px] font-bold text-bg no-underline transition-colors duration-[120ms] hover:bg-accent-hover hover:text-bg"
           >
             {buttonLabel}
