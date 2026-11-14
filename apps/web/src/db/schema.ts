@@ -106,6 +106,8 @@ export const smartPlaylists = pgTable(
     exclude: jsonb('exclude').$type<string[]>().notNull().default([]),
     pinned: jsonb('pinned').$type<Record<string, number>>().notNull().default({}),
     spotifyPlaylistId: text('spotify_playlist_id'),
+    /** The playlist's cover in Spotify, so AutoSort can show it. */
+    imageUrl: text('image_url'),
     managedTrackIds: jsonb('managed_track_ids').$type<string[]>().notNull().default([]),
     trackCount: integer('track_count'),
     paused: boolean('paused').notNull().default(false),

@@ -5,7 +5,7 @@ import { MobileTabs, SidebarNav } from '@/components/app/nav';
 import { Logo } from '@/components/logo';
 import { SpotifyLogo } from '@/components/ui';
 import { dailySchedule } from '@/lib/access';
-import { coverGradient, timeAgo } from '@/lib/format';
+import { coverBackground, timeAgo } from '@/lib/format';
 import { lastRun, spotifyStatus, userSmartPlaylists, userSources } from '@/lib/queries';
 import { requireUser } from '@/lib/session';
 import { withBase } from '@/lib/base-path';
@@ -19,7 +19,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const schedule = dailySchedule().label.toLowerCase();
   const needsReconnect = !spotify || spotify.status === 'reconnect' || missingScopes(spotify.scope, SPOTIFY_ALL_SCOPES).length > 0;
   const library = [
-    ...playlists.map((p) => ({ id: p.id, href: `/app/playlists/${p.id}`, name: p.name, meta: `Smart · ${p.trackCount ?? 0} songs`, cover: coverGradient(p.name) })),
+    ...playlists.map((p) => ({ id: p.id, href: `/app/playlists/${p.id}`, name: p.name, meta: `Smart · ${p.trackCount ?? 0} songs`, cover: coverBackground(p.name, p.imageUrl) })),
     ...sources.map((s) => ({ id: s.id, href: `/app/sources/${s.id}`, name: s.name, meta: `Source · ${s.snapshot?.length ?? 0} songs`, cover: 'linear-gradient(90deg,#4A3B2A 50%,#2F3B4A 50%)' })),
   ];
 

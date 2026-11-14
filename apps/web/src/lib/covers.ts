@@ -100,6 +100,17 @@ async function aiCover(name: string, rule: Rule): Promise<Buffer> {
   return Buffer.from(b64, 'base64');
 }
 
+/** True when Spotify is showing its automatic 4-album mosaic (no custom cover yet). */
+export function isMosaic(url: string | null | undefined): boolean {
+  return !url || /mosaic\.scdn\.co/.test(url);
+}
+
+/** The playlist's current cover address in Spotify (null when it has none). */
+export async function playlistImage(client: SpotifyClient, playlistId: string): Promise<string | null> {
+  const raw = await client.request<{ images?: Array<{ url?: string }> | null }>('GET', `/playlists/${encodeURIComponent(playlistId)}?fields=images`);
+  return raw.images?.[0]?.url ?? null;
+}
+
 /**
  * Make and upload a cover for a smart playlist. Uses an AI image when OPENROUTER_API_KEY is set
  * (falling back to the designed cover if that fails), otherwise the designed cover.

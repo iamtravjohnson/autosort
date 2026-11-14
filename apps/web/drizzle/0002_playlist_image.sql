@@ -1,0 +1,1 @@
+ALTER TABLE "smart_playlists" ADD COLUMN "image_url" text;

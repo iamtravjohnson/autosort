@@ -49,3 +49,8 @@ export function coverGradient(name: string): string {
   const [from, to] = COVERS.find(([re]) => re.test(name))?.[1] ?? ['#8B5CF6', '#1E1B4B'];
   return `linear-gradient(145deg, ${from}, ${to})`;
 }
+
+/** CSS background for a playlist tile: its Spotify cover when known, else AutoSort's gradient. */
+export function coverBackground(name: string, imageUrl?: string | null): string {
+  return imageUrl ? `center / cover no-repeat url("${imageUrl.replace(/"/g, '%22')}"), ${coverGradient(name)}` : coverGradient(name);
+}

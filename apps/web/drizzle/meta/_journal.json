@@ -15,6 +15,13 @@
       "when": 1794634490839,
       "tag": "0001_autopilot",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794635837199,
+      "tag": "0002_playlist_image",
+      "breakpoints": true
     }
   ]
 }

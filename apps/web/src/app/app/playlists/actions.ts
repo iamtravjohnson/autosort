@@ -13,7 +13,7 @@ import { friendlyLastError, orderSchema, spotifyErrorResult, stableJson, syncSch
 import { requireUser } from '@/lib/session';
 import { spotifyFor } from '@/lib/spotify';
 import { SPOTIFY_NAME_SUFFIX, syncUser } from '@/lib/sync';
-import { aiCoversEnabled, uploadCover } from '@/lib/covers';
+import { aiCoversEnabled, playlistImage, uploadCover } from '@/lib/covers';
 
 const draftSchema = z.object({
   name: z.string().trim().min(1, 'Give it a name.').max(100, 'Keep the name under 100 characters.'),
@@ -171,7 +171,12 @@ export async function regenerateCover(input: { id: string }): Promise<ActionResu
   if (!p) return { ok: false, error: "We couldn't find that playlist." };
   if (!p.spotifyPlaylistId) return { ok: false, error: 'Save the playlist to Spotify first, then make a cover.' };
   try {
-    const kind = await uploadCover(await spotifyFor(user.id), p.spotifyPlaylistId, p);
+    const client = await spotifyFor(user.id);
+    const kind = await uploadCover(client, p.spotifyPlaylistId, p);
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    const imageUrl = await playlistImage(client, p.spotifyPlaylistId).catch(() => null);
+    if (imageUrl) await db().update(schema.smartPlaylists).set({ imageUrl }).where(eq(schema.smartPlaylists.id, p.id));
+    revalidatePath('/app', 'layout');
     return {
       ok: true,
       message:

@@ -18,7 +18,7 @@ import { db, schema } from '@/db';
 import type { RunPlaylistResult, SmartPlaylist, Source, TrackSnapshot } from '@/db/schema';
 import { dbCache, pruneCache } from './cache';
 import { saveAutopilotPicks } from './autopilot';
-import { uploadCover } from './covers';
+import { isMosaic, playlistImage, uploadCover } from './covers';
 import { spotifyFor } from './spotify';
 
 /** Suffix on playlists AutoSort creates in Spotify (the app shows the plain name). */
@@ -289,9 +289,36 @@ export async function syncUser(userId: string, opts: SyncOptions): Promise<strin
         results.push(result);
       }
 
-      // Covers for new playlists, a few at a time (AI images take ~20 s each). Failures don't fail the run.
-      for (let i = 0; i < needCovers.length; i += 4) {
-        await Promise.allSettled(needCovers.slice(i, i + 4).map((c) => uploadCover(client, c.playlistId, c)));
+      // Covers: one for every new playlist, plus any playlist still showing Spotify's automatic
+      // mosaic (an earlier upload failed). A cover the user set in Spotify is left alone. Then
+      // remember each cover's address so AutoSort can show it. Failures don't fail the run.
+      const coverQueue = new Map(needCovers.map((c) => [c.playlistId, c]));
+      const images = new Map<string, string | null>();
+      for (const r of results) {
+        if (!r.playlistId || r.error || coverQueue.has(r.playlistId)) continue;
+        const p = playlists.find((x) => x.id === r.smartPlaylistId);
+        if (!p || (p.imageUrl && !isMosaic(p.imageUrl))) continue;
+        const url = await playlistImage(client, r.playlistId).catch(() => undefined);
+        if (url === undefined) continue;
+        images.set(r.playlistId, url);
+        if (isMosaic(url)) coverQueue.set(r.playlistId, { playlistId: r.playlistId, name: p.name, rule: p.rule });
+      }
+      const queue = [...coverQueue.values()].slice(0, 24);
+      for (let i = 0; i < queue.length; i += 4) {
+        const batch = queue.slice(i, i + 4);
+        const settled = await Promise.allSettled(batch.map((c) => uploadCover(client, c.playlistId, c)));
+        settled.forEach((s, j) => {
+          if (s.status === 'rejected') console.error(`Cover upload failed for "${batch[j]!.name}":`, s.reason instanceof Error ? s.reason.message : s.reason);
+        });
+      }
+      if (queue.length) {
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+        for (const c of queue) images.set(c.playlistId, await playlistImage(client, c.playlistId).catch(() => null));
+      }
+      for (const r of results) {
+        if (r.smartPlaylistId && r.playlistId && images.has(r.playlistId)) {
+          await d.update(schema.smartPlaylists).set({ imageUrl: images.get(r.playlistId) ?? null }).where(eq(schema.smartPlaylists.id, r.smartPlaylistId));
+        }
       }
 
       const allPlaylists = await d.select().from(schema.smartPlaylists).where(eq(schema.smartPlaylists.userId, userId));

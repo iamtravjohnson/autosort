@@ -2,7 +2,7 @@ import { ruleChips } from '@autosort/core';
 import Link from 'next/link';
 import { AlertIcon, ExternalIcon, MusicIcon } from '@/components/icons';
 import type { SmartPlaylist } from '@/db/schema';
-import { coverGradient, timeAgo } from '@/lib/format';
+import { coverBackground, timeAgo } from '@/lib/format';
 import { friendlyLastError, spotifyPlaylistUrl } from '@/lib/rules-ui';
 
 const DAY = 86_400_000;
@@ -25,11 +25,11 @@ export function SmartPlaylistCard({ playlist: p, sourceNames }: { playlist: Smar
     >
       <span
         className="relative flex aspect-square flex-col justify-between rounded-sm p-3.5"
-        style={{ background: coverGradient(p.name), opacity: p.paused ? 0.55 : 1 }}
+        style={{ background: coverBackground(p.name, p.imageUrl), opacity: p.paused ? 0.55 : 1 }}
         aria-hidden="true"
       >
-        <MusicIcon size={26} className="text-bg" />
-        <span className="line-clamp-3 text-[22px] font-extrabold leading-none tracking-[-0.03em] text-bg">{p.name}</span>
+        {p.imageUrl ? <span /> : <MusicIcon size={26} className="text-bg" />}
+        {p.imageUrl ? null : <span className="line-clamp-3 text-[22px] font-extrabold leading-none tracking-[-0.03em] text-bg">{p.name}</span>}
         {today ? <span className="tnum absolute right-2.5 top-2.5 rounded-pill bg-bg px-2.5 py-[3px] text-[12px] font-bold text-text-1">+{today} today</span> : null}
       </span>
 

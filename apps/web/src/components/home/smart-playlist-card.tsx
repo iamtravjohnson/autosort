@@ -1,7 +1,7 @@
 import { ruleChips } from '@autosort/core';
 import Link from 'next/link';
 import type { SmartPlaylist } from '@/db/schema';
-import { coverGradient, timeAgo } from '@/lib/format';
+import { coverBackground, timeAgo } from '@/lib/format';
 import { isWithinDay } from '@/lib/stats';
 import { ExternalGlyph, MusicGlyph, PauseGlyph, WarningGlyph } from './glyphs';
 import { withBase } from '@/lib/base-path';
@@ -30,11 +30,11 @@ export function SmartPlaylistCard({ playlist: p, from, needsReconnect }: { playl
     >
       <div
         className={`relative flex aspect-square flex-col justify-between rounded-sm p-3 sm:p-3.5 ${p.paused ? 'opacity-55' : ''}`}
-        style={{ background: coverGradient(p.name) }}
+        style={{ background: coverBackground(p.name, p.imageUrl) }}
         aria-hidden="true"
       >
-        <MusicGlyph size={24} className="text-bg" />
-        <span className="line-clamp-3 text-[19px] font-extrabold leading-none tracking-[-0.03em] text-bg sm:text-[22px]">{p.name}</span>
+        {p.imageUrl ? <span /> : <MusicGlyph size={24} className="text-bg" />}
+        {p.imageUrl ? null : <span className="line-clamp-3 text-[19px] font-extrabold leading-none tracking-[-0.03em] text-bg sm:text-[22px]">{p.name}</span>}
         {today ? (
           <span className="tnum absolute right-2 top-2 rounded-pill bg-bg px-2 py-0.5 text-[11px] font-bold text-text-1 sm:right-2.5 sm:top-2.5 sm:px-[9px] sm:py-[3px] sm:text-[12px]">
             +{today} today
