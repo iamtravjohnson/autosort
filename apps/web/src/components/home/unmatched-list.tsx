@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useActionState, useEffect, useId, useRef, useState } from 'react';
+import { useActionState, useEffect, useId, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { addToSmartPlaylist, createFromSuggestion } from '@/app/app/sources/[id]/unmatched/actions';
 import { buttonClass } from '@/components/ui';
 import type { ActionState } from '@/lib/stats';
@@ -21,8 +21,14 @@ export interface UnmatchedRow {
 export interface MenuTarget {
   id: string;
   name: string;
+  /** CSS background: the playlist's real cover when known, else its gradient. */
   cover: string;
+  songs: number | null;
+  /** "Genres", "By decade", "Moods", "Themes" or "Other", for grouping the menu. */
+  group: string;
 }
+
+const GROUP_ORDER = ['Genres', 'By decade', 'Moods', 'Themes', 'Other'];
 
 export interface SuggestionView {
   key: string;
@@ -58,12 +64,35 @@ function AddToMenu({
   up?: boolean;
 }) {
   const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState('');
   const menuId = useId();
   const wrap = useRef<HTMLFormElement>(null);
   const button = useRef<HTMLButtonElement>(null);
+  const list = useRef<HTMLDivElement>(null);
+  const search = useRef<HTMLInputElement>(null);
+  const searchable = targets.length > 6;
+
+  const q = query.trim().toLowerCase();
+  const shown = q ? targets.filter((t) => t.name.toLowerCase().includes(q)) : targets;
+  const groups = GROUP_ORDER.map((g) => ({ name: g, items: shown.filter((t) => t.group === g).sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true })) })).filter(
+    (g) => g.items.length,
+  );
+
+  // Arrow keys move between options; the search box hands off to the first one.
+  const moveFocus = (e: ReactKeyboardEvent) => {
+    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+    const options = [...(list.current?.querySelectorAll<HTMLButtonElement>('[data-option]') ?? [])];
+    if (!options.length) return;
+    e.preventDefault();
+    const at = options.indexOf(document.activeElement as HTMLButtonElement);
+    const next = e.key === 'ArrowDown' ? (at + 1) % options.length : at <= 0 ? options.length - 1 : at - 1;
+    options[next]?.focus();
+  };
 
   useEffect(() => {
     if (!open) return;
+    if (searchable) search.current?.focus();
+    else list.current?.querySelector<HTMLButtonElement>('[data-option]')?.focus();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setOpen(false);
@@ -94,7 +123,10 @@ function AddToMenu({
         aria-expanded={open}
         aria-controls={menuId}
         disabled={disabled}
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => {
+          setQuery('');
+          setOpen((o) => !o);
+        }}
         className={
           variant === 'bulk'
             ? 'inline-flex h-10 items-center gap-1.5 rounded-pill bg-white px-4 text-[14px] font-bold text-bg hover:bg-white/90 disabled:cursor-not-allowed disabled:bg-surface-3 disabled:text-text-3'
@@ -109,27 +141,58 @@ function AddToMenu({
           <div className="fixed inset-0 z-40 bg-black/55 sm:hidden" aria-hidden="true" onClick={() => setOpen(false)} />
           <div
             id={menuId}
-            className={`fixed inset-x-0 bottom-0 z-50 flex max-h-[70dvh] flex-col overflow-y-auto rounded-t-panel bg-surface-3 p-3 pb-[max(env(safe-area-inset-bottom),16px)] shadow-[0_-24px_64px_rgba(0,0,0,0.65)] sm:absolute sm:inset-x-auto sm:right-0 sm:max-h-[320px] ${up ? 'sm:bottom-full sm:mb-1.5' : 'sm:bottom-auto sm:top-full sm:mt-1.5'} sm:w-60 sm:rounded-card sm:p-1.5 sm:pb-1.5 sm:shadow-e3`}
+            onKeyDown={moveFocus}
+            className={`fixed inset-x-0 bottom-0 z-50 flex max-h-[75dvh] flex-col rounded-t-panel border border-white/10 bg-surface-3 pb-[max(env(safe-area-inset-bottom),12px)] shadow-[0_-24px_64px_rgba(0,0,0,0.65)] sm:absolute sm:inset-x-auto sm:right-0 sm:max-h-[440px] sm:w-[320px] sm:rounded-card sm:pb-0 sm:shadow-e3 ${up ? 'sm:bottom-full sm:mb-2' : 'sm:bottom-auto sm:top-full sm:mt-2'}`}
           >
-            <p className="m-0 px-2.5 pb-2 pt-1 text-[15px] font-bold sm:hidden">{label.replace('…', '')}</p>
-            {targets.length ? (
-              targets.map((t) => (
-                <button
-                  key={t.id}
-                  type="submit"
-                  name="playlistId"
-                  value={t.id}
-                  className="flex min-h-11 items-center gap-2.5 rounded-sm px-2.5 py-2 text-left text-[14px] font-semibold text-text-1 hover:bg-white/[0.06] sm:min-h-0"
-                >
-                  <span className="size-6 shrink-0 rounded-art" style={{ background: t.cover }} aria-hidden="true" />
-                  {t.name}
-                </button>
-              ))
-            ) : (
-              <p className="m-0 px-2.5 py-2 text-[13px] text-text-2">No smart playlists read from {sourceName} yet.</p>
-            )}
-            <span className="mt-1 border-t border-line px-2.5 pb-1 pt-2 text-[12px] text-text-3">
-              {trackIds.length === 1 ? 'Adds it as a manual pin.' : 'Adds them as manual pins.'}
+            <div className="flex flex-col gap-2.5 border-b border-line px-3.5 pb-3 pt-3.5">
+              <span className="text-[14px] font-bold text-text-1">
+                {trackIds.length > 1 ? `Add ${trackIds.length.toLocaleString('en-US')} songs to…` : 'Add to a smart playlist'}
+              </span>
+              {searchable ? (
+                <input
+                  ref={search}
+                  type="search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Find a playlist"
+                  aria-label="Find a playlist"
+                  className="h-9 rounded-pill border border-line bg-surface-1 px-3.5 text-[14px] text-text-1 placeholder:text-text-3 focus:border-accent focus:outline-none"
+                />
+              ) : null}
+            </div>
+            <div ref={list} role="listbox" aria-label="Smart playlists" className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain p-1.5">
+              {targets.length === 0 ? (
+                <p className="m-0 px-2.5 py-3 text-[13px] text-text-2">No smart playlists read from {sourceName} yet.</p>
+              ) : groups.length === 0 ? (
+                <p className="m-0 px-2.5 py-3 text-[13px] text-text-2">No playlist matches “{query}”.</p>
+              ) : (
+                groups.map((g) => (
+                  <div key={g.name} role="group" aria-label={g.name} className="flex flex-col pb-1">
+                    <span className="px-2.5 pb-1 pt-2 text-[11px] font-bold uppercase tracking-[0.08em] text-text-3">{g.name}</span>
+                    {g.items.map((t) => (
+                      <button
+                        key={t.id}
+                        type="submit"
+                        name="playlistId"
+                        value={t.id}
+                        data-option
+                        role="option"
+                        aria-selected={false}
+                        className="flex min-h-12 items-center gap-3 rounded-sm px-2.5 py-1.5 text-left outline-none hover:bg-white/[0.07] focus-visible:bg-white/[0.09] focus-visible:ring-2 focus-visible:ring-accent/60"
+                      >
+                        <span className="size-9 shrink-0 rounded-[6px] shadow-[0_2px_6px_rgba(0,0,0,0.35)]" style={{ background: t.cover }} aria-hidden="true" />
+                        <span className="flex min-w-0 flex-1 flex-col">
+                          <span className="truncate text-[14px] font-semibold text-text-1">{t.name}</span>
+                          {t.songs !== null ? <span className="tnum text-[12px] text-text-3">{t.songs.toLocaleString('en-US')} songs</span> : null}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                ))
+              )}
+            </div>
+            <span className="border-t border-line px-3.5 py-2.5 text-[12px] text-text-3">
+              {trackIds.length === 1 ? 'Pins it into the playlist, even if the rules don’t match.' : 'Pins them into the playlist, even if the rules don’t match.'}
             </span>
           </div>
         </>

@@ -1,11 +1,11 @@
-import { ruleChips, suggestPlaylists } from '@autosort/core';
+import { ruleChips, suggestPlaylists, type Rule } from '@autosort/core';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { CheckGlyph } from '@/components/home/glyphs';
 import { type MenuTarget, type SuggestionView, type UnmatchedRow, UnmatchedList, UnmatchedSuggestions } from '@/components/home/unmatched-list';
 import { SpotifyLogo } from '@/components/ui';
-import { coverGradient } from '@/lib/format';
+import { coverBackground, coverGradient } from '@/lib/format';
 import { getSource, userSmartPlaylists } from '@/lib/queries';
 import { requireUser } from '@/lib/session';
 import { genreText, moodLabel, playlistsFeeding, unmatchedTracks } from '@/lib/stats';
@@ -15,6 +15,16 @@ type Props = { params: Promise<{ id: string }> };
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const MAX_ROWS = 500;
+
+/** Which section of the "Add to…" menu a playlist goes in, from its rule. */
+function menuGroup(rule: Rule): string {
+  const fields = new Set(rule.conditions.flatMap((c) => ('match' in c ? [] : [c.field])));
+  if (fields.has('decade') || fields.has('year')) return 'By decade';
+  if (fields.has('genre')) return 'Genres';
+  if (fields.has('mood')) return 'Moods';
+  if (fields.has('theme')) return 'Themes';
+  return 'Other';
+}
 
 export const metadata: Metadata = { title: 'Unmatched songs · AutoSort' };
 
@@ -31,7 +41,13 @@ export default async function UnmatchedPage({ params }: Props) {
   const suggestions: SuggestionView[] = suggestPlaylists(unmatched.map(fromSnapshot), { existingRules: playlists.map((p) => p.rule), minSize: 5 })
     .slice(0, 3)
     .map((s) => ({ key: s.key, name: s.name, count: s.count, chips: ruleChips(s.rule), cover: coverGradient(s.name) }));
-  const targets: MenuTarget[] = playlistsFeeding(source.id, playlists).map((p) => ({ id: p.id, name: p.name, cover: coverGradient(p.name) }));
+  const targets: MenuTarget[] = playlistsFeeding(source.id, playlists).map((p) => ({
+    id: p.id,
+    name: p.name,
+    cover: coverBackground(p.name, p.imageUrl),
+    songs: p.trackCount,
+    group: menuGroup(p.rule),
+  }));
   const rows: UnmatchedRow[] = unmatched.slice(0, MAX_ROWS).map((t) => ({
     id: t.id,
     title: t.name,
