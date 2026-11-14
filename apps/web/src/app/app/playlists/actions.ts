@@ -13,7 +13,7 @@ import { friendlyLastError, orderSchema, spotifyErrorResult, stableJson, syncSch
 import { requireUser } from '@/lib/session';
 import { spotifyFor } from '@/lib/spotify';
 import { SPOTIFY_NAME_SUFFIX, syncUser } from '@/lib/sync';
-import { aiCoversEnabled, playlistImage, uploadCover } from '@/lib/covers';
+import { aiCoversEnabled, COVER_CONCURRENCY, playlistImage, uploadCover } from '@/lib/covers';
 
 const draftSchema = z.object({
   name: z.string().trim().min(1, 'Give it a name.').max(100, 'Keep the name under 100 characters.'),
@@ -207,11 +207,15 @@ export async function regenerateAllCovers(): Promise<ActionResult & { made?: num
   }
   let made = 0;
   let failed = 0;
-  for (let i = 0; i < rows.length; i += 4) {
-    const batch = rows.slice(i, i + 4);
+  let plain = 0;
+  for (let i = 0; i < rows.length; i += COVER_CONCURRENCY) {
+    const batch = rows.slice(i, i + COVER_CONCURRENCY);
     const settled = await Promise.allSettled(batch.map((p) => uploadCover(client, p.spotifyPlaylistId!, p)));
     settled.forEach((s, j) => {
-      if (s.status === 'fulfilled') made++;
+      if (s.status === 'fulfilled') {
+        made++;
+        if (s.value === 'designed' && aiCoversEnabled()) plain++;
+      }
       else {
         failed++;
         console.error(`Cover upload failed for "${batch[j]!.name}":`, s.reason instanceof Error ? s.reason.message : s.reason);
@@ -225,6 +229,13 @@ export async function regenerateAllCovers(): Promise<ActionResult & { made?: num
   }
   revalidatePath('/app', 'layout');
   if (failed) return { ok: false, made, failed, error: `${failed} cover${failed === 1 ? '' : 's'} didn’t upload. Try again in a minute.` };
+  if (plain)
+    return {
+      ok: false,
+      made,
+      failed,
+      error: `${plain} of ${made} covers got the color design because the photo service turned them down, usually because your OpenRouter credits are running low. Add credits at openrouter.ai/settings/credits, then click again.`,
+    };
   return { ok: true, made, failed };
 }
 

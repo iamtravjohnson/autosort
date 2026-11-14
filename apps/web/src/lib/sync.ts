@@ -18,7 +18,7 @@ import { db, schema } from '@/db';
 import type { RunPlaylistResult, SmartPlaylist, Source, TrackSnapshot } from '@/db/schema';
 import { dbCache, pruneCache } from './cache';
 import { saveAutopilotPicks } from './autopilot';
-import { isMosaic, playlistImage, uploadCover } from './covers';
+import { COVER_CONCURRENCY, isMosaic, playlistImage, uploadCover } from './covers';
 import { spotifyFor } from './spotify';
 
 /** Suffix on playlists AutoSort creates in Spotify (the app shows the plain name). */
@@ -304,8 +304,8 @@ export async function syncUser(userId: string, opts: SyncOptions): Promise<strin
         if (isMosaic(url)) coverQueue.set(r.playlistId, { playlistId: r.playlistId, name: p.name, rule: p.rule });
       }
       const queue = [...coverQueue.values()].slice(0, 24);
-      for (let i = 0; i < queue.length; i += 4) {
-        const batch = queue.slice(i, i + 4);
+      for (let i = 0; i < queue.length; i += COVER_CONCURRENCY) {
+        const batch = queue.slice(i, i + COVER_CONCURRENCY);
         const settled = await Promise.allSettled(batch.map((c) => uploadCover(client, c.playlistId, c)));
         settled.forEach((s, j) => {
           if (s.status === 'rejected') console.error(`Cover upload failed for "${batch[j]!.name}":`, s.reason instanceof Error ? s.reason.message : s.reason);
