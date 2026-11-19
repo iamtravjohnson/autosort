@@ -7,13 +7,13 @@ import { buttonClass, SpotifyLogo } from '@/components/ui';
 import { userSmartPlaylists } from '@/lib/queries';
 import { spotifyErrorResult, type ActionError } from '@/lib/rules-ui';
 import { requireUser } from '@/lib/session';
-import { spotifyFor } from '@/lib/spotify';
+import { listMyPlaylists } from '@/lib/spotify';
 
 export const metadata: Metadata = { title: 'Sort a playlist' };
 
 async function loadPlaylists(userId: string): Promise<{ playlists: PlaylistSummary[]; error: ActionError | null }> {
   try {
-    return { playlists: await (await spotifyFor(userId)).myPlaylists(), error: null };
+    return { playlists: await listMyPlaylists(userId), error: null };
   } catch (err) {
     console.error('sort list load failed', err);
     return { playlists: [], error: spotifyErrorResult(err) };

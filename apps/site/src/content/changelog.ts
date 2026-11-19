@@ -22,12 +22,25 @@ export interface Release {
 
 export const releases: Release[] = [
   {
+    id: 'app-v0-4-1',
+    product: 'App',
+    version: 'v0.4.1',
+    date: '2026-11-19',
+    title: 'Clearer Spotify rate limits',
+    latest: true,
+    items: [
+      { kind: 'Fixed', text: 'When Spotify rate-limits your AutoSort, the message now says how long the pause lasts (in Development Mode it can be hours) instead of “try again in a minute”.' },
+      { kind: 'Improved', text: 'During a pause, AutoSort stops calling that part of Spotify, so reloads and the daily sync don’t add requests, and the logs show the wait Spotify asked for.' },
+      { kind: 'Improved', text: 'Your playlist list is reused for a minute as you move between Home, Add a source and Sort.' },
+    ],
+    notesUrl: `${site.github}/tree/main/apps/web`,
+  },
+  {
     id: 'app-v0-4-0',
     product: 'App',
     version: 'v0.4.0',
     date: '2026-11-14',
     title: 'Album mosaic covers and cleaning up your source',
-    latest: true,
     items: [
       { kind: 'New', text: 'Choose a cover style in Settings: Spotify’s own album mosaic (the new default), a photo, or a designed cover. Switching existing playlists to mosaics rebuilds them as fresh copies with the same songs.' },
       { kind: 'New', text: 'Remove songs from your source playlist right from Unmatched, handy for versions Spotify no longer offers.' },

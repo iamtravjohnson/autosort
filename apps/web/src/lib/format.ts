@@ -21,6 +21,20 @@ export function duration(ms: number): string {
   return h ? `${h} hr ${m} min` : `${m} min`;
 }
 
+/** "a minute or two", "about 40 minutes", "about an hour", "about 6 hours". */
+export function waitText(ms: number): string {
+  const min = Math.ceil(ms / 60_000);
+  if (min <= 2) return 'a minute or two';
+  if (min < 60) return `about ${min} minutes`;
+  const h = Math.round(min / 60);
+  return h <= 1 ? 'about an hour' : `about ${h} hours`;
+}
+
+/** What to say while Spotify has AutoSort on a rate-limit pause that ends at `until` (epoch ms). */
+export function pausedText(until: number): string {
+  return `Spotify asked us to slow down for ${waitText(until - Date.now())}, so try again after that. Reloading sooner won’t help.`;
+}
+
 export function trackTime(ms: number): string {
   const s = Math.round(ms / 1000);
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;

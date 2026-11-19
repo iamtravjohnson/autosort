@@ -7,7 +7,7 @@ import { SpotifyLogo } from '@/components/ui';
 import type { Source, User } from '@/db/schema';
 import { userSmartPlaylists, userSources } from '@/lib/queries';
 import { requireUser } from '@/lib/session';
-import { spotifyFor } from '@/lib/spotify';
+import { listMyPlaylists } from '@/lib/spotify';
 import { friendlyError } from '@/lib/stats';
 import { SPOTIFY_NAME_SUFFIX } from '@/lib/sync';
 import { withBase } from '@/lib/base-path';
@@ -19,7 +19,7 @@ const ART = ['#4A3B2A', '#2F3B4A', '#3A2F4A', '#4A4530', '#2F4A40', '#4A302F', '
 async function PickerList({ user, sources }: { user: User; sources: Source[] }) {
   let lists: PlaylistSummary[];
   try {
-    lists = await (await spotifyFor(user.id)).myPlaylists();
+    lists = await listMyPlaylists(user.id);
   } catch (err) {
     const e = friendlyError(err);
     return (

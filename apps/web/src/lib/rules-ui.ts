@@ -19,6 +19,7 @@ import {
 } from '@autosort/core';
 import { z } from 'zod';
 import type { TrackSnapshot } from '@/db/schema';
+import { pausedText } from './format';
 
 /* ---------- Tracks sent to the browser ---------- */
 
@@ -136,12 +137,13 @@ export type ActionError = Extract<ActionResult, { ok: false }>;
 
 /** Turn an error from Spotify (or the token store) into a friendly message. Duck-typed so it's client-safe. */
 export function spotifyErrorResult(err: unknown, opts: { forbidden?: string; prefix?: string } = {}): ActionError {
-  const e = (err ?? {}) as { name?: string; status?: number; message?: string };
+  const e = (err ?? {}) as { name?: string; status?: number; message?: string; until?: number };
   const prefix = opts.prefix ? `${opts.prefix} ` : '';
   if (e.name === 'ReconnectNeeded') return { ok: false, reconnect: true, error: `${prefix}Spotify signed you out of AutoSort.` };
+  if (e.name === 'SpotifyPaused' && typeof e.until === 'number') return { ok: false, error: `${prefix}${pausedText(e.until)}` };
   if (e.status === 403)
     return { ok: false, error: `${prefix}${opts.forbidden ?? "Spotify says you're not on this AutoSort's Spotify user list yet. Ask the owner to add you."}` };
-  if (e.status === 429) return { ok: false, error: `${prefix}Spotify asked us to slow down. Try again in a minute.` };
+  if (e.status === 429) return { ok: false, error: `${prefix}Spotify asked us to slow down. Try again in a few minutes.` };
   if (e.status === 404) return { ok: false, error: `${prefix}Spotify couldn't find that playlist. It may have been deleted.` };
   return { ok: false, error: `${prefix}Something went wrong talking to Spotify. Try again in a minute.` };
 }

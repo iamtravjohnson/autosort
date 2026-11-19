@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { SpotifyLogo } from '@/components/ui';
 import type { User } from '@/db/schema';
-import { spotifyFor } from '@/lib/spotify';
+import { listMyPlaylists } from '@/lib/spotify';
 import { friendlyError } from '@/lib/stats';
 import { SPOTIFY_NAME_SUFFIX } from '@/lib/sync';
 import { InfoGlyph, LockGlyph } from './glyphs';
@@ -30,7 +30,7 @@ function Header() {
 export async function OtherPlaylists({ user, hideIds }: { user: User; hideIds: string[] }) {
   let lists: PlaylistSummary[];
   try {
-    lists = await (await spotifyFor(user.id)).myPlaylists();
+    lists = await listMyPlaylists(user.id);
   } catch (err) {
     const e = friendlyError(err);
     return (

@@ -76,9 +76,15 @@ export default function TroubleshootingPage() {
 
       <ErrorSection id="rate" code="429 · Too many requests" title="“Spotify asked us to slow down”">
         <P>
-          Nothing to fix. Spotify returns HTTP 429 when an app makes too many requests in a short time. AutoSort waits as long as
-          Spotify&apos;s <code>Retry-After</code> header asks, then retries automatically. Very large libraries may take a few extra minutes on
-          the first analysis.
+          <strong>Cause:</strong> Spotify returns HTTP 429 when your Spotify app makes too many requests. The limit belongs to the Spotify
+          app, so everyone on your AutoSort shares it. Short limits clear in seconds, and AutoSort waits them out on its own. Apps in
+          Development Mode can also be paused for hours, sometimes most of a day. AutoSort then stops calling that part of Spotify until the
+          pause ends and tells you how long it is.
+        </P>
+        <P>
+          <strong>Fix:</strong> Wait it out. Reloading doesn&apos;t help, and the daily sync picks up again by itself once the pause ends. If
+          it keeps happening, look in your Vercel project&apos;s logs for lines starting with <code>Spotify said 429</code>; they name the
+          request and how long Spotify asked AutoSort to wait.
         </P>
       </ErrorSection>
 

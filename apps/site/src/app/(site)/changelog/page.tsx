@@ -35,8 +35,8 @@ export default function ChangelogPage() {
       </div>
 
       <QuickAnswer>
-        AutoSort&apos;s latest releases are the self-hosted app v0.4.0 and engine v0.3.2 (@autosort/core on npm), published November 14,
-        2026. Recent versions added Autopilot, which creates recommended playlists for you, asking for a playlist in your own words, album
+        AutoSort&apos;s latest releases are the self-hosted app v0.4.1 (November 19, 2026) and engine v0.3.2 (@autosort/core on npm,
+        November 14, 2026). Recent versions added Autopilot, which creates recommended playlists for you, asking for a playlist in your own words, album
         mosaic covers and a genre analyzer measured on Billboard charts. The app first shipped as v0.1.0, an early release with one-click
         Deploy to Vercel.
       </QuickAnswer>

@@ -1,7 +1,8 @@
 import 'server-only';
 import { GENRE_LABELS, MOOD_LABELS, SpotifyApiError, matchesRule, type GenreBucket, type Mood } from '@autosort/core';
 import type { SmartPlaylist, Source, TrackSnapshot } from '@/db/schema';
-import { ReconnectNeeded } from './spotify';
+import { pausedText } from './format';
+import { ReconnectNeeded, SpotifyPaused } from './spotify';
 import { fromSnapshot } from './sync';
 
 /* ---------- Action results ---------- */
@@ -21,16 +22,17 @@ export interface ActionState {
 /** Turn a Spotify (or any) error into short, friendly copy. */
 export function friendlyError(err: unknown): ActionState {
   if (err instanceof ReconnectNeeded) return { message: 'Spotify signed you out.', reconnect: true };
+  if (err instanceof SpotifyPaused) return { message: pausedText(err.until) };
   if (err instanceof SpotifyApiError) {
     if (err.status === 401) return { message: 'Spotify signed you out.', reconnect: true };
     if (err.status === 403) return { message: "Spotify says you're not on this AutoSort's Spotify user list. Ask the owner to add you." };
-    if (err.status === 429) return { message: 'Spotify asked us to slow down, try again in a minute.' };
+    if (err.status === 429) return { message: 'Spotify asked us to slow down. Try again in a few minutes.' };
     if (err.status === 404) return { message: "Spotify couldn't find that playlist. It may have been deleted." };
     return { message: `Spotify had a problem (error ${err.status}). Try again in a minute.` };
   }
   const text = err instanceof Error ? err.message : String(err);
   if (/\(403\)/.test(text)) return { message: "Spotify says you're not on this AutoSort's Spotify user list. Ask the owner to add you." };
-  if (/\(429\)/.test(text)) return { message: 'Spotify asked us to slow down, try again in a minute.' };
+  if (/\(429\)/.test(text)) return { message: 'Spotify asked us to slow down. Try again in a few minutes.' };
   return { message: `Something went wrong: ${text.slice(0, 160)}` };
 }
 
